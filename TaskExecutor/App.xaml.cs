@@ -1,6 +1,6 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
+﻿using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
+using TaskExecutor.ViewModels;
 
 namespace TaskExecutor;
 
@@ -9,4 +9,31 @@ namespace TaskExecutor;
 /// </summary>
 public partial class App : Application
 {
+    public static IServiceProvider Services { get; private set; }
+    
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+
+        var services = new ServiceCollection();
+        
+        services.AddSingleton<MainWindowViewModel>();
+        
+        // services.AddSingleton<IDialogService, DialogService>();
+
+        // services.AddTransient<ApplicationsViewModel>();
+        // services.AddTransient<SubmitApplicationViewModel>();
+        // services.AddTransient<UpdateApplicationViewModel>();
+        // services.AddTransient<AboutTransmitterViewModel>();
+
+        Services = services.BuildServiceProvider();
+
+        var mainWindow = new MainWindow
+        {
+            DataContext = Services.GetRequiredService<MainWindowViewModel>()
+        };
+
+        MainWindow = mainWindow;
+        mainWindow.Show();
+    }
 }
