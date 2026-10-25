@@ -294,12 +294,16 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBox Grid.Column="0" Style="{StaticResource PlaceHolderTextBoxStyle}" />
+                    <TextBox
+                        Grid.Column="0"
+                        Style="{StaticResource PlaceHolderTextBoxStyle}"
+                        Tag="应用名称，如：钉钉" />
 
                     <TextBox
                         Grid.Column="1"
                         Margin="8,0"
-                        Style="{StaticResource PlaceHolderTextBoxStyle}" />
+                        Style="{StaticResource PlaceHolderTextBoxStyle}"
+                        Tag="com.example.package" />
 
                     <Button
                         Grid.Column="2"

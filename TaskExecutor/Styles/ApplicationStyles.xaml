@@ -163,13 +163,54 @@
         x:Key="PlaceHolderTextBoxStyle"
         BasedOn="{StaticResource FieldTextBoxStyle}"
         TargetType="TextBox">
+        <Setter Property="Padding" Value="6,0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
-                    <!--  TODO 待完善  -->
-                    <Border x:Name="FieldBorder" />
+                    <Border
+                        x:Name="FieldBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="4">
+                        <Grid>
+                            <!--  必须是这个名字，TextBox 靠它承载文本编辑器  -->
+                            <ScrollViewer x:Name="PART_ContentHost" />
+
+                            <!--  水印层  -->
+                            <TextBlock
+                                x:Name="WatermarkText"
+                                Margin="{TemplateBinding Padding}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                FontFamily="{TemplateBinding FontFamily}"
+                                FontSize="{TemplateBinding FontSize}"
+                                Foreground="{StaticResource TextDisabledBrush}"
+                                IsHitTestVisible="False"
+                                Text="{TemplateBinding Tag}"
+                                TextTrimming="CharacterEllipsis"
+                                Visibility="Collapsed" />
+                        </Grid>
+                    </Border>
 
                     <ControlTemplate.Triggers>
+                        <!--  文本为空且未获得焦点时显示水印  -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="Text" Value="" />
+                                <Condition Property="IsFocused" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="WatermarkText" Property="Visibility" Value="Visible" />
+                        </MultiTrigger>
+
+                        <!--  绑定源为 null 时 Text 可能是 null，单独兜一层  -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="Text" Value="{x:Null}" />
+                                <Condition Property="IsFocused" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="WatermarkText" Property="Visibility" Value="Visible" />
+                        </MultiTrigger>
+
                         <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter TargetName="FieldBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}" />
                         </Trigger>
