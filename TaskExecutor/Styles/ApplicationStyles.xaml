@@ -72,12 +72,10 @@
                             <Setter TargetName="ButtonContainerBorder" Property="Background" Value="{StaticResource ControlFillBrush}" />
                         </Trigger>
 
-                        <!--  危险态（Tag="Danger"）：常态红字（对应 .btn.danger-ghost）  -->
                         <Trigger Property="Tag" Value="Danger">
                             <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
                         </Trigger>
 
-                        <!--  危险 hover：边框转 50% 红（对应 .btn.danger-ghost:hover）  -->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="True" />
@@ -92,6 +90,37 @@
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.5" />
                             <Setter Property="Cursor" Value="None" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TextButtonStyle" TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="Transparent">
+                        <ContentPresenter
+                            x:Name="LinkSite"
+                            VerticalAlignment="Center"
+                            TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Cursor" Value="Hand" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Opacity" Value="0.75" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -119,6 +148,27 @@
                         CornerRadius="4">
                         <ScrollViewer x:Name="PART_ContentHost" Margin="4,0" />
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="FieldBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  带水印的圆角输入框  -->
+    <Style
+        x:Key="PlaceHolderTextBoxStyle"
+        BasedOn="{StaticResource FieldTextBoxStyle}"
+        TargetType="TextBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <!--  TODO 待完善  -->
+                    <Border x:Name="FieldBorder" />
+
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter TargetName="FieldBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}" />
