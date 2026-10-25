@@ -26,6 +26,10 @@
             <DataTemplate DataType="{x:Type vm:TargetAppViewModel}">
                 <views:TargetAppView/>
             </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type vm:EmailConfigViewModel}">
+                <views:EmailConfigView/>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

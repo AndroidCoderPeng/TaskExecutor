@@ -25,6 +25,7 @@ public partial class App : Application
         services.AddTransient<TaskManagerViewModel>();
         services.AddTransient<ImportExportViewModel>();
         services.AddTransient<TargetAppViewModel>();
+        services.AddTransient<EmailConfigViewModel>();
 
         Services = services.BuildServiceProvider();
 

@@ -51,7 +51,7 @@ public partial class MainWindowViewModel : ObservableObject
             "任务管理" => App.Services.GetRequiredService<TaskManagerViewModel>(),
             "导入导出" => App.Services.GetRequiredService<ImportExportViewModel>(),
             "目标APP" => App.Services.GetRequiredService<TargetAppViewModel>(),
-            // "邮箱配置" => App.Services.GetRequiredService<EmailConfigurationViewModel>(),
+            "邮箱配置" => App.Services.GetRequiredService<EmailConfigViewModel>(),
             // "企业微信配置" => App.Services.GetRequiredService<WeChatWorkConfigurationViewModel>(),
             // "任务等待时间" => App.Services.GetRequiredService<TaskWaitTimeViewModel>(),
             // "任务重置时间" => App.Services.GetRequiredService<TaskResetTimeViewModel>(),
