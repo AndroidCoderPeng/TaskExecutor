@@ -8,6 +8,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Colors/ApplicationColors.xaml" />
+                <ResourceDictionary Source="Styles/ApplicationStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate DataType="{x:Type vm:WiFiConnectionViewModel}">

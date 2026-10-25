@@ -1,12 +1,208 @@
-<UserControl x:Class="TaskExecutor.Views.WiFiConnectionView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:TaskExecutor.Views"
-             mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        
-    </Grid>
+<UserControl
+    x:Class="TaskExecutor.Views.WiFiConnectionView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:WiFiConnectionViewModel}"
+    mc:Ignorable="d">
+    <StackPanel Orientation="Vertical">
+        <Grid Background="{StaticResource CardBackgroundBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock
+                Grid.Column="0"
+                Margin="20"
+                FontSize="16"
+                FontWeight="SemiBold"
+                Foreground="White"
+                Text="任务管理" />
+
+            <Border
+                Grid.Column="1"
+                Margin="12,0"
+                Padding="10,6"
+                VerticalAlignment="Center"
+                Background="{StaticResource SuccessDimBrush}"
+                CornerRadius="4">
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="8" Height="8">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{StaticResource TextDisabledBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsTaskScheduled}" Value="True">
+                                        <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+
+                    <TextBlock
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource SuccessBrush}"
+                        Text="{Binding TaskState, FallbackValue=调度运行中}" />
+                </StackPanel>
+            </Border>
+
+            <Button
+                Grid.Column="2"
+                Margin="0,0,20,0"
+                Command="{Binding CreateTaskCommand}"
+                Style="{StaticResource PrimaryButtonStyle}">
+                <Button.Content>
+                    <StackPanel Margin="8,0" Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontFamily="/TaskExecutor;component/Fonts/#iconfont"
+                            FontSize="16"
+                            Foreground="White"
+                            Text="&#xe620;" />
+                        <TextBlock
+                            Margin="8,0,0,0"
+                            FontSize="14"
+                            Foreground="White"
+                            Text="新建任务" />
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+        </Grid>
+
+        <TextBlock
+            Margin="20"
+            Foreground="{StaticResource TextTertiaryBrush}"
+            Text="本软件仅支持 Wi-Fi 无线连接，手机与电脑需接入同一局域网。输入设备 IP 点击「连接设备」，首次连接时设备上会弹出「允许 USB 调试吗？」，勾选「一律允许」即可。" />
+
+        <Border
+            Height="110"
+            Margin="20,0"
+            Background="{StaticResource CardBackgroundBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="16"
+                        FontSize="15"
+                        FontWeight="SemiBold"
+                        Foreground="White"
+                        Text="当前连接" />
+
+                    <Button
+                        Grid.Column="1"
+                        Margin="8,12,0,0"
+                        Command="{Binding RestartAdbCommand}"
+                        Content="重启 ADB 服务"
+                        Style="{StaticResource CommonButtonStyle}" />
+
+                    <Button
+                        Grid.Column="2"
+                        Margin="8,12,16,0"
+                        Command="{Binding DisconnectDeviceCommand}"
+                        Content="断开连接"
+                        Style="{StaticResource CommonButtonStyle}"
+                        Tag="Danger" />
+                </Grid>
+
+                <TextBlock
+                    Grid.Row="1"
+                    Margin="64,0"
+                    VerticalAlignment="Center"
+                    FontSize="14">
+                    <Run Foreground="{StaticResource TextSecondaryBrush}" Text="设备状态" />
+                    <Run Foreground="White" Text="{Binding DeviceName}" />
+                    <Run Foreground="White" Text=" · " />
+                    <Run Foreground="White" Text="{Binding DeviceIp}" />
+                    <Run Foreground="White" Text=" · " />
+                    <Run Foreground="White" Text="{Binding ConnectionState}" />
+                </TextBlock>
+            </Grid>
+        </Border>
+
+        <Border
+            Height="170"
+            Margin="20,12"
+            Background="{StaticResource CardBackgroundBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock
+                    Grid.Row="0"
+                    Margin="16,12"
+                    FontSize="15"
+                    FontWeight="SemiBold"
+                    Foreground="White"
+                    Text="连接新设备" />
+
+                <StackPanel
+                    Grid.Row="1"
+                    Margin="64,0"
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Foreground="{StaticResource TextSecondaryBrush}"
+                        Text="设备状态" />
+
+                    <TextBox
+                        Width="240"
+                        Margin="12,0"
+                        Style="{StaticResource FieldTextBoxStyle}"
+                        Text="{Binding DeviceIp}" />
+
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource TextTertiaryBrush}"
+                        Text="端口固定 5555" />
+                </StackPanel>
+
+                <Border
+                    Grid.Row="2"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,1,0,0">
+                    <DockPanel Margin="20,0" LastChildFill="False">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource TextTertiaryBrush}"
+                            Text="首次连接需要在设备上确认调试授权，之后直连即可" />
+
+                        <Button
+                            Margin="0,12"
+                            Padding="14,0"
+                            Command="{Binding ConnectDeviceCommand}"
+                            Content="连接设备"
+                            DockPanel.Dock="Right"
+                            Style="{StaticResource PrimaryButtonStyle}" />
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </StackPanel>
 </UserControl>

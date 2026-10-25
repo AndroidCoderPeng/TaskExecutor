@@ -47,7 +47,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         CurrentView = menuItem.Title switch
         {
-            // "应用列表" => App.Services.GetRequiredService<ApplicationsViewModel>(),
+            "无线连接" => App.Services.GetRequiredService<WiFiConnectionViewModel>(),
             // "提交软件" => App.Services.GetRequiredService<SubmitApplicationViewModel>(),
             // "关于应用" => App.Services.GetRequiredService<AboutTransmitterViewModel>(),
             _ => CurrentView
