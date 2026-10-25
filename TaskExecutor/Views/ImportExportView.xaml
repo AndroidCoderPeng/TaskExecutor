@@ -14,20 +14,20 @@
                 FontSize="16"
                 FontWeight="SemiBold"
                 Foreground="White"
-                Text="Êý¾Ýµ¼Èëµ¼³ö" />
+                Text="æ•°æ®å¯¼å…¥å¯¼å‡º" />
 
             <TextBlock
                 Margin="20"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
                 Foreground="{StaticResource TextTertiaryBrush}"
-                Text="ÅäÖÃ±¸·ÝÓë»Ö¸´" />
+                Text="é…ç½®å¤‡ä»½ä¸Žæ¢å¤" />
         </DockPanel>
 
         <TextBlock
             Margin="20"
             Foreground="{StaticResource TextTertiaryBrush}"
-            Text="ÈÎÎñÅäÖÃ¡¢Ä¿±ê APP Ó³ÉäÓëÍ¨ÖªÅäÖÃ¿Éµ¼³öÎª CSV ±¸·Ý£¬Ò²¿ÉÒÔ´Ó CSV ±¸·Ý»Ö¸´£¬µ¼ÈëÊ±Í¬ÃûÈÎÎñ½«±»¸²¸Ç" />
+            Text="ä»»åŠ¡é…ç½®ã€ç›®æ ‡ APP æ˜ å°„ä¸Žé€šçŸ¥é…ç½®å¯å¯¼å‡ºä¸º CSV å¤‡ä»½ï¼Œä¹Ÿå¯ä»¥ä»Ž CSV å¤‡ä»½æ¢å¤ï¼Œå¯¼å…¥æ—¶åŒåä»»åŠ¡å°†è¢«è¦†ç›–" />
 
         <UniformGrid
             Height="196"
@@ -48,24 +48,26 @@
                         FontSize="15"
                         FontWeight="SemiBold"
                         Foreground="White"
-                        Text="µ¼³öÅäÖÃ" />
+                        Text="å¯¼å‡ºé…ç½®" />
 
                     <TextBlock
                         Grid.Row="1"
                         Margin="0,12"
                         Foreground="{StaticResource TextTertiaryBrush}"
-                        Text="½«µ±Ç°È«²¿ÈÎÎñ£¨Ãû³Æ¡¢Ö´ÐÐÊ±¼ä¡¢¶¯×÷Á´¡¢Í¨Öª·½Ê½£©µ¼³öÎª CSV ÎÄ¼þ£¬¿ÉÓÃÓÚ±¸·Ý»òÇ¨ÒÆµ½ÆäËûµçÄÔ"
+                        Text="å°†å½“å‰å…¨éƒ¨ä»»åŠ¡ï¼ˆåç§°ã€æ‰§è¡Œæ—¶é—´ã€åŠ¨ä½œé“¾ã€é€šçŸ¥æ–¹å¼ï¼‰å¯¼å‡ºä¸º CSV æ–‡ä»¶ï¼Œå¯ç”¨äºŽå¤‡ä»½æˆ–è¿ç§»åˆ°å…¶ä»–ç”µè„‘"
                         TextWrapping="Wrap" />
+
+
 
                     <StackPanel Grid.Row="3" Orientation="Horizontal">
                         <Button
                             Margin="0,0,8,0"
                             Padding="14,0"
-                            Content="µ¼³öÈÎÎñÅäÖÃ"
+                            Content="å¯¼å‡ºä»»åŠ¡é…ç½®"
                             FontSize="14"
                             Style="{StaticResource PrimaryButtonStyle}" />
                         <Button
-                            Content="µ¼³öÈ«²¿ÅäÖÃ"
+                            Content="å¯¼å‡ºå…¨éƒ¨é…ç½®"
                             FontSize="14"
                             Style="{StaticResource CommonButtonStyle}" />
                     </StackPanel>
@@ -86,24 +88,24 @@
                         FontSize="15"
                         FontWeight="SemiBold"
                         Foreground="White"
-                        Text="µ¼ÈëÅäÖÃ" />
+                        Text="å¯¼å…¥é…ç½®" />
 
                     <TextBlock
                         Grid.Row="1"
                         Margin="0,12"
                         Foreground="{StaticResource TextTertiaryBrush}"
-                        Text="´Ó CSV ÎÄ¼þµ¼ÈëÈÎÎñÓë°üÃûÓ³Éä¡£Ö§³Ö TaskExecutor µ¼³ö¸ñÊ½£¬Ò²Ö§³Ö×Ô¶¨Òå¡¸Ó¦ÓÃÃû£¬°üÃû¡¹Á½ÁÐ¸ñÊ½"
+                        Text="ä»Ž CSV æ–‡ä»¶å¯¼å…¥ä»»åŠ¡ä¸ŽåŒ…åæ˜ å°„ã€‚æ”¯æŒ TaskExecutor å¯¼å‡ºæ ¼å¼ï¼Œä¹Ÿæ”¯æŒè‡ªå®šä¹‰ã€Œåº”ç”¨åï¼ŒåŒ…åã€ä¸¤åˆ—æ ¼å¼"
                         TextWrapping="Wrap" />
 
                     <StackPanel Grid.Row="3" Orientation="Horizontal">
                         <Button
                             Margin="0,0,8,0"
                             Padding="14,0"
-                            Content="µ¼ÈëÈÎÎñ"
+                            Content="å¯¼å…¥ä»»åŠ¡"
                             FontSize="14"
                             Style="{StaticResource PrimaryButtonStyle}" />
                         <Button
-                            Content="µ¼³ö°üÃûÓ³Éä"
+                            Content="å¯¼å‡ºåŒ…åæ˜ å°„"
                             FontSize="14"
                             Style="{StaticResource CommonButtonStyle}" />
                     </StackPanel>
