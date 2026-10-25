@@ -43,6 +43,235 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="DataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="Background" Value="{StaticResource CardBackgroundAltBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource TextTertiaryBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="SeparatorBrush" Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridColumnHeader">
+                        <Border
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            SnapsToDevicePixels="True">
+                            <ContentPresenter
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                RecognizesAccessKey="True" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style
+            x:Key="DataGridFirstColumnHeaderStyle"
+            BasedOn="{StaticResource DataGridColumnHeaderStyle}"
+            TargetType="DataGridColumnHeader">
+            <Setter Property="Padding" Value="16,0" />
+        </Style>
+
+        <Style
+            x:Key="DataGridLastColumnHeaderStyle"
+            BasedOn="{StaticResource DataGridColumnHeaderStyle}"
+            TargetType="DataGridColumnHeader">
+            <Setter Property="Padding" Value="10,0,16,0" />
+        </Style>
+
+        <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border
+                            Padding="{TemplateBinding Padding}"
+                            Background="Transparent"
+                            SnapsToDevicePixels="True">
+                            <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style
+            x:Key="DataGridFirstCellStyle"
+            BasedOn="{StaticResource DataGridCellStyle}"
+            TargetType="DataGridCell">
+            <Setter Property="Padding" Value="16,8" />
+        </Style>
+
+        <Style
+            x:Key="DataGridLastCellStyle"
+            BasedOn="{StaticResource DataGridCellStyle}"
+            TargetType="DataGridCell">
+            <Setter Property="Padding" Value="10,8,16,8" />
+        </Style>
+
+        <Style x:Key="DataGridRowStyle" TargetType="DataGridRow">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridRow">
+                        <Border
+                            x:Name="RowBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{StaticResource DividerBrush}"
+                            BorderThickness="0,1,0,0"
+                            SnapsToDevicePixels="True">
+                            <SelectiveScrollingGrid>
+                                <SelectiveScrollingGrid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </SelectiveScrollingGrid.ColumnDefinitions>
+                                <SelectiveScrollingGrid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </SelectiveScrollingGrid.RowDefinitions>
+
+                                <DataGridCellsPresenter
+                                    Grid.Column="1"
+                                    ItemsPanel="{TemplateBinding ItemsPanel}"
+                                    SelectiveScrollingGrid.SelectiveScrollingOrientation="Vertical"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+
+                                <DataGridDetailsPresenter
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Visibility="Collapsed" />
+                            </SelectiveScrollingGrid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="RowBorder" Property="Background" Value="{StaticResource HoverOverlayBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="RowBorder" Property="Background" Value="{StaticResource HoverOverlayBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CardDataGridStyle" TargetType="DataGrid">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="AutoGenerateColumns" Value="False" />
+            <Setter Property="HeadersVisibility" Value="Column" />
+            <Setter Property="RowHeaderWidth" Value="0" />
+            <Setter Property="CanUserAddRows" Value="False" />
+            <Setter Property="CanUserDeleteRows" Value="False" />
+            <Setter Property="CanUserResizeRows" Value="False" />
+            <Setter Property="CanUserResizeColumns" Value="False" />
+            <Setter Property="CanUserReorderColumns" Value="False" />
+            <Setter Property="CanUserSortColumns" Value="False" />
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="SelectionMode" Value="Single" />
+            <Setter Property="SelectionUnit" Value="FullRow" />
+            <Setter Property="RowBackground" Value="Transparent" />
+            <Setter Property="AlternatingRowBackground" Value="Transparent" />
+            <Setter Property="GridLinesVisibility" Value="None" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ColumnHeaderStyle" Value="{StaticResource DataGridColumnHeaderStyle}" />
+            <Setter Property="CellStyle" Value="{StaticResource DataGridCellStyle}" />
+            <Setter Property="RowStyle" Value="{StaticResource DataGridRowStyle}" />
+        </Style>
+
+        <Style x:Key="ChipBorderStyle" TargetType="Border">
+            <Setter Property="Margin" Value="0,0,4,0" />
+            <Setter Property="Padding" Value="6,2" />
+            <Setter Property="Background" Value="{StaticResource ControlFillBrush}" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+
+        <Style x:Key="StatusPillStyle" TargetType="ToggleButton">
+            <Setter Property="Padding" Value="8,2" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Background" Value="{StaticResource SuccessDimBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border
+                            x:Name="PillBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse
+                                    x:Name="PillDot"
+                                    Width="6"
+                                    Height="6"
+                                    Fill="{TemplateBinding Foreground}" />
+                                <ContentPresenter
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Center"
+                                    TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter TargetName="PillBorder" Property="Background" Value="{StaticResource ControlFillBrush}" />
+                                <Setter TargetName="PillDot" Property="Fill" Value="{StaticResource TextDisabledBrush}" />
+                                <Setter Property="TextElement.Foreground" Value="{StaticResource TextTertiaryBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource TextTertiaryBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="PillBorder" Property="Opacity" Value="0.88" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="LinkButtonStyle" TargetType="Button">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="{StaticResource InfoBrightBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="Transparent">
+                            <ContentPresenter
+                                x:Name="LinkSite"
+                                VerticalAlignment="Center"
+                                TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Tag" Value="Mute">
+                    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+                </Trigger>
+                <Trigger Property="Tag" Value="Danger">
+                    <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <DockPanel LastChildFill="True">
@@ -192,7 +421,7 @@
                             FontSize="15"
                             FontWeight="SemiBold"
                             Foreground="White"
-                            Text="当前连接" />
+                            Text="定时任务" />
 
                         <Border
                             Grid.Column="1"
@@ -216,7 +445,6 @@
                                 Command="{Binding TaskOptionRadioChangedCommand}"
                                 CommandParameter="0"
                                 Content="全部"
-                                Foreground="{StaticResource TextTertiaryBrush}"
                                 GroupName="TaskOption"
                                 IsChecked="True"
                                 Style="{StaticResource SegmentRadioStyle}" />
@@ -226,7 +454,6 @@
                                 Command="{Binding TaskOptionRadioChangedCommand}"
                                 CommandParameter="1"
                                 Content="已启用"
-                                Foreground="{StaticResource TextTertiaryBrush}"
                                 GroupName="TaskOption"
                                 Style="{StaticResource SegmentRadioStyle}" />
 
@@ -234,20 +461,202 @@
                                 Command="{Binding TaskOptionRadioChangedCommand}"
                                 CommandParameter="2"
                                 Content="已停用"
-                                Foreground="{StaticResource TextTertiaryBrush}"
                                 GroupName="TaskOption"
                                 Style="{StaticResource SegmentRadioStyle}" />
                         </StackPanel>
                     </Grid>
 
-                    <DataGrid
-                        Background="Transparent"
-                        BorderThickness="0"
-                        DockPanel.Dock="Bottom" />
+                    <Grid DockPanel.Dock="Bottom">
+                        <DataGrid
+                            x:Name="TaskDataGrid"
+                            ItemsSource="{Binding Tasks}"
+                            Style="{StaticResource CardDataGridStyle}">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn
+                                    Width="30*"
+                                    CellStyle="{StaticResource DataGridFirstCellStyle}"
+                                    Header="任务名称"
+                                    HeaderStyle="{StaticResource DataGridFirstColumnHeaderStyle}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock
+                                                    FontSize="13"
+                                                    FontWeight="Medium"
+                                                    Foreground="{StaticResource TextPrimaryBrush}"
+                                                    Text="{Binding Name}"
+                                                    TextTrimming="CharacterEllipsis" />
+                                                <TextBlock
+                                                    Margin="0,1,0,0"
+                                                    FontSize="11"
+                                                    Foreground="{StaticResource TextTertiaryBrush}"
+                                                    Text="{Binding Sub}"
+                                                    TextTrimming="CharacterEllipsis" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn
+                                    Width="13*"
+                                    Binding="{Binding Time}"
+                                    Header="执行时间" />
+
+                                <DataGridTemplateColumn Width="28*" Header="动作链">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ItemsControl ItemsSource="{Binding Actions}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Horizontal" />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Style="{StaticResource ChipBorderStyle}">
+                                                            <TextBlock
+                                                                FontSize="11"
+                                                                Foreground="{StaticResource TextSecondaryBrush}"
+                                                                Text="{Binding}" />
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn
+                                    Width="11*"
+                                    Binding="{Binding Notify}"
+                                    Header="通知方式" />
+
+                                <DataGridTemplateColumn Width="9*" Header="状态">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ToggleButton
+                                                Content="{Binding IsEnabled, Converter={StaticResource EnabledToTextConverter}}"
+                                                IsChecked="{Binding IsEnabled, Mode=OneWay}"
+                                                Style="{StaticResource StatusPillStyle}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTemplateColumn
+                                    Width="9*"
+                                    MinWidth="104"
+                                    CellStyle="{StaticResource DataGridLastCellStyle}"
+                                    Header="操作"
+                                    HeaderStyle="{StaticResource DataGridLastColumnHeaderStyle}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button
+                                                    Command="{Binding DataContext.EditTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="编辑"
+                                                    Style="{StaticResource LinkButtonStyle}" />
+                                                <Button
+                                                    Margin="12,0,0,0"
+                                                    Command="{Binding DataContext.ToggleTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="{Binding IsEnabled}"
+                                                    Style="{StaticResource LinkButtonStyle}"
+                                                    Tag="Mute" />
+                                                <Button
+                                                    Margin="12,0,0,0"
+                                                    Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="删除"
+                                                    Style="{StaticResource LinkButtonStyle}"
+                                                    Tag="Danger" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!--  空态  -->
+                        <TextBlock
+                            Margin="0,28"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            Foreground="{StaticResource TextTertiaryBrush}"
+                            Text="暂无任务，点击右上角「新建任务」添加">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Items.Count, ElementName=TaskDataGrid}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
                 </DockPanel>
             </Border>
 
-            <Border Grid.Row="2" Style="{StaticResource CommonBorderStyle}" />
+            <Border Grid.Row="2" Style="{StaticResource CommonBorderStyle}">
+                <DockPanel LastChildFill="True">
+                    <DockPanel DockPanel.Dock="Top" LastChildFill="True">
+                        <TextBlock
+                            Margin="16,16,10,16"
+                            DockPanel.Dock="Left"
+                            FontSize="15"
+                            FontWeight="SemiBold"
+                            Foreground="White"
+                            Text="运行日志" />
+
+                        <Button
+                            Margin="16,0"
+                            Content="查看全部"
+                            DockPanel.Dock="Right">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="Transparent">
+                                                    <ContentPresenter
+                                                        x:Name="LinkSite"
+                                                        VerticalAlignment="Center"
+                                                        TextElement.Foreground="{TemplateBinding Foreground}" />
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Cursor" Value="Hand" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter Property="Opacity" Value="0.75" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsEnabled" Value="False">
+                                                        <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </DockPanel>
+
+                    <ListBox
+                        Background="Transparent"
+                        BorderThickness="0"
+                        DockPanel.Dock="Bottom"
+                        ItemsSource="{Binding RuntimeLog}" />
+                </DockPanel>
+            </Border>
         </Grid>
     </DockPanel>
 </UserControl>
