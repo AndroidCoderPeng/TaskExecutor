@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
-    Title="任务执行器"
+    Title="TaskExecutor - 定时任务自动化"
     Width="1200"
     Height="806"
     d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}"
