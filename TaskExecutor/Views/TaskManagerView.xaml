@@ -7,8 +7,46 @@
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
     d:DataContext="{d:DesignInstance Type=vm:TaskManagerViewModel}"
     mc:Ignorable="d">
-    <StackPanel Orientation="Vertical">
-        <Grid Background="{StaticResource CardBackgroundBrush}">
+
+    <UserControl.Resources>
+        <Style x:Key="SegmentRadioStyle" TargetType="RadioButton">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{StaticResource TextTertiaryBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border Padding="{TemplateBinding Padding}" Background="Transparent">
+                            <ContentPresenter
+                                x:Name="ContentSite"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                RecognizesAccessKey="True" />
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="{StaticResource TextSecondaryBrush}" />
+                            </Trigger>
+
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="{StaticResource InfoBrightBrush}" />
+                                <Setter TargetName="ContentSite" Property="TextElement.FontWeight" Value="Medium" />
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="{StaticResource TextDisabledBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel LastChildFill="True">
+        <Grid Background="{StaticResource CardBackgroundBrush}" DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
@@ -21,7 +59,7 @@
                 FontSize="16"
                 FontWeight="SemiBold"
                 Foreground="White"
-                Text="�������" />
+                Text="任务管理" />
 
             <Border
                 Grid.Column="1"
@@ -48,7 +86,7 @@
                         Margin="8,0,0,0"
                         VerticalAlignment="Center"
                         Foreground="{StaticResource SuccessBrush}"
-                        Text="{Binding TaskState, FallbackValue=����������}" />
+                        Text="{Binding TaskState, FallbackValue=任务调度中}" />
                 </StackPanel>
             </Border>
 
@@ -69,10 +107,147 @@
                             Margin="8,0,0,0"
                             FontSize="14"
                             Foreground="White"
-                            Text="�½�����" />
+                            Text="新建任务" />
                     </StackPanel>
                 </Button.Content>
             </Button>
         </Grid>
-    </StackPanel>
+
+        <Grid Margin="20" DockPanel.Dock="Bottom">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <UniformGrid
+                Grid.Row="0"
+                Columns="4"
+                Rows="1">
+                <Border Margin="0,0,12,0" Style="{StaticResource CommonBorderStyle}">
+                    <StackPanel Margin="16,12" Orientation="Vertical">
+                        <TextBlock Foreground="{StaticResource TextTertiaryBrush}" Text="绑定设备" />
+                        <TextBlock
+                            Margin="0,8,0,0"
+                            FontSize="20"
+                            FontWeight="SemiBold"
+                            Foreground="White"
+                            Text="{Binding DeviceName, FallbackValue=Pixel 6}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Margin="0,0,12,0" Style="{StaticResource CommonBorderStyle}">
+                    <StackPanel Margin="16,12" Orientation="Vertical">
+                        <TextBlock Foreground="{StaticResource TextTertiaryBrush}" Text="今日执行" />
+                        <TextBlock
+                            Margin="0,8,0,0"
+                            FontSize="20"
+                            FontWeight="SemiBold"
+                            Foreground="White"
+                            Text="{Binding ScheduledTaskCount, StringFormat={}{0} 次, FallbackValue=0 次}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Margin="0,0,12,0" Style="{StaticResource CommonBorderStyle}">
+                    <StackPanel Margin="16,12" Orientation="Vertical">
+                        <TextBlock Foreground="{StaticResource TextTertiaryBrush}" Text="执行成功率" />
+                        <TextBlock
+                            Margin="0,8,0,0"
+                            FontSize="20"
+                            FontWeight="SemiBold"
+                            Foreground="{StaticResource SuccessBrush}"
+                            Text="{Binding SuccessRate, StringFormat={}{0}%, FallbackValue=100%}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource CommonBorderStyle}">
+                    <StackPanel Margin="16,12" Orientation="Vertical">
+                        <TextBlock Foreground="{StaticResource TextTertiaryBrush}" Text="下次执行" />
+                        <TextBlock
+                            Margin="0,8,0,0"
+                            FontSize="20"
+                            FontWeight="SemiBold"
+                            Foreground="{StaticResource PrimaryHoverBrush}"
+                            Text="{Binding NextNodeTime, FallbackValue=07:30}" />
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <Border
+                Grid.Row="1"
+                Height="290"
+                Margin="0,12"
+                Style="{StaticResource CommonBorderStyle}">
+                <DockPanel LastChildFill="True">
+                    <Grid DockPanel.Dock="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                            Grid.Column="0"
+                            Margin="16,16,10,16"
+                            FontSize="15"
+                            FontWeight="SemiBold"
+                            Foreground="White"
+                            Text="当前连接" />
+
+                        <Border
+                            Grid.Column="1"
+                            Padding="8,3"
+                            VerticalAlignment="Center"
+                            Background="{StaticResource ControlFillBrush}"
+                            CornerRadius="4">
+                            <TextBlock
+                                FontSize="11"
+                                Foreground="{StaticResource TextTertiaryBrush}"
+                                Text="{Binding Tasks.Count, StringFormat={}{0} 项, FallbackValue=0 项}" />
+                        </Border>
+
+                        <StackPanel
+                            Grid.Column="2"
+                            Margin="16,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
+                            <RadioButton
+                                Command="{Binding TaskOptionRadioChangedCommand}"
+                                CommandParameter="0"
+                                Content="全部"
+                                Foreground="{StaticResource TextTertiaryBrush}"
+                                GroupName="TaskOption"
+                                IsChecked="True"
+                                Style="{StaticResource SegmentRadioStyle}" />
+
+                            <RadioButton
+                                Margin="16,0"
+                                Command="{Binding TaskOptionRadioChangedCommand}"
+                                CommandParameter="1"
+                                Content="已启用"
+                                Foreground="{StaticResource TextTertiaryBrush}"
+                                GroupName="TaskOption"
+                                Style="{StaticResource SegmentRadioStyle}" />
+
+                            <RadioButton
+                                Command="{Binding TaskOptionRadioChangedCommand}"
+                                CommandParameter="2"
+                                Content="已停用"
+                                Foreground="{StaticResource TextTertiaryBrush}"
+                                GroupName="TaskOption"
+                                Style="{StaticResource SegmentRadioStyle}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <DataGrid
+                        Background="Transparent"
+                        BorderThickness="0"
+                        DockPanel.Dock="Bottom" />
+                </DockPanel>
+            </Border>
+
+            <Border Grid.Row="2" Style="{StaticResource CommonBorderStyle}" />
+        </Grid>
+    </DockPanel>
 </UserControl>

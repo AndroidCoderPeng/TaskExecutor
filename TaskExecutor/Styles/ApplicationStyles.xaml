@@ -1,4 +1,11 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style x:Key="CommonBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+    </Style>
+
     <!--  主按钮：蓝底白字，hover 深蓝  -->
     <Style x:Key="PrimaryButtonStyle" TargetType="Button">
         <Setter Property="Height" Value="32" />
@@ -91,7 +98,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <!--  圆角输入框  -->
     <Style x:Key="FieldTextBoxStyle" TargetType="TextBox">
         <Setter Property="Height" Value="34" />
