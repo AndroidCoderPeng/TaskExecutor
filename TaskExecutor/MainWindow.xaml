@@ -48,7 +48,7 @@
                             <GroupStyle.HeaderTemplate>
                                 <DataTemplate>
                                     <TextBlock
-                                        Margin="16,16,16,8"
+                                        Margin="16,12,0,8"
                                         d:DataContext="{d:DesignInstance Type=data:CollectionViewGroup}"
                                         FontWeight="SemiBold"
                                         Foreground="{StaticResource TextDisabledBrush}"
@@ -145,9 +145,7 @@
                                 </Ellipse.Style>
                             </Ellipse>
 
-                            <TextBlock
-                                Margin="8,0,0,0"
-                                Text="{Binding DeviceState, FallbackValue=设备未连接}">
+                            <TextBlock Margin="8,0,0,0" Text="{Binding DeviceState, FallbackValue=设备未连接}">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
