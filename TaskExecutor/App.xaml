@@ -19,10 +19,10 @@
                 <views:TaskManagerView/>
             </DataTemplate>
             
-            <!-- <DataTemplate DataType="{x:Type vm:UpdateApplicationViewModel}"> -->
-            <!--     <views:UpdateApplicationView/> -->
-            <!-- </DataTemplate> -->
-            <!--    -->
+            <DataTemplate DataType="{x:Type vm:ImportExportViewModel}">
+                <views:ImportExportView/>
+            </DataTemplate>
+            
             <!-- <DataTemplate DataType="{x:Type vm:AboutTransmitterViewModel}"> -->
             <!--     <views:AboutTransmitterView/> -->
             <!-- </DataTemplate> -->

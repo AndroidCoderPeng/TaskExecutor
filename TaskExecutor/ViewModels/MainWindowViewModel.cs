@@ -49,7 +49,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             "无线连接" => App.Services.GetRequiredService<WiFiConnectionViewModel>(),
             "任务管理" => App.Services.GetRequiredService<TaskManagerViewModel>(),
-            // "关于应用" => App.Services.GetRequiredService<AboutTransmitterViewModel>(),
+            "导入导出" => App.Services.GetRequiredService<ImportExportViewModel>(),
             _ => CurrentView
         };
     }
