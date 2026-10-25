@@ -7,6 +7,43 @@
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
     d:DataContext="{d:DesignInstance Type=vm:ImportExportViewModel}"
     mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <Style x:Key="FileHintStyle" TargetType="ContentControl">
+            <Setter Property="Padding" Value="14" />
+            <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContentControl">
+                        <Grid>
+                            <Rectangle
+                                Fill="{StaticResource WindowBackgroundBrush}"
+                                RadiusX="4"
+                                RadiusY="4"
+                                SnapsToDevicePixels="True"
+                                Stroke="{StaticResource BorderBrush}"
+                                StrokeDashArray="3,3"
+                                StrokeThickness="1" />
+                            <TextBlock
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                FontFamily="{TemplateBinding FontFamily}"
+                                FontSize="{TemplateBinding FontSize}"
+                                Foreground="{TemplateBinding Foreground}"
+                                Text="{TemplateBinding Content}"
+                                TextAlignment="Center"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="Wrap" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
     <StackPanel Orientation="Vertical">
         <DockPanel Background="{StaticResource CardBackgroundBrush}" LastChildFill="True">
             <TextBlock
@@ -57,7 +94,11 @@
                         Text="将当前全部任务（名称、执行时间、动作链、通知方式）导出为 CSV 文件，可用于备份或迁移到其他电脑"
                         TextWrapping="Wrap" />
 
-
+                    <ContentControl
+                        Grid.Row="2"
+                        VerticalAlignment="Top"
+                        Content="{Binding ExportFileName, FallbackValue=tasks_2026-10-24.csv}"
+                        Style="{StaticResource FileHintStyle}" />
 
                     <StackPanel Grid.Row="3" Orientation="Horizontal">
                         <Button
@@ -96,6 +137,12 @@
                         Foreground="{StaticResource TextTertiaryBrush}"
                         Text="从 CSV 文件导入任务与包名映射。支持 TaskExecutor 导出格式，也支持自定义「应用名，包名」两列格式"
                         TextWrapping="Wrap" />
+
+                    <ContentControl
+                        Grid.Row="2"
+                        VerticalAlignment="Top"
+                        Content="{Binding SelectedFilePath, TargetNullValue=选择 CSV 文件…, FallbackValue=选择 CSV 文件…}"
+                        Style="{StaticResource FileHintStyle}" />
 
                     <StackPanel Grid.Row="3" Orientation="Horizontal">
                         <Button
