@@ -23,9 +23,9 @@
                 <views:ImportExportView/>
             </DataTemplate>
             
-            <!-- <DataTemplate DataType="{x:Type vm:AboutTransmitterViewModel}"> -->
-            <!--     <views:AboutTransmitterView/> -->
-            <!-- </DataTemplate> -->
+            <DataTemplate DataType="{x:Type vm:TargetAppViewModel}">
+                <views:TargetAppView/>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

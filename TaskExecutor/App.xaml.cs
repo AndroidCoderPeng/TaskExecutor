@@ -24,6 +24,7 @@ public partial class App : Application
         services.AddTransient<WiFiConnectionViewModel>();
         services.AddTransient<TaskManagerViewModel>();
         services.AddTransient<ImportExportViewModel>();
+        services.AddTransient<TargetAppViewModel>();
 
         Services = services.BuildServiceProvider();
 

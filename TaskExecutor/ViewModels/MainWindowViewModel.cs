@@ -50,6 +50,16 @@ public partial class MainWindowViewModel : ObservableObject
             "无线连接" => App.Services.GetRequiredService<WiFiConnectionViewModel>(),
             "任务管理" => App.Services.GetRequiredService<TaskManagerViewModel>(),
             "导入导出" => App.Services.GetRequiredService<ImportExportViewModel>(),
+            "目标APP" => App.Services.GetRequiredService<TargetAppViewModel>(),
+            // "邮箱配置" => App.Services.GetRequiredService<EmailConfigurationViewModel>(),
+            // "企业微信配置" => App.Services.GetRequiredService<WeChatWorkConfigurationViewModel>(),
+            // "任务等待时间" => App.Services.GetRequiredService<TaskWaitTimeViewModel>(),
+            // "任务重置时间" => App.Services.GetRequiredService<TaskResetTimeViewModel>(),
+            // "随机时间范围" => App.Services.GetRequiredService<RandomTimeRangeViewModel>(),
+            // "调度开关" => App.Services.GetRequiredService<ScheduleSwitchViewModel>(),
+            // "指令测试" => App.Services.GetRequiredService<CommandTestViewModel>(),
+            // "常见问题" => App.Services.GetRequiredService<FaqViewModel>(),
+            // "关于应用" => App.Services.GetRequiredService<AboutViewModel>(),
             _ => CurrentView
         };
     }
