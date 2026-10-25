@@ -24,7 +24,10 @@
     </Window.Resources>
 
     <DockPanel LastChildFill="True">
-        <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
+        <Border
+            Background="{StaticResource CardBackgroundBrush}"
+            BorderBrush="{StaticResource DividerBrush}"
+            BorderThickness="0,0,1,0">
             <Grid Width="218">
                 <Grid.RowDefinitions>
                     <RowDefinition />
@@ -48,7 +51,7 @@
                                         Margin="16,16,16,8"
                                         d:DataContext="{d:DesignInstance Type=data:CollectionViewGroup}"
                                         FontWeight="SemiBold"
-                                        Foreground="{StaticResource TextTertiaryBrush}"
+                                        Foreground="{StaticResource TextDisabledBrush}"
                                         Text="{Binding Name}" />
                                 </DataTemplate>
                             </GroupStyle.HeaderTemplate>
@@ -87,13 +90,13 @@
 
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}" Value="True">
-                                    <Setter TargetName="MenuItemBorder" Property="Background" Value="{StaticResource ControlHoverOverlayBrush}" />
+                                    <Setter TargetName="MenuItemBorder" Property="Background" Value="{StaticResource ControlFillBrush}" />
                                 </DataTrigger>
 
                                 <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}" Value="True">
-                                    <Setter TargetName="MenuItemBorder" Property="Background" Value="{StaticResource FocusGlowBrush}" />
-                                    <Setter TargetName="IconTextBlock" Property="Foreground" Value="{StaticResource PrimaryBrush}" />
-                                    <Setter TargetName="TitleTextBlock" Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                                    <Setter TargetName="MenuItemBorder" Property="Background" Value="{StaticResource InfoDimBrush}" />
+                                    <Setter TargetName="IconTextBlock" Property="Foreground" Value="{StaticResource InfoBrightBrush}" />
+                                    <Setter TargetName="TitleTextBlock" Property="Foreground" Value="{StaticResource InfoBrightBrush}" />
                                 </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
@@ -125,19 +128,37 @@
                 <Border
                     Grid.Row="1"
                     Margin="12"
-                    Background="{StaticResource CardBackgroundBrush}"
+                    Background="{StaticResource CardBackgroundAltBrush}"
                     CornerRadius="6">
                     <StackPanel Margin="10" Orientation="Vertical">
                         <DockPanel>
-                            <Ellipse
-                                Width="10"
-                                Height="10"
-                                Fill="{StaticResource TextTertiaryBrush}" />
+                            <Ellipse Width="10" Height="10">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="{StaticResource TextDisabledBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsDeviceConnected}" Value="True">
+                                                <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
 
                             <TextBlock
                                 Margin="8,0,0,0"
-                                Foreground="{StaticResource TextTertiaryBrush}"
-                                Text="{Binding DeviceState, FallbackValue=设备未连接}" />
+                                Text="{Binding DeviceState, FallbackValue=设备未连接}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsDeviceConnected}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </DockPanel>
 
                         <TextBlock

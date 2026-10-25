@@ -13,6 +13,7 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<MenuItem> _menuItems = [];
     [ObservableProperty] private int _selectedIndex;
     [ObservableProperty] private ObservableObject _currentView;
+    [ObservableProperty] private bool _isDeviceConnected;
 
     #endregion
 
