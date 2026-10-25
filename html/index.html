@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>TaskDispatcher · 无线 ADB 连接 &amp; MIUI 限制 · 合辑</title>
+    <title>TaskExecutor · 无线 ADB 连接 &amp; MIUI 限制 · 合辑</title>
     <style>
         * {
             margin: 0;
@@ -336,7 +336,7 @@
     <div class="qa-card">
         <div class="qa-header">
             <h1>
-                🔗 TaskDispatcher · 无线 ADB 完全手册
+                🔗 TaskExecutor · 无线 ADB 完全手册
                 <small>含 MIUI / HyperOS 限制</small>
             </h1>
             <div class="badge-group">
@@ -350,7 +350,7 @@
         <div class="qa-body">
 
             <!-- ========== PART 1 : 无线连接指南 ========== -->
-            <div class="section-divider">📲 TaskDispatcher · 无线 ADB 初次连接步骤</div>
+            <div class="section-divider">📲 TaskExecutor · 无线 ADB 初次连接步骤</div>
 
             <div class="qa-item">
                 <div class="step-title">
@@ -359,7 +359,7 @@
                 <div class="step-desc">
                     <p>确保满足以下条件：</p>
                     <ul>
-                        <li>一台 Windows 电脑（已安装 TaskDispatcher，内置 ADB 工具）</li>
+                        <li>一台 Windows 电脑（已安装 TaskExecutor，内置 ADB 工具）</li>
                         <li>一部 Android 手机（版本 8~16 均可），<strong>USB 数据线</strong></li>
                         <li>手机和电脑连接<strong>同一个 Wi-Fi 网络</strong>（同一网段）</li>
                         <li>手机已开启<strong>开发者选项</strong>和 <strong>USB 调试</strong></li>
@@ -390,7 +390,7 @@
                     <span class="step-num">3</span> 点击「连接手机」按钮
                 </div>
                 <div class="step-desc">
-                    <p>启动 TaskDispatcher 程序，点击右下角的 <strong>「连接手机」</strong> 按钮。</p>
+                    <p>启动 TaskExecutor 程序，点击右下角的 <strong>「连接手机」</strong> 按钮。</p>
                     <p>程序将自动将手机 ADB 从 USB 模式切换为无线模式</p>
                     <div class="tip-note">
                         💡 如果弹出错误提示「请重新插拔手机 USB 线，并在手机上选择传输文件模式」，说明 ADB 未正确识别手机。请检查 USB 调试授权和连接模式后重试。
@@ -420,7 +420,7 @@
                     <p>连接成功后，程序会弹出提示 <strong>「设备已通过 WiFi 连接，现在可以拔掉 USB 线了」</strong>。此时底部状态栏显示
                         <strong>「已连接」</strong>，按钮文字变为 <strong>「断开设备」</strong>。
                     </p>
-                    <p>拔掉 USB 数据线后，只要手机和电脑保持同一 Wi-Fi 网络，即可正常使用 TaskDispatcher 的全部功能。</p>
+                    <p>拔掉 USB 数据线后，只要手机和电脑保持同一 Wi-Fi 网络，即可正常使用 TaskExecutor 的全部功能。</p>
                     <div class="success-note">
                         ✅ 输入的 IP 地址会被自动保存，下次连接无需重新输入，程序会使用上次的 IP 自动连接。
                     </div>
@@ -459,10 +459,10 @@
                             答：检查手机和电脑是否在同一 Wi-Fi 下；关闭手机 VPN 或热点；尝试点击「指令 → 重启ADB」后重试。</li>
                         <li><strong>问：手机重启后无线 ADB 失效了？</strong><br>
                             答：正常现象，手机重启后需重新插 USB 线，点击「连接手机」按钮让程序自动切换为无线模式。</li>
-                        <li><strong>问：TaskDispatcher 可以自动重连吗？</strong><br>
+                        <li><strong>问：TaskExecutor 可以自动重连吗？</strong><br>
                             答：可以。程序会每隔 5 秒检测连接状态，断线后自动尝试重连（最多 3 次），3 次均失败后会发送通知提醒用户手动处理。</li>
                         <li><strong>问：无线 ADB 比 USB 慢吗？</strong><br>
-                            答：日常指令（唤醒、启动 APP、截图）延迟差别极小，不影响 TaskDispatcher 的链式任务执行。</li>
+                            答：日常指令（唤醒、启动 APP、截图）延迟差别极小，不影响 TaskExecutor 的链式任务执行。</li>
                         <li><strong>问：点击「连接手机」后提示 ADB 初始化失败？</strong><br>
                             答：请确认手机已通过 USB 连接且授权了调试权限，USB 连接模式为「文件传输 (MTP)」。若仍失败，尝试「指令 → 重启ADB」后重连。</li>
                     </ul>
@@ -495,7 +495,7 @@
                     <div class="warn-note">
                         ⚠️ 「USB 调试（安全设置）」和「USB 安装」通常<strong>要求登录小米账号且联网</strong>，部分机型还需插 SIM 卡。选项可能置灰，需先登账号。
                     </div>
-                    <p>开启后通过 TaskDispatcher <strong>「指令 → 亮屏」</strong> 测试：如果手机亮起并解锁，说明权限已生效。如果仍然无效，继续看下一个问题。</p>
+                    <p>开启后通过 TaskExecutor <strong>「指令 → 亮屏」</strong> 测试：如果手机亮起并解锁，说明权限已生效。如果仍然无效，继续看下一个问题。</p>
                 </div>
             </div>
 
@@ -547,7 +547,7 @@
             <!-- footer -->
             <div class="footer-meta">
                 <span>📱 适用于 Android 8 – 16 · 小米 MIUI / HyperOS 用户请留意安全设置</span>
-                <span>更新于 2026-07-02 · 以 TaskDispatcher 实际版本为准</span>
+                <span>更新于 2026-07-02 · 以 TaskExecutor 实际版本为准</span>
             </div>
         </div>
     </div>
