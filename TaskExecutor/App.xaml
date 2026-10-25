@@ -15,10 +15,10 @@
                 <views:WiFiConnectionView />
             </DataTemplate>
 
-            <!-- <DataTemplate DataType="{x:Type vm:SubmitApplicationViewModel}"> -->
-            <!--     <views:SubmitApplicationView/> -->
-            <!-- </DataTemplate> -->
-            <!--    -->
+            <DataTemplate DataType="{x:Type vm:TaskManagerViewModel}">
+                <views:TaskManagerView/>
+            </DataTemplate>
+            
             <!-- <DataTemplate DataType="{x:Type vm:UpdateApplicationViewModel}"> -->
             <!--     <views:UpdateApplicationView/> -->
             <!-- </DataTemplate> -->

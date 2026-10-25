@@ -22,9 +22,7 @@ public partial class App : Application
         // services.AddSingleton<IDialogService, DialogService>();
 
         services.AddTransient<WiFiConnectionViewModel>();
-        // services.AddTransient<SubmitApplicationViewModel>();
-        // services.AddTransient<UpdateApplicationViewModel>();
-        // services.AddTransient<AboutTransmitterViewModel>();
+        services.AddTransient<TaskManagerViewModel>();
 
         Services = services.BuildServiceProvider();
 

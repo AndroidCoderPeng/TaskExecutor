@@ -8,72 +8,21 @@
     d:DataContext="{d:DesignInstance Type=vm:WiFiConnectionViewModel}"
     mc:Ignorable="d">
     <StackPanel Orientation="Vertical">
-        <Grid Background="{StaticResource CardBackgroundBrush}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
+        <DockPanel Background="{StaticResource CardBackgroundBrush}" LastChildFill="True">
             <TextBlock
-                Grid.Column="0"
                 Margin="20"
                 FontSize="16"
                 FontWeight="SemiBold"
                 Foreground="White"
-                Text="任务管理" />
+                Text="无线连接" />
 
-            <Border
-                Grid.Column="1"
-                Margin="12,0"
-                Padding="10,6"
+            <TextBlock
+                Margin="20"
+                HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                Background="{StaticResource SuccessDimBrush}"
-                CornerRadius="4">
-                <StackPanel Orientation="Horizontal">
-                    <Ellipse Width="8" Height="8">
-                        <Ellipse.Style>
-                            <Style TargetType="Ellipse">
-                                <Setter Property="Fill" Value="{StaticResource TextDisabledBrush}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsTaskScheduled}" Value="True">
-                                        <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Ellipse.Style>
-                    </Ellipse>
-
-                    <TextBlock
-                        Margin="8,0,0,0"
-                        VerticalAlignment="Center"
-                        Foreground="{StaticResource SuccessBrush}"
-                        Text="{Binding TaskState, FallbackValue=调度运行中}" />
-                </StackPanel>
-            </Border>
-
-            <Button
-                Grid.Column="2"
-                Margin="0,0,20,0"
-                Command="{Binding CreateTaskCommand}"
-                Style="{StaticResource PrimaryButtonStyle}">
-                <Button.Content>
-                    <StackPanel Margin="8,0" Orientation="Horizontal">
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            FontFamily="/TaskExecutor;component/Fonts/#iconfont"
-                            FontSize="16"
-                            Foreground="White"
-                            Text="&#xe620;" />
-                        <TextBlock
-                            Margin="8,0,0,0"
-                            FontSize="14"
-                            Foreground="White"
-                            Text="新建任务" />
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-        </Grid>
+                Foreground="{StaticResource TextTertiaryBrush}"
+                Text="Wi-Fi ADB · 仅支持无线" />
+        </DockPanel>
 
         <TextBlock
             Margin="20"
