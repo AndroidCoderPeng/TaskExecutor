@@ -10,21 +10,21 @@
     <StackPanel Orientation="Vertical">
         <DockPanel Background="{StaticResource CardBackgroundBrush}" LastChildFill="True">
             <TextBlock
-                Margin="20"
+                Margin="20,16"
                 FontSize="16"
                 FontWeight="SemiBold"
                 Foreground="White"
                 Text="邮箱配置" />
 
             <TextBlock
-                Margin="20"
+                Margin="20,16"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
                 Foreground="{StaticResource TextTertiaryBrush}"
                 Text="QQ 邮箱 · SMTP" />
         </DockPanel>
 
-        <Border Margin="20" Style="{StaticResource CommonBorderStyle}">
+        <Border Margin="20,16" Style="{StaticResource CommonBorderStyle}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

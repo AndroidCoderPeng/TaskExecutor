@@ -275,54 +275,21 @@
     </UserControl.Resources>
 
     <DockPanel LastChildFill="True">
-        <Grid Background="{StaticResource CardBackgroundBrush}" DockPanel.Dock="Top">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
+        <DockPanel
+            Background="{StaticResource CardBackgroundBrush}"
+            DockPanel.Dock="Top"
+            LastChildFill="False">
             <TextBlock
-                Grid.Column="0"
-                Margin="20"
+                Margin="20,16"
                 FontSize="16"
                 FontWeight="SemiBold"
                 Foreground="White"
                 Text="任务管理" />
 
-            <Border
-                Grid.Column="1"
-                Margin="12,0"
-                Padding="10,6"
-                VerticalAlignment="Center"
-                Background="{StaticResource SuccessDimBrush}"
-                CornerRadius="4">
-                <StackPanel Orientation="Horizontal">
-                    <Ellipse Width="8" Height="8">
-                        <Ellipse.Style>
-                            <Style TargetType="Ellipse">
-                                <Setter Property="Fill" Value="{StaticResource TextDisabledBrush}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsTaskScheduled}" Value="True">
-                                        <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Ellipse.Style>
-                    </Ellipse>
-
-                    <TextBlock
-                        Margin="8,0,0,0"
-                        VerticalAlignment="Center"
-                        Foreground="{StaticResource SuccessBrush}"
-                        Text="{Binding TaskState, FallbackValue=任务调度中}" />
-                </StackPanel>
-            </Border>
-
             <Button
-                Grid.Column="2"
                 Margin="0,0,20,0"
                 Command="{Binding CreateTaskCommand}"
+                DockPanel.Dock="Right"
                 Style="{StaticResource PrimaryButtonStyle}">
                 <Button.Content>
                     <StackPanel Margin="8,0" Orientation="Horizontal">
@@ -340,9 +307,9 @@
                     </StackPanel>
                 </Button.Content>
             </Button>
-        </Grid>
+        </DockPanel>
 
-        <Grid Margin="20" DockPanel.Dock="Bottom">
+        <Grid Margin="20,16" DockPanel.Dock="Bottom">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -404,7 +371,7 @@
 
             <Border
                 Grid.Row="1"
-                Height="290"
+                Height="298"
                 Margin="0,12"
                 Style="{StaticResource CommonBorderStyle}">
                 <DockPanel LastChildFill="True">
@@ -413,6 +380,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <TextBlock
@@ -435,8 +403,37 @@
                                 Text="{Binding Tasks.Count, StringFormat={}{0} 项, FallbackValue=0 项}" />
                         </Border>
 
-                        <StackPanel
+                        <Border
                             Grid.Column="2"
+                            Padding="10,6"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Background="{StaticResource SuccessDimBrush}"
+                            CornerRadius="4">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="8" Height="8">
+                                    <Ellipse.Style>
+                                        <Style TargetType="Ellipse">
+                                            <Setter Property="Fill" Value="{StaticResource TextDisabledBrush}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsTaskScheduled}" Value="True">
+                                                    <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
+                                </Ellipse>
+
+                                <TextBlock
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Foreground="{StaticResource SuccessBrush}"
+                                    Text="{Binding TaskState, FallbackValue=任务调度中}" />
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel
+                            Grid.Column="3"
                             Margin="16,0"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
@@ -604,7 +601,7 @@
                 <DockPanel LastChildFill="True">
                     <DockPanel DockPanel.Dock="Top" LastChildFill="True">
                         <TextBlock
-                            Margin="16,16,10,16"
+                            Margin="16,12,10,16"
                             DockPanel.Dock="Left"
                             FontSize="15"
                             FontWeight="SemiBold"

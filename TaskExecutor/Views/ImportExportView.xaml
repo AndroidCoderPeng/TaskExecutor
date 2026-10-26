@@ -47,7 +47,7 @@
     <StackPanel Orientation="Vertical">
         <DockPanel Background="{StaticResource CardBackgroundBrush}" LastChildFill="True">
             <TextBlock
-                Margin="20"
+                Margin="20,16"
                 FontSize="16"
                 FontWeight="SemiBold"
                 Foreground="White"
@@ -62,7 +62,7 @@
         </DockPanel>
 
         <TextBlock
-            Margin="20"
+            Margin="20,16"
             Foreground="{StaticResource TextTertiaryBrush}"
             Text="任务配置、目标 APP 映射与通知配置可导出为 CSV 备份，也可以从 CSV 备份恢复，导入时同名任务将被覆盖" />
 

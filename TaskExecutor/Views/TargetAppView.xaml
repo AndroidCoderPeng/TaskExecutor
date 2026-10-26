@@ -171,14 +171,14 @@
     <StackPanel Orientation="Vertical">
         <DockPanel Background="{StaticResource CardBackgroundBrush}" LastChildFill="True">
             <TextBlock
-                Margin="20"
+                Margin="20,16"
                 FontSize="16"
                 FontWeight="SemiBold"
                 Foreground="White"
                 Text="目标 APP" />
 
             <TextBlock
-                Margin="20"
+                Margin="20,16"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
                 Foreground="{StaticResource TextTertiaryBrush}"
@@ -186,7 +186,7 @@
         </DockPanel>
 
         <TextBlock
-            Margin="20"
+            Margin="20,16"
             Foreground="{StaticResource TextTertiaryBrush}"
             Text="维护常用应用的包名映射，任务动作链中「打开 / 关闭目标应用」按此执行。支持 CSV 批量导入。" />
 
@@ -207,7 +207,7 @@
 
                     <TextBlock
                         Grid.Column="0"
-                        Margin="16,16,10,16"
+                        Margin="16,12,10,12"
                         FontSize="15"
                         FontWeight="SemiBold"
                         Foreground="White"

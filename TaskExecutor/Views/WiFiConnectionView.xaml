@@ -10,7 +10,7 @@
     <StackPanel Orientation="Vertical">
         <DockPanel Background="{StaticResource CardBackgroundBrush}" LastChildFill="True">
             <TextBlock
-                Margin="20"
+                Margin="20,16"
                 FontSize="16"
                 FontWeight="SemiBold"
                 Foreground="White"
@@ -25,7 +25,7 @@
         </DockPanel>
 
         <TextBlock
-            Margin="20"
+            Margin="20,16"
             Foreground="{StaticResource TextTertiaryBrush}"
             Text="本软件仅支持 Wi-Fi 无线连接，手机与电脑需接入同一局域网。输入设备 IP 点击「连接设备」，首次连接时设备上会弹出「允许 USB 调试吗？」，勾选「一律允许」即可。" />
 
@@ -59,14 +59,14 @@
 
                     <Button
                         Grid.Column="1"
-                        Margin="8,12,0,0"
+                        Margin="8,8,0,0"
                         Command="{Binding RestartAdbCommand}"
                         Content="重启 ADB 服务"
                         Style="{StaticResource CommonButtonStyle}" />
 
                     <Button
                         Grid.Column="2"
-                        Margin="8,12,16,0"
+                        Margin="8,8,16,0"
                         Command="{Binding DisconnectDeviceCommand}"
                         Content="断开连接"
                         Style="{StaticResource CommonButtonStyle}"
@@ -136,14 +136,14 @@
                     Grid.Row="2"
                     BorderBrush="{StaticResource BorderBrush}"
                     BorderThickness="0,1,0,0">
-                    <DockPanel Margin="20,0" LastChildFill="False">
+                    <DockPanel Margin="16,0" LastChildFill="False">
                         <TextBlock
                             VerticalAlignment="Center"
                             Foreground="{StaticResource TextTertiaryBrush}"
                             Text="首次连接需要在设备上确认调试授权，之后直连即可" />
 
                         <Button
-                            Margin="0,12"
+                            Margin="0,10"
                             Padding="14,0"
                             Command="{Binding ConnectDeviceCommand}"
                             Content="连接设备"
