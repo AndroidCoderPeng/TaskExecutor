@@ -26,6 +26,7 @@ public partial class App : Application
         services.AddTransient<ImportExportViewModel>();
         services.AddTransient<TargetAppViewModel>();
         services.AddTransient<EmailConfigViewModel>();
+        services.AddTransient<WxConfigViewModel>();
 
         Services = services.BuildServiceProvider();
 

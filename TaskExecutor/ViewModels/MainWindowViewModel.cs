@@ -52,7 +52,7 @@ public partial class MainWindowViewModel : ObservableObject
             "导入导出" => App.Services.GetRequiredService<ImportExportViewModel>(),
             "目标APP" => App.Services.GetRequiredService<TargetAppViewModel>(),
             "邮箱配置" => App.Services.GetRequiredService<EmailConfigViewModel>(),
-            // "企业微信配置" => App.Services.GetRequiredService<WeChatWorkConfigurationViewModel>(),
+            "企业微信配置" => App.Services.GetRequiredService<WxConfigViewModel>(),
             // "任务等待时间" => App.Services.GetRequiredService<TaskWaitTimeViewModel>(),
             // "任务重置时间" => App.Services.GetRequiredService<TaskResetTimeViewModel>(),
             // "随机时间范围" => App.Services.GetRequiredService<RandomTimeRangeViewModel>(),

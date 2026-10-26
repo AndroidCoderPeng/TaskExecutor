@@ -30,6 +30,10 @@
             <DataTemplate DataType="{x:Type vm:EmailConfigViewModel}">
                 <views:EmailConfigView/>
             </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type vm:WxConfigViewModel}">
+                <views:WxConfigView/>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
