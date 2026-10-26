@@ -8,12 +8,6 @@
 </head>
 <body>
 
-<!-- 设计辅助：间距标注开关（不参与界面布局） -->
-<div class="anno-bar">
-  <button class="anno-btn" id="btnAnno">间距标注：关</button>
-  <span class="anno-hint">P=内边距(padding) · M=外边距(margin) · G=子项间距(gap)，悬停控件查看明细</span>
-</div>
-
 <div class="win">
   <!-- Windows 标题栏 -->
   <div class="titlebar">
@@ -471,17 +465,9 @@
     </div>
   </div>
 
-  <!-- 间距标注图层（设计辅助） -->
-  <div id="annoLayer"></div>
-
   <!-- Toast -->
   <div class="toast" id="toast"><span class="dot sm"></span><span id="toastMsg"></span></div>
 </div>
-
-<!-- 间距标注：窗口外侧数值标签 + 引线箭头（设计辅助） -->
-<div id="annoOuter"></div>
-<svg id="annoSvg"></svg>
-<div class="anno-info" id="annoInfo"></div>
 
 <script src="app.js"></script>
 </body>
