@@ -59,45 +59,124 @@
 
                 <Grid Grid.Row="1" Margin="16,12">
                     <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <DockPanel Grid.Row="0" LastChildFill="True">
-                        <TextBlock />
+                        <Grid Width="110">
+                            <TextBlock
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                FontSize="13"
+                                Foreground="{StaticResource TextTertiaryBrush}"
+                                Text="STMP 服务器" />
+                        </Grid>
 
-                        <TextBox Style="{StaticResource FieldTextBoxStyle}" />
+                        <TextBox Margin="12,0,0,0" Style="{StaticResource FieldTextBoxStyle}" />
+                    </DockPanel>
+
+                    <StackPanel
+                        Grid.Row="1"
+                        Margin="0,16"
+                        Orientation="Horizontal">
+                        <Grid Width="110">
+                            <TextBlock
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                FontSize="13"
+                                Foreground="{StaticResource TextTertiaryBrush}"
+                                Text="端口" />
+                        </Grid>
+
+                        <TextBox
+                            Width="120"
+                            Margin="12,0"
+                            Style="{StaticResource FieldTextBoxStyle}" />
+
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            Foreground="{StaticResource TextTertiaryBrush}"
+                            Text="SSL 加密连接（超时 60s）" />
+                    </StackPanel>
+
+                    <DockPanel Grid.Row="2" LastChildFill="True">
+                        <Grid Width="110">
+                            <TextBlock
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                FontSize="13"
+                                Foreground="{StaticResource TextTertiaryBrush}"
+                                Text="发件人邮箱" />
+                        </Grid>
+
+                        <TextBox Margin="12,0,0,0" Style="{StaticResource FieldTextBoxStyle}" />
+                    </DockPanel>
+
+                    <DockPanel
+                        Grid.Row="3"
+                        Margin="0,16"
+                        LastChildFill="True">
+                        <Grid Width="110">
+                            <TextBlock
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                FontSize="13"
+                                Foreground="{StaticResource TextTertiaryBrush}"
+                                Text="授权码" />
+                        </Grid>
+
+                        <TextBox Margin="12,0,0,0" Style="{StaticResource FieldTextBoxStyle}" />
+                    </DockPanel>
+
+                    <DockPanel Grid.Row="4" LastChildFill="True">
+                        <Grid Width="110">
+                            <TextBlock
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                FontSize="13"
+                                Foreground="{StaticResource TextTertiaryBrush}"
+                                Text="收件人邮箱" />
+                        </Grid>
+
+                        <TextBox Margin="12,0,0,0" Style="{StaticResource FieldTextBoxStyle}" />
                     </DockPanel>
                 </Grid>
 
-                <Grid Grid.Row="2" Margin="16,0,16,12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                <Border
+                    Grid.Row="2"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,1,0,0">
+                    <Grid Margin="16,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                    <TextBlock
-                        Grid.Column="0"
-                        VerticalAlignment="Center"
-                        Foreground="{StaticResource TextTertiaryBrush}"
-                        Text="授权码在 QQ 邮箱「设备 → 账户 → POP3/SMTP服务」中生成" />
+                        <TextBlock
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource TextTertiaryBrush}"
+                            Text="授权码在 QQ 邮箱「设备 → 账户 → POP3/SMTP服务」中生成" />
 
-                    <Button
-                        Grid.Column="1"
-                        Content="测试邮箱通知"
-                        Style="{StaticResource CommonButtonStyle}" />
+                        <Button
+                            Grid.Column="1"
+                            Content="测试邮箱通知"
+                            Style="{StaticResource CommonButtonStyle}" />
 
-                    <Button
-                        Grid.Column="2"
-                        Margin="8,0,0,0"
-                        Padding="14,0"
-                        Content="保存配置"
-                        Style="{StaticResource PrimaryButtonStyle}" />
-                </Grid>
+                        <Button
+                            Grid.Column="2"
+                            Margin="8,0,0,0"
+                            Padding="14,0"
+                            Content="保存配置"
+                            Style="{StaticResource PrimaryButtonStyle}" />
+                    </Grid>
+                </Border>
             </Grid>
         </Border>
     </StackPanel>
