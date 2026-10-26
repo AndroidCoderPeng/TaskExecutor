@@ -24,7 +24,10 @@
                 Text="QQ 邮箱 · SMTP" />
         </DockPanel>
 
-        <Border Margin="20,16" Style="{StaticResource CommonBorderStyle}">
+        <Border
+            Height="374"
+            Margin="20,16"
+            Style="{StaticResource CommonBorderStyle}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -41,7 +44,7 @@
 
                     <TextBlock
                         Grid.Column="0"
-                        Margin="16,16,10,16"
+                        Margin="16,12,10,12"
                         FontSize="15"
                         FontWeight="SemiBold"
                         Foreground="White"
