@@ -100,7 +100,6 @@
         <h1 id="pageTitle">任务管理</h1>
         <div class="topbar-right">
           <span class="desc" id="pageDesc"></span>
-          <span class="badge green" id="svcBadge" title="任务调度引擎状态（与 ADB 连接状态无关）"><span class="dot sm pulse"></span>调度运行中</span>
           <button class="btn btn-primary" id="btnNew">
             <svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
             新建任务
@@ -122,10 +121,13 @@
           <div class="card tasks">
             <div class="card-head">
               <div class="left"><b>定时任务</b><span class="count-badge" id="countBadge">4 项</span></div>
-              <div class="filters">
-                <span class="on" data-f="all">全部</span>
-                <span data-f="on">已启用</span>
-                <span data-f="off">已停用</span>
+              <div class="head-right">
+                <span class="badge green" id="svcBadge" title="任务调度引擎状态（与 ADB 连接状态无关）"><span class="dot sm pulse"></span>调度运行中</span>
+                <div class="filters">
+                  <span class="on" data-f="all">全部</span>
+                  <span data-f="on">已启用</span>
+                  <span data-f="off">已停用</span>
+                </div>
               </div>
             </div>
             <table>

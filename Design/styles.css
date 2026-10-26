@@ -175,6 +175,7 @@
   .card-head .left{display:flex;align-items:center;gap:8px;}
   .card-head .left b{font-size:14px;font-weight:600;color:var(--text-1);}
   .card-head .left small{font-size:12px;color:var(--text-3);}
+  .head-right{display:flex;align-items:center;gap:12px;}
   .count-badge{background:var(--fill-3);color:var(--text-3);font-size:11px;border-radius:3px;padding:1px 6px;}
   .filters{display:flex;gap:12px;}
   .filters span{font-size:13px;color:var(--text-3);cursor:pointer;}

@@ -1,12 +1,101 @@
-<UserControl x:Class="TaskExecutor.Views.EmailConfigView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:TaskExecutor.Views"
-             mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        
-    </Grid>
+<UserControl
+    x:Class="TaskExecutor.Views.EmailConfigView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:EmailConfigViewModel}"
+    mc:Ignorable="d">
+    <StackPanel Orientation="Vertical">
+        <DockPanel Background="{StaticResource CardBackgroundBrush}" LastChildFill="True">
+            <TextBlock
+                Margin="20"
+                FontSize="16"
+                FontWeight="SemiBold"
+                Foreground="White"
+                Text="邮箱配置" />
+
+            <TextBlock
+                Margin="20"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Foreground="{StaticResource TextTertiaryBrush}"
+                Text="QQ 邮箱 · SMTP" />
+        </DockPanel>
+
+        <Border Margin="20" Style="{StaticResource CommonBorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="16,16,10,16"
+                        FontSize="15"
+                        FontWeight="SemiBold"
+                        Foreground="White"
+                        Text="邮箱（SMTP）" />
+
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource TextTertiaryBrush}"
+                        Text="QQ 邮箱 · SSL 加密" />
+                </Grid>
+
+                <Grid Grid.Row="1" Margin="16,12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" LastChildFill="True">
+                        <TextBlock />
+
+                        <TextBox Style="{StaticResource FieldTextBoxStyle}" />
+                    </DockPanel>
+                </Grid>
+
+                <Grid Grid.Row="2" Margin="16,0,16,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource TextTertiaryBrush}"
+                        Text="授权码在 QQ 邮箱「设备 → 账户 → POP3/SMTP服务」中生成" />
+
+                    <Button
+                        Grid.Column="1"
+                        Content="测试邮箱通知"
+                        Style="{StaticResource CommonButtonStyle}" />
+
+                    <Button
+                        Grid.Column="2"
+                        Margin="8,0,0,0"
+                        Padding="14,0"
+                        Content="保存配置"
+                        Style="{StaticResource PrimaryButtonStyle}" />
+                </Grid>
+            </Grid>
+        </Border>
+    </StackPanel>
 </UserControl>

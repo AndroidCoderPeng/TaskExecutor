@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
     Title="TaskExecutor - 定时任务自动化"
-    Width="1188"
+    Width="1300"
     Height="806"
     d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}"
     Background="{StaticResource WindowBackgroundBrush}"
