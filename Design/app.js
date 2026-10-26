@@ -53,16 +53,9 @@
     $("pageDesc").textContent=VIEW_META[v].desc;
     $("btnNew").style.display=v==="tasks"?"":"none";
     document.querySelector(".content").scrollTop=0;
+    scheduleAnno();
   }
   document.querySelectorAll(".nav-item").forEach(n=>n.addEventListener("click",()=>switchView(n.dataset.view)));
-
-  // Ctrl+T / Ctrl+R 快捷键
-  document.addEventListener("keydown",e=>{
-    if(!e.ctrlKey||e.shiftKey||e.altKey)return;
-    const k=e.key.toLowerCase();
-    if(k==="t"){e.preventDefault();switchView("wait");setTimeout(()=>$("waitInput").focus(),60);toast("已定位到「任务等待时间」");}
-    if(k==="r"){e.preventDefault();switchView("reset");setTimeout(()=>$("resetInput").focus(),60);toast("已定位到「任务重置时间」");}
-  });
 
   // ===== Toast =====
   let toastTimer;
@@ -88,6 +81,7 @@
     $("logList").innerHTML=list.map(l=>`
       <div class="log-row"><span class="t">${l.t}</span><span class="lv ${l.lv}">${l.l}</span><span class="m">${l.m}</span></div>`).join("");
     $("logToggle").textContent=logExpanded?"收起":"查看全部";
+    scheduleAnno();
   }
   $("logToggle").onclick=()=>{logExpanded=!logExpanded;renderLogs();};
 
@@ -110,6 +104,7 @@
       </tr>`;}).join("")
       :`<tr class="empty-row"><td colspan="6">暂无${filter==="off"?"已停用":"已启用"}任务，点击右上角「新建任务」添加</td></tr>`;
     $("countBadge").textContent=tasks.length+" 项";
+    scheduleAnno();
   }
   $("taskBody").addEventListener("click",e=>{
     const act=e.target.dataset.act;
@@ -147,9 +142,9 @@
     $("fName").textContent=mode==="edit"?tasks[i].name:"";
     $("fTime").textContent=mode==="edit"?tasks[i].time.split(" ")[0]:"";
     overlay.classList.add("show");
-    setTimeout(()=>$("fName").focus(),50);
+    setTimeout(()=>{scheduleAnno();$("fName").focus();},50);
   }
-  function closeDialog(){overlay.classList.remove("show");}
+  function closeDialog(){overlay.classList.remove("show");scheduleAnno();}
   $("btnNew").onclick=()=>openDialog("new");
   $("btnClose").onclick=closeDialog;
   $("btnCancel").onclick=closeDialog;
@@ -340,5 +335,223 @@
     },1000);
   };
 
+  // ===== 间距标注（设计稿辅助，可开关） =====
+  const WIN=document.querySelector(".win"),LAYER=$("annoLayer"),INFO=$("annoInfo");
+  const OUT=$("annoOuter"),SVG=$("annoSvg"),SVGNS="http://www.w3.org/2000/svg";
+  const SKIP_TAG={SVG:1,PATH:1,CIRCLE:1,RECT:1,G:1,LINE:1,POLYGON:1,ELLIPSE:1,DEFS:1};
+  let annoOn=false,annoRaf=0,annoSet=new WeakSet(),annoGroups=new Map();
+  function metrics(el){
+    const cs=getComputedStyle(el);
+    return {
+      m:[cs.marginTop,cs.marginRight,cs.marginBottom,cs.marginLeft].map(apx),
+      p:[cs.paddingTop,cs.paddingRight,cs.paddingBottom,cs.paddingLeft].map(apx),
+      g:apx(cs.rowGap)
+    };
+  }
+
+  const apx=v=>Math.round((parseFloat(v)||0)*10)/10;
+  function fmtBox(a){
+    if(a.every(x=>x===0))return null;
+    if(a[0]===a[1]&&a[1]===a[2]&&a[2]===a[3])return String(a[0]);
+    if(a[0]===a[2]&&a[1]===a[3])return a[0]+" "+a[1];
+    return a.join(" ");
+  }
+  function annoTargets(){
+    const out=[];
+    WIN.querySelectorAll("*").forEach(el=>{
+      const ov=el.closest(".overlay");
+      if(SKIP_TAG[el.tagName]||el.closest("#annoLayer,.toast")||(ov&&!ov.classList.contains("show")))return;
+      const cs=getComputedStyle(el);
+      if(cs.display==="none"||cs.visibility==="hidden")return;
+      const r=el.getBoundingClientRect();
+      if(r.width<20||r.height<12)return;
+      const m=[cs.marginTop,cs.marginRight,cs.marginBottom,cs.marginLeft].map(apx);
+      const p=[cs.paddingTop,cs.paddingRight,cs.paddingBottom,cs.paddingLeft].map(apx);
+      const g=apx(cs.rowGap);
+      if(m.every(x=>x===0)&&p.every(x=>x===0)&&!g)return;
+      out.push({el:el,m:m,p:p,g:g});
+    });
+    return out;
+  }
+  function tagText(t,n){
+    const parts=[],p=fmtBox(t.p),m=fmtBox(t.m);
+    if(p)parts.push("P "+p);
+    if(m)parts.push("M "+m);
+    if(t.g)parts.push("G "+t.g);
+    return parts.join(" · ")+(n>1?" ×"+n:"");
+  }
+  // 同类控件（标签+样式类+间距完全相同，如列表子项）只标注一个代表
+  function sig(el,m,p,g){
+    const cls=[...el.classList].filter(x=>x!=="anno-hit"&&x!=="hot").sort().join(".");
+    return el.tagName+"|"+cls+"|"+m.join(",")+"|"+p.join(",")+"|"+g;
+  }
+  // 外部引线标注：数值标签排在窗口左右空白区，用箭头指向对应控件
+  function renderAnno(){
+    if(!annoOn)return;
+    document.querySelectorAll(".anno-hit").forEach(x=>x.classList.remove("anno-hit","hot"));
+    LAYER.innerHTML="";OUT.innerHTML="";
+    annoSet=new WeakSet();
+    const groups=new Map();
+    annoTargets().forEach(t=>{
+      annoSet.add(t.el);
+      const k=sig(t.el,t.m,t.p,t.g);
+      const g=groups.get(k);
+      if(g)g.n++;else groups.set(k,{t:t,n:1});
+    });
+    annoGroups=groups;
+
+    const doc=document.documentElement;
+    SVG.setAttribute("width",doc.scrollWidth);
+    SVG.setAttribute("height",doc.scrollHeight);
+    SVG.innerHTML=
+      '<defs>'+
+      '<marker id="arw" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#4098FC"/></marker>'+
+      '<marker id="arwHot" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#FFFFFF"/></marker>'+
+      '</defs>';
+
+    const sx=window.scrollX,sy=window.scrollY,docW=doc.scrollWidth,docH=doc.scrollHeight;
+    const wr=WIN.getBoundingClientRect();
+    const winL=wr.left+sx,winR=wr.right+sx,winT=wr.top+sy,winB=wr.bottom+sy,mid=(winL+winR)/2;
+
+    const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+    const nodes=[...groups.values()].map((g,i)=>{
+      g.i=i;
+      const r=g.t.el.getBoundingClientRect();
+      const div=document.createElement("div");
+      div.className="anno-out";div.dataset.i=i;
+      div.textContent=tagText(g.t,g.n);
+      OUT.appendChild(div);
+      const n={g:g,div:div,
+               w:div.offsetWidth||90,h:div.offsetHeight||16,
+               bx:r.left+sx,by:r.top+sy,bw:r.width,bh:r.height};
+      return n;
+    });
+
+    // 就近原则：在控件四周空白区（左/右/上/下）中选离它最近的一侧放置标签，
+    // 标签贴住对应的窗口边缘，再用最短的箭头指向控件。
+    const buckets={L:[],R:[],T:[],B:[]};
+    nodes.forEach(n=>{
+      const cx=n.bx+n.bw/2, cy=n.by+n.bh/2;
+      const cand=[
+        {s:"L", x:winL-n.w-12, y:cy-n.h/2, ax:winL-12, ay:cy, ex:n.bx,      ey:cy},
+        {s:"R", x:winR+12,     y:cy-n.h/2, ax:winR+12, ay:cy, ex:n.bx+n.bw, ey:cy},
+        {s:"T", x:clamp(cx-n.w/2,8,docW-n.w-8), y:winT-n.h-12, ax:cx, ay:winT-12, ex:cx, ey:n.by},
+        {s:"B", x:clamp(cx-n.w/2,8,docW-n.w-8), y:winB+12,     ax:cx, ay:winB+12, ex:cx, ey:n.by+n.bh}
+      ];
+      cand.forEach(c=>{
+        if(c.s==="L"||c.s==="R")c.y=clamp(c.y,8,docH-n.h-8);
+        c.len=Math.hypot(c.ax-c.ex,c.ay-c.ey);
+      });
+      cand.sort((a,b)=>(a.len-b.len)||((a.s==="T"||a.s==="B"?1:0)-(b.s==="T"||b.s==="B"?1:0)));
+      const b=cand[0];
+      n.side=b.s;n.pos={x:b.x,y:b.y};n.ax=b.ax;n.ay=b.ay;n.ex=b.ex;n.ey=b.ey;
+      buckets[b.s].push(n);
+    });
+
+    // 同侧防重叠：左/右沿 Y 堆叠，上/下沿 X 堆叠，仅在碰撞时做最小位移
+    const pack=(arr,horiz)=>{
+      arr.sort((a,b)=>horiz?a.pos.x-b.pos.x:a.by-b.by);
+      let cur=-1e9;
+      arr.forEach(n=>{
+        if(horiz){let x=clamp(Math.max(n.pos.x,cur+6),8,docW-n.w-8);n.pos.x=x;cur=x+n.w;}
+        else{let y=clamp(Math.max(n.pos.y,cur+6),8,docH-n.h-8);n.pos.y=y;cur=y+n.h;}
+      });
+    };
+    pack(buckets.L,false);pack(buckets.R,false);pack(buckets.T,true);pack(buckets.B,true);
+
+    // 按最终位置绘制标签与引线（箭头指向控件）
+    nodes.forEach(n=>{
+      n.g.t.el.classList.add("anno-hit");
+      const x=n.pos.x,y=n.pos.y;
+      n.div.style.left=x+"px";n.div.style.top=y+"px";
+      if(n.side==="L"){n.ax=x+n.w;n.ay=y+n.h/2;}
+      else if(n.side==="R"){n.ax=x;n.ay=y+n.h/2;}
+      else if(n.side==="T"){n.ax=x+n.w/2;n.ay=y+n.h;}
+      else{n.ax=x+n.w/2;n.ay=y;}
+      const ln=document.createElementNS(SVGNS,"line");
+      ln.setAttribute("class","anno-line");
+      ln.setAttribute("x1",n.ax);ln.setAttribute("y1",n.ay);
+      ln.setAttribute("x2",n.ex);ln.setAttribute("y2",n.ey);
+      ln.setAttribute("marker-end","url(#arw)");
+      ln.dataset.i=n.g.i;
+      SVG.appendChild(ln);
+      const dot=document.createElementNS(SVGNS,"circle");
+      dot.setAttribute("class","anno-dot");
+      dot.setAttribute("cx",n.ex);dot.setAttribute("cy",n.ey);dot.setAttribute("r",2.5);
+      SVG.appendChild(dot);
+    });
+  }
+  function scheduleAnno(){
+    if(!annoOn||annoRaf)return;
+    annoRaf=requestAnimationFrame(()=>{annoRaf=0;renderAnno();});
+  }
+  function clearAnno(){
+    document.querySelectorAll(".anno-hit").forEach(x=>x.classList.remove("anno-hit","hot"));
+    LAYER.innerHTML="";OUT.innerHTML="";SVG.innerHTML="";INFO.textContent="";
+    annoGroups=new Map();
+  }
+  function annoHot(i){
+    OUT.querySelectorAll(".anno-out.hot").forEach(x=>x.classList.remove("hot"));
+    SVG.querySelectorAll(".anno-line.hot").forEach(x=>{x.classList.remove("hot");x.setAttribute("marker-end","url(#arw)");});
+    if(i==null)return;
+    const lb=OUT.querySelector('.anno-out[data-i="'+i+'"]');
+    const ln=SVG.querySelector('.anno-line[data-i="'+i+'"]');
+    if(lb)lb.classList.add("hot");
+    if(ln){ln.classList.add("hot");ln.setAttribute("marker-end","url(#arwHot)");}
+  }
+  function sel(el){
+    const c=(el.className||"").trim().split(/\s+/).filter(x=>x).slice(0,2).map(x=>"."+x).join("");
+    return el.tagName.toLowerCase()+(el.id?"#"+el.id:"")+c;
+  }
+  function annoHover(e){
+    if(!annoOn)return;
+    LAYER.querySelectorAll(".anno-box,.anno-mbox").forEach(x=>x.remove());
+    document.querySelectorAll(".anno-hit.hot").forEach(x=>x.classList.remove("hot"));
+    annoHot(null);
+    let el=document.elementFromPoint(e.clientX,e.clientY);
+    if(!el||el.closest("#annoLayer,.toast,.anno-bar")||SKIP_TAG[el.tagName]){INFO.textContent="";return;}
+    const ov=el.closest(".overlay");
+    if(ov&&!ov.classList.contains("show")){INFO.textContent="";return;}
+    while(el&&el!==WIN&&!annoSet.has(el))el=el.parentElement;
+    if(!el||el===WIN){INFO.textContent="";return;}
+    const cs=getComputedStyle(el),r=el.getBoundingClientRect(),wr=WIN.getBoundingClientRect();
+    const mm=metrics(el),m=mm.m,p=mm.p;
+    const b=[cs.borderTopWidth,cs.borderRightWidth,cs.borderBottomWidth,cs.borderLeftWidth].map(apx);
+    const gm=annoGroups.get(sig(el,m,p,mm.g));
+    annoHot(gm?gm.i:null);
+    el.classList.add("hot");
+    const box=(cls,left,top,w,h)=>{
+      const d=document.createElement("div");
+      d.className=cls;
+      d.style.left=(left-wr.left)+"px";d.style.top=(top-wr.top)+"px";
+      d.style.width=w+"px";d.style.height=h+"px";
+      LAYER.appendChild(d);
+    };
+    box("anno-mbox",r.left-m[3],r.top-m[0],r.width+m[3]+m[1],r.height+m[0]+m[2]);
+    box("anno-box",r.left+b[3],r.top+b[0],r.width-b[3]-b[1],r.height-b[0]-b[2]);
+    INFO.textContent=
+      sel(el)+"\n"+
+      "margin  : "+m.join(" ")+"\n"+
+      "padding : "+p.join(" ")+"\n"+
+      "gap     : "+apx(cs.rowGap)+" / "+apx(cs.columnGap)+"\n"+
+      "border  : "+b.join(" ")+"\n"+
+      "size    : "+Math.round(r.width)+" × "+Math.round(r.height);
+  }
+  $("btnAnno").onclick=()=>{
+    annoOn=!annoOn;
+    document.body.classList.toggle("anno-mode",annoOn);
+    $("btnAnno").classList.toggle("on",annoOn);
+    $("btnAnno").textContent="间距标注："+(annoOn?"开":"关");
+    annoOn?renderAnno():clearAnno();
+  };
+  WIN.addEventListener("mousemove",annoHover);
+  document.querySelector(".content").addEventListener("scroll",scheduleAnno);
+  window.addEventListener("resize",scheduleAnno);
+  new MutationObserver(muts=>{
+    if(muts.every(m=>LAYER.contains(m.target)||OUT.contains(m.target)||SVG.contains(m.target)))return;
+    scheduleAnno();
+  }).observe(WIN,{childList:true,subtree:true});
+
   // ===== 初始化 =====
   render();renderLogs();refreshLock();
+  if(location.hash==="#anno")$("btnAnno").click();

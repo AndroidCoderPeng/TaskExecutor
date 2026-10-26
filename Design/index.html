@@ -8,6 +8,12 @@
 </head>
 <body>
 
+<!-- 设计辅助：间距标注开关（不参与界面布局） -->
+<div class="anno-bar">
+  <button class="anno-btn" id="btnAnno">间距标注：关</button>
+  <span class="anno-hint">P=内边距(padding) · M=外边距(margin) · G=子项间距(gap)，悬停控件查看明细</span>
+</div>
+
 <div class="win">
   <!-- Windows 标题栏 -->
   <div class="titlebar">
@@ -56,11 +62,11 @@
         <div class="nav-label">调度</div>
         <div class="nav-item" data-view="wait">
           <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          任务等待时间<span class="kbd">Ctrl+T</span>
+          任务等待时间
         </div>
         <div class="nav-item" data-view="reset">
           <svg viewBox="0 0 24 24" fill="none"><path d="M3.5 12a8.5 8.5 0 1 0 2.5-6L3.5 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 3.5v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          任务重置时间<span class="kbd">Ctrl+R</span>
+          任务重置时间
         </div>
         <div class="nav-item" data-view="random">
           <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="9" width="18" height="6" rx="3" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="12" r="1.8" fill="currentColor"/><path d="M17 10.5v3M15.5 12h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -465,9 +471,17 @@
     </div>
   </div>
 
+  <!-- 间距标注图层（设计辅助） -->
+  <div id="annoLayer"></div>
+
   <!-- Toast -->
   <div class="toast" id="toast"><span class="dot sm"></span><span id="toastMsg"></span></div>
 </div>
+
+<!-- 间距标注：窗口外侧数值标签 + 引线箭头（设计辅助） -->
+<div id="annoOuter"></div>
+<svg id="annoSvg"></svg>
+<div class="anno-info" id="annoInfo"></div>
 
 <script src="app.js"></script>
 </body>
