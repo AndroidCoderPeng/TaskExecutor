@@ -222,7 +222,6 @@
 
     <!--  开关样式复选框  -->
     <Style x:Key="CheckBoxSwitchStyle" TargetType="CheckBox">
-        <Setter Property="FontSize" Value="14" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="Template">

@@ -71,7 +71,7 @@
                             <TextBlock
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
-                                FontSize="13"
+                                FontSize="14"
                                 Foreground="{StaticResource TextTertiaryBrush}"
                                 Text="Webhook Key" />
                         </Grid>
@@ -87,7 +87,7 @@
                             <TextBlock
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
-                                FontSize="13"
+                                FontSize="14"
                                 Foreground="{StaticResource TextTertiaryBrush}"
                                 Text="消息标题" />
                         </Grid>
@@ -100,7 +100,7 @@
                             <TextBlock
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
-                                FontSize="13"
+                                FontSize="14"
                                 Foreground="{StaticResource TextTertiaryBrush}"
                                 Text="附带截屏" />
                         </Grid>

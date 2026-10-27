@@ -118,7 +118,7 @@
                         VerticalAlignment="Center"
                         FontSize="14"
                         Foreground="{StaticResource TextSecondaryBrush}"
-                        Text="设备状态" />
+                        Text="设备IP" />
 
                     <TextBox
                         Width="240"
