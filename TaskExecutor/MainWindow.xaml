@@ -190,13 +190,54 @@
             VerticalAlignment="Bottom"
             Panel.ZIndex="999"
             CornerRadius="16">
+
+            <!--  必须预置 TranslateTransform，Storyboard 才能绑定到 RenderTransform.Y  -->
+            <Border.RenderTransform>
+                <TranslateTransform Y="24" />
+            </Border.RenderTransform>
+
             <Border.Style>
                 <Style TargetType="Border">
-                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Setter Property="Opacity" Value="0" />
                     <Setter Property="Background" Value="{StaticResource ControlFillBrush}" />
+
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Toast.IsVisible}" Value="True">
-                            <Setter Property="Visibility" Value="Visible" />
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetProperty="Opacity"
+                                            From="0"
+                                            To="1"
+                                            Duration="0:0:0.18" />
+                                        <DoubleAnimation
+                                            Storyboard.TargetProperty="RenderTransform.Y"
+                                            From="24"
+                                            To="0"
+                                            Duration="0:0:0.24">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="0:0:0.16" />
+                                        <DoubleAnimation
+                                            Storyboard.TargetProperty="RenderTransform.Y"
+                                            To="16"
+                                            Duration="0:0:0.16" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
                         </DataTrigger>
 
                         <DataTrigger Binding="{Binding Toast.Level}" Value="Success">
