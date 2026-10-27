@@ -1,0 +1,240 @@
+﻿<UserControl
+    x:Class="TaskExecutor.Views.CommandTestView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:CommandTestViewModel}"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="94" />
+            <Setter Property="Background" Value="{StaticResource ControlFillBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="ActionButtonBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!--  普通 hover：蓝色  -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ActionButtonBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                            </Trigger>
+
+                            <!--  危险 hover：红色（声明在后，覆盖上面的蓝色）  -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="Tag" Value="Danger" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="ActionButtonBorder" Property="BorderBrush" Value="{StaticResource DangerBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                            </MultiTrigger>
+
+                            <!--  按下：复位  -->
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ActionButtonBorder" Property="Opacity" Value="0.75" />
+                            </Trigger>
+
+                            <!--  禁用：半透明  -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Vertical">
+        <DockPanel Background="{StaticResource CardBackgroundBrush}" LastChildFill="True">
+            <TextBlock
+                Margin="20,16"
+                FontSize="16"
+                FontWeight="SemiBold"
+                Foreground="White"
+                Text="指令测试" />
+
+            <TextBlock
+                Margin="20,16"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Foreground="{StaticResource TextTertiaryBrush}"
+                Text="ADB 指令调试" />
+        </DockPanel>
+
+        <Border Margin="20,16" Style="{StaticResource CommonBorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <StackPanel
+                    Grid.Row="0"
+                    Margin="16"
+                    Orientation="Horizontal">
+                    <TextBlock
+                        FontSize="15"
+                        FontWeight="SemiBold"
+                        Foreground="White"
+                        Text="ADB 指令测试" />
+
+                    <TextBlock
+                        Margin="8,0"
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource TextTertiaryBrush}"
+                        Text="{Binding DeviceName, FallbackValue=Pixel 6}" />
+                </StackPanel>
+
+                <UniformGrid
+                    Grid.Row="1"
+                    Margin="16,4,16,16"
+                    Columns="5"
+                    Rows="1">
+                    <Button Margin="0,0,6,0" Style="{StaticResource ActionButtonStyle}">
+                        <Button.Content>
+                            <StackPanel Margin="16,0" Orientation="Vertical">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontFamily="/TaskExecutor;component/Fonts/#iconfont"
+                                    FontSize="24"
+                                    Text="&#xe74d;" />
+
+                                <TextBlock
+                                    Margin="0,6"
+                                    HorizontalAlignment="Center"
+                                    FontSize="14"
+                                    Foreground="White"
+                                    Text="亮屏" />
+
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontSize="10"
+                                    Foreground="{StaticResource TextDisabledBrush}"
+                                    Text="KEYCODE_WAKEUP" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+
+                    <Button Margin="6,0" Style="{StaticResource ActionButtonStyle}">
+                        <Button.Content>
+                            <StackPanel Margin="16,0" Orientation="Vertical">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontFamily="/TaskExecutor;component/Fonts/#iconfont"
+                                    FontSize="24"
+                                    Text="&#xe749;" />
+
+                                <TextBlock
+                                    Margin="0,6"
+                                    HorizontalAlignment="Center"
+                                    FontSize="14"
+                                    Foreground="White"
+                                    Text="息屏" />
+
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontSize="10"
+                                    Foreground="{StaticResource TextDisabledBrush}"
+                                    Text="KEYCODE_SLEEP" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+
+                    <Button Margin="6,0" Style="{StaticResource ActionButtonStyle}">
+                        <Button.Content>
+                            <StackPanel Margin="16,0" Orientation="Vertical">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontFamily="/TaskExecutor;component/Fonts/#iconfont"
+                                    FontSize="24"
+                                    Text="&#xe639;" />
+
+                                <TextBlock
+                                    Margin="0,6"
+                                    HorizontalAlignment="Center"
+                                    FontSize="14"
+                                    Foreground="White"
+                                    Text="截屏" />
+
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontSize="10"
+                                    Foreground="{StaticResource TextDisabledBrush}"
+                                    Text="screencap" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+
+                    <Button Margin="6,0" Style="{StaticResource ActionButtonStyle}">
+                        <Button.Content>
+                            <StackPanel Margin="16,0" Orientation="Vertical">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontFamily="/TaskExecutor;component/Fonts/#iconfont"
+                                    FontSize="24"
+                                    Text="&#xe6b7;" />
+
+                                <TextBlock
+                                    Margin="0,6"
+                                    HorizontalAlignment="Center"
+                                    FontSize="14"
+                                    Foreground="White"
+                                    Text="打开目标应用" />
+
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontSize="10"
+                                    Foreground="{StaticResource TextDisabledBrush}"
+                                    Text="am start" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+
+                    <Button
+                        Margin="6,0,0,0"
+                        Style="{StaticResource ActionButtonStyle}"
+                        Tag="Danger">
+                        <Button.Content>
+                            <StackPanel Margin="16,0" Orientation="Vertical">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontFamily="/TaskExecutor;component/Fonts/#iconfont"
+                                    FontSize="24"
+                                    Text="&#xe6b8;" />
+
+                                <TextBlock
+                                    Margin="0,6"
+                                    HorizontalAlignment="Center"
+                                    FontSize="14"
+                                    Foreground="White"
+                                    Text="关闭目标应用" />
+
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontSize="10"
+                                    Foreground="{StaticResource TextDisabledBrush}"
+                                    Text="am force-stop" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                </UniformGrid>
+            </Grid>
+        </Border>
+    </StackPanel>
+</UserControl>

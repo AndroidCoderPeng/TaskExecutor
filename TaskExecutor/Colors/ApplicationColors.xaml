@@ -25,7 +25,7 @@
     <!--  滚动条滑块  -->
 
     <!--  ========== 边框 / 分割线 ==========  -->
-    <Color x:Key="BorderColor">#FF33363E</Color>
+    <Color x:Key="CardBorderColor">#FF33363E</Color>
     <!--  border 输入框/卡片边框  -->
     <Color x:Key="DividerColor">#FF2C2F36</Color>
     <!--  divider 表格行/卡内分割线  -->
@@ -81,7 +81,7 @@
     <SolidColorBrush x:Key="ControlFillBrush" Color="{StaticResource ControlFillColor}" />
     <SolidColorBrush x:Key="ScrollbarThumbBrush" Color="{StaticResource ScrollbarThumbColor}" />
 
-    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}" />
+    <SolidColorBrush x:Key="CardBorderBrush" Color="{StaticResource CardBorderColor}" />
     <SolidColorBrush x:Key="DividerBrush" Color="{StaticResource DividerColor}" />
 
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />

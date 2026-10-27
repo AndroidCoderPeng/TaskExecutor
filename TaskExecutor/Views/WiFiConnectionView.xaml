@@ -33,7 +33,7 @@
             Height="110"
             Margin="20,0"
             Background="{StaticResource CardBackgroundBrush}"
-            BorderBrush="{StaticResource BorderBrush}"
+            BorderBrush="{StaticResource CardBorderBrush}"
             BorderThickness="1"
             CornerRadius="8">
             <Grid>
@@ -92,7 +92,7 @@
             Height="170"
             Margin="20,12"
             Background="{StaticResource CardBackgroundBrush}"
-            BorderBrush="{StaticResource BorderBrush}"
+            BorderBrush="{StaticResource CardBorderBrush}"
             BorderThickness="1"
             CornerRadius="8">
             <Grid>
@@ -134,7 +134,7 @@
 
                 <Border
                     Grid.Row="2"
-                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderBrush="{StaticResource CardBorderBrush}"
                     BorderThickness="0,1,0,0">
                     <DockPanel Margin="16,0" LastChildFill="False">
                         <TextBlock

@@ -50,6 +50,10 @@
             <DataTemplate DataType="{x:Type vm:ScheduleSwitchViewModel}">
                 <views:ScheduleSwitchView/>
             </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type vm:CommandTestViewModel}">
+                <views:CommandTestView/>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
