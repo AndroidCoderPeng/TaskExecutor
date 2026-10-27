@@ -1,0 +1,124 @@
+﻿<UserControl
+    x:Class="TaskExecutor.Views.RandomTimeView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:RandomTimeViewModel}"
+    mc:Ignorable="d">
+    <StackPanel Orientation="Vertical">
+        <DockPanel Background="{StaticResource CardBackgroundBrush}" LastChildFill="True">
+            <TextBlock
+                Margin="20,16"
+                FontSize="16"
+                FontWeight="SemiBold"
+                Foreground="White"
+                Text="随机时间范围" />
+
+            <TextBlock
+                Margin="20,16"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Foreground="{StaticResource TextTertiaryBrush}"
+                Text="执行时间偏移" />
+        </DockPanel>
+
+        <Border
+            Height="220"
+            Margin="20,16"
+            Background="{StaticResource CardBackgroundBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel
+                    Grid.Row="0"
+                    Margin="16,12"
+                    Orientation="Horizontal">
+                    <TextBlock
+                        FontSize="15"
+                        FontWeight="SemiBold"
+                        Foreground="White"
+                        Text="任务重置时间" />
+
+                    <TextBlock
+                        Margin="12,0"
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource TextTertiaryBrush}"
+                        Text="执行时间随机偏移上下限" />
+                </StackPanel>
+
+                <!--  套一层更好管理统一间距  -->
+                <StackPanel
+                    Grid.Row="1"
+                    Margin="64,0"
+                    Orientation="Vertical">
+                    <StackPanel Margin="0,16,0,12" Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="{StaticResource TextSecondaryBrush}"
+                            Text="偏移下限" />
+
+                        <TextBox
+                            Width="120"
+                            Margin="12,0"
+                            Style="{StaticResource FieldTextBoxStyle}"
+                            Text="{Binding LowerLimitTime, FallbackValue=0}" />
+
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource TextTertiaryBrush}"
+                            Text="分钟" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="{StaticResource TextSecondaryBrush}"
+                            Text="偏移上限" />
+
+                        <TextBox
+                            Width="120"
+                            Margin="12,0"
+                            Style="{StaticResource FieldTextBoxStyle}"
+                            Text="{Binding UpperLimitTime, FallbackValue=5}" />
+
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource TextTertiaryBrush}"
+                            Text="分钟" />
+                    </StackPanel>
+                </StackPanel>
+
+                <Border
+                    Grid.Row="2"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,1,0,0">
+                    <DockPanel Margin="16,0" LastChildFill="False">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource TextTertiaryBrush}"
+                            Text="任务实际执行时间 = 设定时间 + [下限, 上限] 内的随机偏移，模拟真实人工操作" />
+
+                        <Button
+                            Margin="0,10"
+                            Padding="14,0"
+                            Command="{Binding SaveConfigCommand}"
+                            Content="保存配置"
+                            DockPanel.Dock="Right"
+                            Style="{StaticResource PrimaryButtonStyle}" />
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </StackPanel>
+</UserControl>

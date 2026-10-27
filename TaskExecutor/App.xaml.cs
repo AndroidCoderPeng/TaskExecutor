@@ -31,6 +31,7 @@ public partial class App : Application
         
         services.AddTransient<TaskWaitTimeViewModel>();
         services.AddTransient<TaskResetTimeViewModel>();
+        services.AddTransient<RandomTimeViewModel>();
 
         Services = services.BuildServiceProvider();
 

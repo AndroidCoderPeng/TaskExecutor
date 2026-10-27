@@ -55,7 +55,7 @@ public partial class MainWindowViewModel : ObservableObject
             "企业微信配置" => App.Services.GetRequiredService<WxConfigViewModel>(),
             "任务等待时间" => App.Services.GetRequiredService<TaskWaitTimeViewModel>(),
             "任务重置时间" => App.Services.GetRequiredService<TaskResetTimeViewModel>(),
-            // "随机时间范围" => App.Services.GetRequiredService<RandomTimeRangeViewModel>(),
+            "随机时间范围" => App.Services.GetRequiredService<RandomTimeViewModel>(),
             // "调度开关" => App.Services.GetRequiredService<ScheduleSwitchViewModel>(),
             // "指令测试" => App.Services.GetRequiredService<CommandTestViewModel>(),
             // "常见问题" => App.Services.GetRequiredService<FaqViewModel>(),

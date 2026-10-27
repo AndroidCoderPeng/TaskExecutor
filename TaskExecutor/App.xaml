@@ -42,6 +42,10 @@
             <DataTemplate DataType="{x:Type vm:TaskResetTimeViewModel}">
                 <views:TaskResetTimeView/>
             </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type vm:RandomTimeViewModel}">
+                <views:RandomTimeView/>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
