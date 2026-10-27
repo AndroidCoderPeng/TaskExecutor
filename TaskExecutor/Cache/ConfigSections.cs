@@ -46,7 +46,7 @@ public class TargetAppRow
 {
     public string Name { get; set; } = "";
     public string PackageName { get; set; } = "";
-    public string LauncherActivity { get; set; } = "";
+    public string Activity { get; set; } = "";
 }
 
 public class EmailConfig

@@ -11,8 +11,9 @@ public partial class TargetAppViewModel : ObservableObject
     #region VM
 
     [ObservableProperty] private ObservableCollection<TargetAppRow> _targetApps;
-    [ObservableProperty] private string _appName;
-    [ObservableProperty] private string _packageName;
+    [ObservableProperty] private string _appName = string.Empty;
+    [ObservableProperty] private string _packageName = string.Empty;
+    [ObservableProperty] private string _launcherActivity = string.Empty;
 
     #endregion
 
@@ -27,19 +28,19 @@ public partial class TargetAppViewModel : ObservableObject
             {
                 Name = "钉钉",
                 PackageName = "com.alibaba.android.rimet",
-                LauncherActivity = ""
+                Activity = "com.alibaba.android.rimet.biz.LaunchHomeActivity"
             });
             _config.Apps.Add(new TargetAppRow
             {
                 Name = "企业微信",
                 PackageName = "com.tencent.wework",
-                LauncherActivity = ""
+                Activity = "com.tencent.wework.biz.LaunchHomeActivity"
             });
             _config.Apps.Add(new TargetAppRow
             {
                 Name = "飞书",
                 PackageName = "com.ss.android.lark",
-                LauncherActivity = ""
+                Activity = "com.ss.android.lark.biz.LaunchHomeActivity"
             });
             TargetApps = new ObservableCollection<TargetAppRow>(_config.Apps);
         }
@@ -63,10 +64,15 @@ public partial class TargetAppViewModel : ObservableObject
         {
             Name = AppName,
             PackageName = PackageName,
-            LauncherActivity = ""
+            Activity = LauncherActivity
         };
         TargetApps.Add(newApp);
         _config.Apps.Add(newApp);
         SettingsStore.Save(ConfigSections.FileName, ConfigSections.TargetApp, _config);
+
+        // Clear input fields after adding
+        AppName = string.Empty;
+        PackageName = string.Empty;
+        LauncherActivity = string.Empty;
     }
 }

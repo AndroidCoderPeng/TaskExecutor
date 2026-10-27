@@ -37,10 +37,10 @@
         </Style>
 
         <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
-            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="Padding" Value="10" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
             <Setter Property="FontSize" Value="13" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -232,88 +232,84 @@
                         Style="{StaticResource TextButtonStyle}" />
                 </Grid>
 
-                <Grid Grid.Row="1">
-                    <DataGrid
-                        x:Name="TargetAppDataGrid"
-                        ItemsSource="{Binding TargetApps}"
-                        Style="{StaticResource CardDataGridStyle}">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn
-                                Width="30*"
-                                Binding="{Binding PackageName}"
-                                Header="应用名称" />
+                <DataGrid
+                    Grid.Row="1"
+                    ItemsSource="{Binding TargetApps}"
+                    Style="{StaticResource CardDataGridStyle}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="23*"
+                            Binding="{Binding Name}"
+                            Header="应用名称" />
 
-                            <DataGridTextColumn
-                                Width="63*"
-                                Binding="{Binding PackageName}"
-                                Header="包名" />
+                        <DataGridTextColumn
+                            Width="25*"
+                            Binding="{Binding PackageName}"
+                            Header="包名" />
 
-                            <DataGridTemplateColumn
-                                Width="7*"
-                                CellStyle="{StaticResource DataGridLastCellStyle}"
-                                Header="操作"
-                                HeaderStyle="{StaticResource DataGridLastColumnHeaderStyle}">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button
-                                            Command="{Binding DataContext.DeleteTargetAppCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                            CommandParameter="{Binding}"
-                                            Content="删除"
-                                            Style="{StaticResource LinkButtonStyle}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                        <DataGridTextColumn
+                            Width="45*"
+                            Binding="{Binding Activity}"
+                            Header="启动页" />
 
-                    <!--  空态  -->
-                    <TextBlock
-                        Margin="0,28"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        FontSize="13"
-                        Foreground="{StaticResource TextTertiaryBrush}"
-                        Text="暂无目标 APP，点击下方「添加」按钮">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Items.Count, ElementName=TargetAppDataGrid}" Value="0">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </Grid>
+                        <DataGridTemplateColumn
+                            Width="7*"
+                            CellStyle="{StaticResource DataGridLastCellStyle}"
+                            Header="操作"
+                            HeaderStyle="{StaticResource DataGridLastColumnHeaderStyle}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        Command="{Binding DataContext.DeleteTargetAppCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"
+                                        Content="删除"
+                                        Style="{StaticResource LinkButtonStyle}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
 
-                <Grid Grid.Row="2" Margin="16,8,16,16">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="7*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                <Border
+                    Grid.Row="2"
+                    BorderBrush="{StaticResource CardBorderBrush}"
+                    BorderThickness="0,1,0,0">
+                    <Grid Margin="16,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="5*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                    <TextBox
-                        Grid.Column="0"
-                        Style="{StaticResource PlaceHolderTextBoxStyle}"
-                        Tag="应用名称，如：钉钉"
-                        Text="{Binding AppName, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox
+                            Grid.Column="0"
+                            Style="{StaticResource PlaceHolderTextBoxStyle}"
+                            Tag="应用名称，如：钉钉"
+                            Text="{Binding AppName, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <TextBox
-                        Grid.Column="1"
-                        Margin="8,0"
-                        Style="{StaticResource PlaceHolderTextBoxStyle}"
-                        Tag="com.example.package"
-                        Text="{Binding PackageName, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox
+                            Grid.Column="1"
+                            Margin="8,0"
+                            Style="{StaticResource PlaceHolderTextBoxStyle}"
+                            Tag="com.example.package"
+                            Text="{Binding PackageName, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <Button
-                        Grid.Column="2"
-                        Padding="14,0"
-                        Command="{Binding AddTargetAppCommand}"
-                        Content="添加"
-                        Style="{StaticResource PrimaryButtonStyle}" />
-                </Grid>
+                        <TextBox
+                            Grid.Column="2"
+                            Margin="0,0,8,0"
+                            Style="{StaticResource PlaceHolderTextBoxStyle}"
+                            Tag="com.alibaba.android.rimet.biz.LaunchHomeActivity"
+                            Text="{Binding LauncherActivity, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <Button
+                            Grid.Column="3"
+                            Padding="14,0"
+                            Command="{Binding AddTargetAppCommand}"
+                            Content="添加"
+                            Style="{StaticResource PrimaryButtonStyle}" />
+                    </Grid>
+                </Border>
             </Grid>
         </Border>
     </StackPanel>
