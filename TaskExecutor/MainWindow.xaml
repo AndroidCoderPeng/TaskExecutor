@@ -103,6 +103,7 @@
 
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
+                            <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
                             <Setter Property="Margin" Value="0,0,0,2" />
                             <Setter Property="Cursor" Value="Hand" />
                             <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
@@ -114,6 +115,14 @@
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>
+
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}" />
+                                    <Setter Property="Cursor" Value="Arrow" />
+                                    <Setter Property="Opacity" Value="0.45" />
+                                </Trigger>
+                            </Style.Triggers>
                         </Style>
                     </ListBox.ItemContainerStyle>
 
@@ -144,12 +153,14 @@
                                 </Ellipse.Style>
                             </Ellipse>
 
-                            <TextBlock Margin="8,0,0,0" Text="{Binding DeviceState, FallbackValue=设备未连接}">
+                            <TextBlock Margin="8,0,0,0">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="设备未连接" />
                                         <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsDeviceConnected}" Value="True">
+                                                <Setter Property="Text" Value="设备已连接" />
                                                 <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
                                             </DataTrigger>
                                         </Style.Triggers>
