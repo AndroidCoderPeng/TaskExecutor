@@ -78,6 +78,8 @@
 
                         <TextBox
                             Margin="12,0,0,0"
+                            Cursor="No"
+                            IsReadOnly="True"
                             Style="{StaticResource FieldTextBoxStyle}"
                             Text="{Binding SmtpServer, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
@@ -98,6 +100,8 @@
                         <TextBox
                             Width="120"
                             Margin="12,0"
+                            Cursor="No"
+                            IsReadOnly="True"
                             Style="{StaticResource FieldTextBoxStyle}"
                             Text="{Binding SmtpPort, UpdateSourceTrigger=PropertyChanged}" />
 
