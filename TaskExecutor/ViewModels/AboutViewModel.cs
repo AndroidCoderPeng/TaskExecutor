@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskExecutor.Services;
@@ -17,6 +18,18 @@ public partial class AboutViewModel : ObservableObject
     [RelayCommand]
     private void OpenHomePage()
     {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = ProjectHomePage,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception)
+        {
+            _toastService.Show("打开浏览器失败", ToastLevel.Error);
+        }
     }
 
     [RelayCommand]
