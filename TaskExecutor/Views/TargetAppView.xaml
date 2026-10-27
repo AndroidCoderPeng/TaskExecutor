@@ -234,7 +234,7 @@
 
                 <Grid Grid.Row="1">
                     <DataGrid
-                        x:Name="TaskDataGrid"
+                        x:Name="TargetAppDataGrid"
                         ItemsSource="{Binding TargetApps}"
                         Style="{StaticResource CardDataGridStyle}">
                         <DataGrid.Columns>
@@ -256,7 +256,7 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button
-                                            Command="{Binding DataContext.DeleteAppCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            Command="{Binding DataContext.DeleteTargetAppCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                             CommandParameter="{Binding}"
                                             Content="删除"
                                             Style="{StaticResource LinkButtonStyle}" />
@@ -297,17 +297,20 @@
                     <TextBox
                         Grid.Column="0"
                         Style="{StaticResource PlaceHolderTextBoxStyle}"
-                        Tag="应用名称，如：钉钉" />
+                        Tag="应用名称，如：钉钉"
+                        Text="{Binding AppName, UpdateSourceTrigger=PropertyChanged}" />
 
                     <TextBox
                         Grid.Column="1"
                         Margin="8,0"
                         Style="{StaticResource PlaceHolderTextBoxStyle}"
-                        Tag="com.example.package" />
+                        Tag="com.example.package"
+                        Text="{Binding PackageName, UpdateSourceTrigger=PropertyChanged}" />
 
                     <Button
                         Grid.Column="2"
                         Padding="14,0"
+                        Command="{Binding AddTargetAppCommand}"
                         Content="添加"
                         Style="{StaticResource PrimaryButtonStyle}" />
                 </Grid>
