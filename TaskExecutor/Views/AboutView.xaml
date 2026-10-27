@@ -58,8 +58,7 @@
 
                 <!--  简介  -->
                 <TextBlock
-                    MaxWidth="440"
-                    Margin="0,10,0,0"
+                    Margin="0,12,0,0"
                     HorizontalAlignment="Center"
                     FontSize="12"
                     Foreground="{StaticResource TextTertiaryBrush}"
@@ -67,8 +66,8 @@
                     LineStackingStrategy="BlockLineHeight"
                     TextAlignment="Center"
                     TextWrapping="Wrap">
-                    Windows 桌面端定时任务自动化工具：Wi-Fi ADB 无线控制 Android 设备，链<LineBreak />
-                    式任务调度、随机时间偏移、邮件与企业微信通知。<LineBreak />
+                    Windows 桌面端定时任务自动化工具，Wi-Fi ADB 无线控制 Android 设备<LineBreak />
+                    链式任务调度、随机时间偏移、邮件与企业微信通知。<LineBreak />
                     作者：PengXianHong · 遵循 GPL-3.0 协议开源发布</TextBlock>
 
                 <!--  项目主页链接 chip（虚线边框）  -->

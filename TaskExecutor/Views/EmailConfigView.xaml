@@ -79,7 +79,7 @@
                         <TextBox
                             Margin="12,0,0,0"
                             Style="{StaticResource FieldTextBoxStyle}"
-                            Text="{Binding StmpServer, UpdateSourceTrigger=PropertyChanged}" />
+                            Text="{Binding SmtpServer, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
 
                     <StackPanel
@@ -99,7 +99,7 @@
                             Width="120"
                             Margin="12,0"
                             Style="{StaticResource FieldTextBoxStyle}"
-                            Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" />
+                            Text="{Binding SmtpPort, UpdateSourceTrigger=PropertyChanged}" />
 
                         <TextBlock
                             VerticalAlignment="Center"

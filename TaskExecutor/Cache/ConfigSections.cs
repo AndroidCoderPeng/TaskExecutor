@@ -52,7 +52,7 @@ public class TargetAppRow
 public class EmailConfig
 {
     public string SmtpServer { get; set; } = "";
-    public int Port { get; set; }
+    public int SmtpPort { get; set; }
     public string SenderEmail { get; set; } = "";
     public string SenderAuthCode { get; set; } = "";
     public string RecipientEmail { get; set; } = "";
