@@ -108,7 +108,8 @@
                         <CheckBox
                             Margin="12,0,0,0"
                             Content="开启后任务截文件以图片消息发送"
-                            Foreground="{StaticResource TextTertiaryBrush}" />
+                            Foreground="{StaticResource TextTertiaryBrush}"
+                            Style="{StaticResource CheckBoxSwitchStyle}" />
                     </StackPanel>
                 </Grid>
 
