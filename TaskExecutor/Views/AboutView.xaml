@@ -54,7 +54,7 @@
                     FontFamily="Consolas"
                     FontSize="12"
                     Foreground="{StaticResource TextTertiaryBrush}"
-                    Text="Version 2.3.0 · WPF · .NET 8（C# / MVVM）" />
+                    Text="Version 2.0.0 · WPF · .NET 8（C# / MVVM）" />
 
                 <!--  简介  -->
                 <TextBlock
@@ -69,7 +69,7 @@
                     TextWrapping="Wrap">
                     Windows 桌面端定时任务自动化工具：Wi-Fi ADB 无线控制 Android 设备，链<LineBreak />
                     式任务调度、随机时间偏移、邮件与企业微信通知。<LineBreak />
-                    作者：pengxianhong · 遵循 GPL-3.0 协议开源发布</TextBlock>
+                    作者：PengXianHong · 遵循 GPL-3.0 协议开源发布</TextBlock>
 
                 <!--  项目主页链接 chip（虚线边框）  -->
                 <Grid Margin="0,10,0,0">
@@ -85,7 +85,7 @@
                         FontFamily="Consolas"
                         FontSize="12"
                         Foreground="{StaticResource TextDisabledBrush}"
-                        Text="https://github.com/AndroidCoderPeng/TaskExecutor" />
+                        Text="{Binding ProjectHomePage}" />
                 </Grid>
 
                 <!--  操作按钮  -->
@@ -94,18 +94,14 @@
                     HorizontalAlignment="Center"
                     Orientation="Horizontal">
                     <Button
+                        Margin="0,0,8,0"
                         Padding="14,0"
-                        Command="{Binding CheckUpdateCommand}"
-                        Content="检查更新"
+                        Command="{Binding OpenHomePageCommand}"
+                        Content="打开项目主页"
                         Style="{StaticResource PrimaryButtonStyle}" />
 
                     <Button
-                        Margin="16,0"
-                        Command="{Binding OpenHomeCommand}"
-                        Content="打开项目主页"
-                        Style="{StaticResource CommonButtonStyle}" />
-
-                    <Button
+                        Margin="8,0,0,0"
                         Command="{Binding CopyLinkCommand}"
                         Content="复制链接"
                         Style="{StaticResource CommonButtonStyle}" />

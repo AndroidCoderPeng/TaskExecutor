@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using TaskExecutor.Services;
 using TaskExecutor.ViewModels;
 
 namespace TaskExecutor;
@@ -19,7 +20,7 @@ public partial class App : Application
         
         services.AddSingleton<MainWindowViewModel>();
         
-        // services.AddSingleton<IDialogService, DialogService>();
+        services.AddSingleton<IToastService, ToastService>();
 
         services.AddTransient<WiFiConnectionViewModel>();
         services.AddTransient<TaskManagerViewModel>();

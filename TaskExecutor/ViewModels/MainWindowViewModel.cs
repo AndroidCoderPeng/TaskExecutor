@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using TaskExecutor.Model;
+using TaskExecutor.Services;
 
 namespace TaskExecutor.ViewModels;
 
@@ -18,11 +19,15 @@ public partial class MainWindowViewModel : ObservableObject
 
     #endregion
 
+    public IToastService Toast { get; }
+
     // 需要设备连接后才可点击的菜单项
     private readonly MenuItem[] _deviceRequiredItems;
 
-    public MainWindowViewModel()
+    public MainWindowViewModel(IToastService toastService)
     {
+        Toast = toastService;
+        
         var taskManager = new MenuItem { Group = "管理", Icon = "\ue63f", Title = "任务管理" };
         var importExport = new MenuItem { Group = "配置", Icon = "\ue629", Title = "导入导出" };
         var commandTest = new MenuItem { Group = "帮助", Icon = "\ue640", Title = "指令测试" };
@@ -68,7 +73,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             return;
         }
-        
+
         SelectedIndex = MenuItems.IndexOf(menuItem);
 
         CurrentView = menuItem.Title switch
@@ -99,7 +104,8 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         // 断开时若停留在受限页面，退回"无线连接"
-        if (!value && MenuItems.ElementAtOrDefault(SelectedIndex) is { } current && _deviceRequiredItems.Contains(current))
+        if (!value && MenuItems.ElementAtOrDefault(SelectedIndex) is { } current &&
+            _deviceRequiredItems.Contains(current))
         {
             SelectedIndex = 0;
             CurrentView = App.Services.GetRequiredService<WiFiConnectionViewModel>();

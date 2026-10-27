@@ -44,7 +44,10 @@
     <Color x:Key="SuccessColor">#FF2EC258</Color>
     <!--  green 成功/已启用/ADB 已连接  -->
     <Color x:Key="SuccessDimColor">#242EC258</Color>
-    <!--  green-dim 成功徽章背景（14%）  -->
+    <Color x:Key="WarningColor">#FFF5A500</Color>
+    <!--  yellow 警告/待处理  -->
+    <Color x:Key="WarningDimColor">#24F5A500</Color>
+    <!--  yellow-dim 警告徽章背景（14%）  -->
     <Color x:Key="DangerColor">#FFF76560</Color>
     <!--  red 失败/删除/断开  -->
     <Color x:Key="DangerDimColor">#80F76560</Color>
@@ -91,6 +94,8 @@
 
     <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}" />
     <SolidColorBrush x:Key="SuccessDimBrush" Color="{StaticResource SuccessDimColor}" />
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
+    <SolidColorBrush x:Key="WarningDimBrush" Color="{StaticResource WarningDimColor}" />
     <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}" />
     <SolidColorBrush x:Key="DangerDimBrush" Color="{StaticResource DangerDimColor}" />
 
