@@ -58,6 +58,10 @@
             <DataTemplate DataType="{x:Type vm:FaqViewModel}">
                 <views:FaqView/>
             </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type vm:AboutViewModel}">
+                <views:AboutView/>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

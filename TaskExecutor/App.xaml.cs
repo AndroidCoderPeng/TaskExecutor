@@ -36,6 +36,7 @@ public partial class App : Application
         
         services.AddTransient<CommandTestViewModel>();
         services.AddTransient<FaqViewModel>();
+        services.AddTransient<AboutViewModel>();
 
         Services = services.BuildServiceProvider();
 
