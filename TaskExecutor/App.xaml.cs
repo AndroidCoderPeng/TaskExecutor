@@ -35,6 +35,7 @@ public partial class App : Application
         services.AddTransient<ScheduleSwitchViewModel>();
         
         services.AddTransient<CommandTestViewModel>();
+        services.AddTransient<FaqViewModel>();
 
         Services = services.BuildServiceProvider();
 

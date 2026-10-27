@@ -54,6 +54,10 @@
             <DataTemplate DataType="{x:Type vm:CommandTestViewModel}">
                 <views:CommandTestView/>
             </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type vm:FaqViewModel}">
+                <views:FaqView/>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

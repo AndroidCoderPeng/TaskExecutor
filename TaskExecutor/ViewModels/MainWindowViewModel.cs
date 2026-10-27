@@ -58,7 +58,7 @@ public partial class MainWindowViewModel : ObservableObject
             "随机时间范围" => App.Services.GetRequiredService<RandomTimeViewModel>(),
             "调度开关" => App.Services.GetRequiredService<ScheduleSwitchViewModel>(),
             "指令测试" => App.Services.GetRequiredService<CommandTestViewModel>(),
-            // "常见问题" => App.Services.GetRequiredService<FaqViewModel>(),
+            "常见问题" => App.Services.GetRequiredService<FaqViewModel>(),
             // "关于应用" => App.Services.GetRequiredService<AboutViewModel>(),
             _ => CurrentView
         };

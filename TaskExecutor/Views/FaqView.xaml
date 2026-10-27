@@ -1,0 +1,24 @@
+﻿<UserControl
+    x:Class="TaskExecutor.Views.FaqView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:FaqViewModel}"
+    mc:Ignorable="d">
+    <StackPanel Orientation="Vertical">
+        <DockPanel Background="{StaticResource CardBackgroundBrush}" LastChildFill="True">
+            <TextBlock
+                Margin="20,16"
+                FontSize="16"
+                FontWeight="SemiBold"
+                Foreground="White"
+                Text="常见问题" />
+        </DockPanel>
+
+        <Border Margin="20,16" Style="{StaticResource CommonBorderStyle}">
+            <ListBox Background="Transparent" BorderThickness="0" />
+        </Border>
+    </StackPanel>
+</UserControl>
