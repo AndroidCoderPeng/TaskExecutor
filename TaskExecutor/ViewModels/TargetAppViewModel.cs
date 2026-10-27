@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskExecutor.Cache;
+using TaskExecutor.Services;
 using TaskExecutor.Utils;
 
 namespace TaskExecutor.ViewModels;
@@ -17,10 +18,13 @@ public partial class TargetAppViewModel : ObservableObject
 
     #endregion
 
+    private readonly IToastService _toastService;
     private readonly TargetAppConfig _config;
 
-    public TargetAppViewModel()
+    public TargetAppViewModel(IToastService toastService)
     {
+        _toastService = toastService;
+
         _config = SettingsStore.Load<TargetAppConfig>(ConfigSections.FileName, ConfigSections.TargetApp);
         if (_config.Apps.Count == 0)
         {
@@ -60,6 +64,13 @@ public partial class TargetAppViewModel : ObservableObject
     [RelayCommand]
     private void AddTargetApp()
     {
+        if (string.IsNullOrWhiteSpace(AppName) || string.IsNullOrWhiteSpace(PackageName) ||
+            string.IsNullOrWhiteSpace(LauncherActivity))
+        {
+            _toastService.Show("请填写完整的应用信息", ToastLevel.Warning);
+            return;
+        }
+
         var newApp = new TargetAppRow
         {
             Name = AppName,

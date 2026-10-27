@@ -76,7 +76,10 @@
                                 Text="STMP 服务器" />
                         </Grid>
 
-                        <TextBox Margin="12,0,0,0" Style="{StaticResource FieldTextBoxStyle}" />
+                        <TextBox
+                            Margin="12,0,0,0"
+                            Style="{StaticResource FieldTextBoxStyle}"
+                            Text="{Binding StmpServer, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
 
                     <StackPanel
@@ -95,7 +98,8 @@
                         <TextBox
                             Width="120"
                             Margin="12,0"
-                            Style="{StaticResource FieldTextBoxStyle}" />
+                            Style="{StaticResource FieldTextBoxStyle}"
+                            Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" />
 
                         <TextBlock
                             VerticalAlignment="Center"
@@ -113,7 +117,10 @@
                                 Text="发件人邮箱" />
                         </Grid>
 
-                        <TextBox Margin="12,0,0,0" Style="{StaticResource FieldTextBoxStyle}" />
+                        <TextBox
+                            Margin="12,0,0,0"
+                            Style="{StaticResource FieldTextBoxStyle}"
+                            Text="{Binding SenderEmail, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
 
                     <DockPanel
@@ -129,7 +136,10 @@
                                 Text="授权码" />
                         </Grid>
 
-                        <TextBox Margin="12,0,0,0" Style="{StaticResource FieldTextBoxStyle}" />
+                        <TextBox
+                            Margin="12,0,0,0"
+                            Style="{StaticResource FieldTextBoxStyle}"
+                            Text="{Binding AuthorizationCode, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
 
                     <DockPanel Grid.Row="4" LastChildFill="True">
@@ -142,7 +152,10 @@
                                 Text="收件人邮箱" />
                         </Grid>
 
-                        <TextBox Margin="12,0,0,0" Style="{StaticResource FieldTextBoxStyle}" />
+                        <TextBox
+                            Margin="12,0,0,0"
+                            Style="{StaticResource FieldTextBoxStyle}"
+                            Text="{Binding RecipientEmail, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
                 </Grid>
 
@@ -165,6 +178,7 @@
 
                         <Button
                             Grid.Column="1"
+                            Command="{Binding TestEmailNotificationCommand}"
                             Content="测试邮箱通知"
                             Style="{StaticResource CommonButtonStyle}" />
 
@@ -172,6 +186,7 @@
                             Grid.Column="2"
                             Margin="8,0,0,0"
                             Padding="14,0"
+                            Command="{Binding SaveEmailConfigCommand}"
                             Content="保存配置"
                             Style="{StaticResource PrimaryButtonStyle}" />
                     </Grid>

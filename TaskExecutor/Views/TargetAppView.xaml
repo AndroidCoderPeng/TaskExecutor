@@ -274,7 +274,7 @@
                     Grid.Row="2"
                     BorderBrush="{StaticResource CardBorderBrush}"
                     BorderThickness="0,1,0,0">
-                    <Grid Margin="16,12">
+                    <Grid Margin="12">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*" />
                             <ColumnDefinition Width="3*" />
