@@ -54,7 +54,7 @@ public partial class MainWindowViewModel : ObservableObject
             "邮箱配置" => App.Services.GetRequiredService<EmailConfigViewModel>(),
             "企业微信配置" => App.Services.GetRequiredService<WxConfigViewModel>(),
             "任务等待时间" => App.Services.GetRequiredService<TaskWaitTimeViewModel>(),
-            // "任务重置时间" => App.Services.GetRequiredService<TaskResetTimeViewModel>(),
+            "任务重置时间" => App.Services.GetRequiredService<TaskResetTimeViewModel>(),
             // "随机时间范围" => App.Services.GetRequiredService<RandomTimeRangeViewModel>(),
             // "调度开关" => App.Services.GetRequiredService<ScheduleSwitchViewModel>(),
             // "指令测试" => App.Services.GetRequiredService<CommandTestViewModel>(),

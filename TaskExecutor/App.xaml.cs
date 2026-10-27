@@ -30,6 +30,7 @@ public partial class App : Application
         services.AddTransient<WxConfigViewModel>();
         
         services.AddTransient<TaskWaitTimeViewModel>();
+        services.AddTransient<TaskResetTimeViewModel>();
 
         Services = services.BuildServiceProvider();
 

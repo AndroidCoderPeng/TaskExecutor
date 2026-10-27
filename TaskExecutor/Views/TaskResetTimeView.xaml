@@ -1,0 +1,103 @@
+﻿<UserControl
+    x:Class="TaskExecutor.Views.TaskResetTimeView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:TaskResetTimeViewModel}"
+    mc:Ignorable="d">
+    <StackPanel Orientation="Vertical">
+        <DockPanel Background="{StaticResource CardBackgroundBrush}" LastChildFill="True">
+            <TextBlock
+                Margin="20,16"
+                FontSize="16"
+                FontWeight="SemiBold"
+                Foreground="White"
+                Text="任务重置时间" />
+
+            <TextBlock
+                Margin="20,16"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Foreground="{StaticResource TextTertiaryBrush}"
+                Text="每日任务重置点" />
+        </DockPanel>
+
+        <Border
+            Height="170"
+            Margin="20,16"
+            Background="{StaticResource CardBackgroundBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel
+                    Grid.Row="0"
+                    Margin="16,12"
+                    Orientation="Horizontal">
+                    <TextBlock
+                        FontSize="15"
+                        FontWeight="SemiBold"
+                        Foreground="White"
+                        Text="任务重置时间" />
+
+                    <TextBlock
+                        Margin="12,0"
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource TextTertiaryBrush}"
+                        Text="每日任务重置点" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Row="1"
+                    Margin="64,0"
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Foreground="{StaticResource TextSecondaryBrush}"
+                        Text="重置时间" />
+
+                    <!--  暂用输入框代替，后期需要自定义 TimePicker  -->
+                    <TextBox
+                        Width="120"
+                        Margin="12,0"
+                        Style="{StaticResource FieldTextBoxStyle}"
+                        Text="{Binding ResetTime}" />
+
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource TextTertiaryBrush}"
+                        Text="HH:MM" />
+                </StackPanel>
+
+                <Border
+                    Grid.Row="2"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,1,0,0">
+                    <DockPanel Margin="16,0" LastChildFill="False">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource TextTertiaryBrush}"
+                            Text="到达该时间点后，当日已完成任务链重置为「待执行」并重新开始调度" />
+
+                        <Button
+                            Margin="0,10"
+                            Padding="14,0"
+                            Command="{Binding SaveConfigCommand}"
+                            Content="保存配置"
+                            DockPanel.Dock="Right"
+                            Style="{StaticResource PrimaryButtonStyle}" />
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </StackPanel>
+</UserControl>

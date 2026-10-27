@@ -69,7 +69,7 @@
                         Width="120"
                         Margin="12,0"
                         Style="{StaticResource FieldTextBoxStyle}"
-                        Text="{Binding DeviceIp}" />
+                        Text="{Binding WaitTime}" />
 
                     <TextBlock
                         VerticalAlignment="Center"

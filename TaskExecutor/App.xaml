@@ -38,6 +38,10 @@
             <DataTemplate DataType="{x:Type vm:TaskWaitTimeViewModel}">
                 <views:TaskWaitTimeView/>
             </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type vm:TaskResetTimeViewModel}">
+                <views:TaskResetTimeView/>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
