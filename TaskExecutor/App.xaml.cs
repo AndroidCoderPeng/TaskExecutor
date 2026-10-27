@@ -23,10 +23,13 @@ public partial class App : Application
 
         services.AddTransient<WiFiConnectionViewModel>();
         services.AddTransient<TaskManagerViewModel>();
+        
         services.AddTransient<ImportExportViewModel>();
         services.AddTransient<TargetAppViewModel>();
         services.AddTransient<EmailConfigViewModel>();
         services.AddTransient<WxConfigViewModel>();
+        
+        services.AddTransient<TaskWaitTimeViewModel>();
 
         Services = services.BuildServiceProvider();
 
