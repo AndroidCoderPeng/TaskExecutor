@@ -65,6 +65,11 @@ public class WechatConfig
     public bool AttachScreenshot { get; set; } = true;
 }
 
+public class WaitTimeConfig
+{
+    public int Time { get; set; } = 30;
+}
+
 public class TimeRangeConfig
 {
     public string LowerLimitTime { get; set; } = "";

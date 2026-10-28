@@ -73,7 +73,7 @@
                                 VerticalAlignment="Center"
                                 FontSize="14"
                                 Foreground="{StaticResource TextTertiaryBrush}"
-                                Text="STMP 服务器" />
+                                Text="SMTP 服务器" />
                         </Grid>
 
                         <TextBox

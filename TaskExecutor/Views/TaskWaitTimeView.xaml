@@ -68,8 +68,9 @@
                     <TextBox
                         Width="120"
                         Margin="12,0"
+                        MaxLength="3"
                         Style="{StaticResource FieldTextBoxStyle}"
-                        Text="{Binding WaitTime}" />
+                        Text="{Binding WaitTime, UpdateSourceTrigger=PropertyChanged}" />
 
                     <TextBlock
                         VerticalAlignment="Center"
