@@ -87,3 +87,10 @@ public class TaskScheduleConfig
     public bool IsSkipHoliday { get; set; } = true;
     public bool IsResetDailyTask { get; set; } = true;
 }
+
+public class ChinaHolidayConfig
+{
+    public int Year { get; set; }
+    public string LastSyncTime { get; set; } = "";
+    public string Data { get; set; } = "";
+}

@@ -63,7 +63,7 @@
                             Margin="12,0,0,0"
                             Content="启用后执行时间按随机范围偏移"
                             Foreground="{StaticResource TextTertiaryBrush}"
-                            IsChecked="True"
+                            IsChecked="{Binding IsNeedRandomTime}"
                             Style="{StaticResource CheckBoxSwitchStyle}" />
                     </StackPanel>
 
@@ -80,7 +80,7 @@
                             Margin="12,0,0,0"
                             Content="法定节假日与周末自动跳过执行"
                             Foreground="{StaticResource TextTertiaryBrush}"
-                            IsChecked="True"
+                            IsChecked="{Binding IsSkipHoliday}"
                             Style="{StaticResource CheckBoxSwitchStyle}" />
                     </StackPanel>
 
@@ -97,6 +97,7 @@
                             Margin="12,0,0,0"
                             Content="到达重置时间点后任务链重新开始"
                             Foreground="{StaticResource TextTertiaryBrush}"
+                            IsChecked="{Binding IsResetDailyTask}"
                             Style="{StaticResource CheckBoxSwitchStyle}" />
                     </StackPanel>
                 </StackPanel>
@@ -130,10 +131,8 @@
                     <TextBlock
                         Margin="12,0"
                         VerticalAlignment="Center"
-                        Foreground="{StaticResource TextTertiaryBrush}">
-                        <Run Text="数据源：" />
-                        <Run Text="{Binding DataSource, FallbackValue=chinese-days}" />
-                    </TextBlock>
+                        Foreground="{StaticResource TextTertiaryBrush}"
+                        Text="数据源：chinese-days" />
                 </StackPanel>
 
                 <TextBlock Grid.Row="1" Margin="64,10,0,0">
