@@ -65,12 +65,11 @@
                         Foreground="{StaticResource TextSecondaryBrush}"
                         Text="重置时间" />
 
-                    <!--  暂用输入框代替，后期需要自定义 TimePicker  -->
                     <TextBox
                         Width="120"
                         Margin="12,0"
                         Style="{StaticResource FieldTextBoxStyle}"
-                        Text="{Binding ResetTime}" />
+                        Text="{Binding ResetTime, UpdateSourceTrigger=PropertyChanged}" />
 
                     <TextBlock
                         VerticalAlignment="Center"
