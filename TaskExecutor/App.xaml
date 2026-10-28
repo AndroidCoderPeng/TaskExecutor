@@ -47,8 +47,8 @@
                 <views:RandomTimeView/>
             </DataTemplate>
             
-            <DataTemplate DataType="{x:Type vm:ScheduleSwitchViewModel}">
-                <views:ScheduleSwitchView/>
+            <DataTemplate DataType="{x:Type vm:TaskScheduleViewModel}">
+                <views:TaskScheduleView/>
             </DataTemplate>
             
             <DataTemplate DataType="{x:Type vm:CommandTestViewModel}">

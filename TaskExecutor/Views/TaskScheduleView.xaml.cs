@@ -2,9 +2,9 @@
 
 namespace TaskExecutor.Views;
 
-public partial class ScheduleSwitchView : UserControl
+public partial class TaskScheduleView : UserControl
 {
-    public ScheduleSwitchView()
+    public TaskScheduleView()
     {
         InitializeComponent();
     }

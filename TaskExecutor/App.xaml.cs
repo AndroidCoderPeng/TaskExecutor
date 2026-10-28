@@ -33,7 +33,7 @@ public partial class App : Application
         services.AddTransient<TaskWaitTimeViewModel>();
         services.AddTransient<TaskResetTimeViewModel>();
         services.AddTransient<RandomTimeViewModel>();
-        services.AddTransient<ScheduleSwitchViewModel>();
+        services.AddTransient<TaskScheduleViewModel>();
 
         services.AddTransient<CommandTestViewModel>();
         services.AddTransient<FaqViewModel>();

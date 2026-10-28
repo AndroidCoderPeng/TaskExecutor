@@ -2,6 +2,6 @@
 
 namespace TaskExecutor.ViewModels;
 
-public class ScheduleSwitchViewModel : ObservableObject
+public class TaskScheduleViewModel : ObservableObject
 {
 }
