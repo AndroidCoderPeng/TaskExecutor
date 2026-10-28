@@ -71,7 +71,7 @@
                             Width="120"
                             Margin="12,0"
                             Style="{StaticResource FieldTextBoxStyle}"
-                            Text="{Binding LowerLimitTime, FallbackValue=0}" />
+                            Text="{Binding LowerLimitTime, UpdateSourceTrigger=PropertyChanged}" />
 
                         <TextBlock
                             VerticalAlignment="Center"
@@ -90,7 +90,7 @@
                             Width="120"
                             Margin="12,0"
                             Style="{StaticResource FieldTextBoxStyle}"
-                            Text="{Binding UpperLimitTime, FallbackValue=5}" />
+                            Text="{Binding UpperLimitTime, UpdateSourceTrigger=PropertyChanged}" />
 
                         <TextBlock
                             VerticalAlignment="Center"

@@ -70,10 +70,15 @@ public class WaitTimeConfig
     public int Time { get; set; } = 30;
 }
 
+public class ResetTimeConfig
+{
+    public string Time { get; set; } = "00:00";
+}
+
 public class TimeRangeConfig
 {
-    public string LowerLimitTime { get; set; } = "";
-    public string UpperLimitTime { get; set; } = "";
+    public int LowerLimitTime { get; set; } = 1;
+    public int UpperLimitTime { get; set; } = 30;
 }
 
 public class TaskScheduleConfig
