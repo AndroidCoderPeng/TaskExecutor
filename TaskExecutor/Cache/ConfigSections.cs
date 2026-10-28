@@ -60,9 +60,9 @@ public class EmailConfig
 
 public class WechatConfig
 {
-    public string WebhookUrl { get; set; } = "";
+    public string WebhookKey { get; set; } = "";
     public string MessageTitle { get; set; } = "";
-    public bool NeedImage { get; set; } = true;
+    public bool AttachScreenshot { get; set; } = true;
 }
 
 public class TimeRangeConfig

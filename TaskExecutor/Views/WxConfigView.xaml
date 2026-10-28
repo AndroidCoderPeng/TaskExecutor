@@ -76,7 +76,10 @@
                                 Text="Webhook Key" />
                         </Grid>
 
-                        <TextBox Margin="12,0,0,0" Style="{StaticResource FieldTextBoxStyle}" />
+                        <TextBox
+                            Margin="12,0,0,0"
+                            Style="{StaticResource FieldTextBoxStyle}"
+                            Text="{Binding WebhookKey, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
 
                     <DockPanel
@@ -92,7 +95,10 @@
                                 Text="消息标题" />
                         </Grid>
 
-                        <TextBox Margin="12,0,0,0" Style="{StaticResource FieldTextBoxStyle}" />
+                        <TextBox
+                            Margin="12,0,0,0"
+                            Style="{StaticResource FieldTextBoxStyle}"
+                            Text="{Binding MessageTitle, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
 
                     <StackPanel Grid.Row="2" Orientation="Horizontal">
@@ -109,6 +115,7 @@
                             Margin="12,0,0,0"
                             Content="开启后任务截文件以图片消息发送"
                             Foreground="{StaticResource TextTertiaryBrush}"
+                            IsChecked="{Binding AttachScreenshot, UpdateSourceTrigger=PropertyChanged}"
                             Style="{StaticResource CheckBoxSwitchStyle}" />
                     </StackPanel>
                 </Grid>
@@ -132,6 +139,7 @@
 
                         <Button
                             Grid.Column="1"
+                            Command="{Binding TestWebhookNotificationCommand}"
                             Content="测试企业微信通知"
                             Style="{StaticResource CommonButtonStyle}" />
 
@@ -139,6 +147,7 @@
                             Grid.Column="2"
                             Margin="8,0,0,0"
                             Padding="14,0"
+                            Command="{Binding SaveWechatConfigCommand}"
                             Content="保存配置"
                             Style="{StaticResource PrimaryButtonStyle}" />
                     </Grid>
