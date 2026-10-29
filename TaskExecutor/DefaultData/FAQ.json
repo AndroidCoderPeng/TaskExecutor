@@ -1,5 +1,13 @@
 [
   {
+    "Question": "邮件发送失败（535 认证错误）？",
+    "Answer": "QQ 邮箱必须使用「授权码」而非登录密码。进入邮箱「设置 → 账户 → POP3/SMTP 服务」开启服务并生成授权码，粘贴到「邮箱配置 → 授权码」输入框。"
+  },
+  {
+    "Question": "企业微信群里收不到消息？",
+    "Answer": "确认 Webhook Key 与机器人所属群一致；同一机器人每分钟最多发送 20 条消息，超频会被限流。可在「企业微信配置」页点击「测试企业微信通知」快速验证。"
+  },
+  {
     "Question": "为什么小米手机执行 adb shell input tap 没反应或报错？",
     "Answer": "MIUI 和 HyperOS 出于安全考虑，默认禁止 ADB 向系统注入输入事件（缺少 INJECT_EVENTS 权限）。即使 ADB 连接正常，input tap / swipe / keyevent / text 也会被系统拦截，表现为无响应或抛出 SecurityException。"
   }
