@@ -1,11 +1,11 @@
 <UserControl
-    x:Class="TaskExecutor.Views.WiFiConnectionView"
+    x:Class="TaskExecutor.Views.ConnectDeviceView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
-    d:DataContext="{d:DesignInstance Type=vm:WiFiConnectionViewModel}"
+    d:DataContext="{d:DesignInstance Type=vm:ConnectDeviceViewModel}"
     mc:Ignorable="d">
     <StackPanel Orientation="Vertical">
         <DockPanel Background="{StaticResource CardBackgroundBrush}" LastChildFill="True">
@@ -69,8 +69,18 @@
                         Margin="8,8,16,0"
                         Command="{Binding DisconnectDeviceCommand}"
                         Content="断开连接"
-                        Style="{StaticResource CommonButtonStyle}"
-                        Tag="Danger" />
+                        Tag="Danger">
+                        <Button.Style>
+                            <Style BasedOn="{StaticResource CommonButtonStyle}" TargetType="Button">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ConnectionState}" Value="未连接">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                 </Grid>
 
                 <TextBlock

@@ -2,9 +2,9 @@ using System.Windows.Controls;
 
 namespace TaskExecutor.Views;
 
-public partial class WiFiConnectionView : UserControl
+public partial class ConnectDeviceView : UserControl
 {
-    public WiFiConnectionView()
+    public ConnectDeviceView()
     {
         InitializeComponent();
     }

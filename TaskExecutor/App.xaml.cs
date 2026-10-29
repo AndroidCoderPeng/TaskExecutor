@@ -22,7 +22,7 @@ public partial class App : Application
 
         services.AddSingleton<IToastService, ToastService>();
 
-        services.AddTransient<WiFiConnectionViewModel>();
+        services.AddTransient<ConnectDeviceViewModel>();
         services.AddTransient<TaskManagerViewModel>();
 
         services.AddTransient<ImportExportViewModel>();

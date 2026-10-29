@@ -80,7 +80,7 @@ public partial class TaskScheduleViewModel : ObservableObject
             }
             catch (Exception e)
             {
-                Console.WriteLine($@"节假日数据同步失败：{url}，{e.Message}");
+                Console.WriteLine($"节假日数据同步失败：{url}，{e.Message}");
             }
         }
 

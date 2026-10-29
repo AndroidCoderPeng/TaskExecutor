@@ -36,7 +36,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         MenuItems =
         [
-            new MenuItem { Group = "管理", Icon = "\ue74f", Title = "无线连接" },
+            new MenuItem { Group = "管理", Icon = "\ue74f", Title = "连接设备" },
             taskManager,
             new MenuItem { Group = "配置", Icon = "\ue622", Title = "目标APP" },
             importExport,
@@ -63,7 +63,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         SelectedIndex = 0;
-        CurrentView = App.Services.GetRequiredService<WiFiConnectionViewModel>();
+        CurrentView = App.Services.GetRequiredService<ConnectDeviceViewModel>();
     }
 
     [RelayCommand]
@@ -78,7 +78,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         CurrentView = menuItem.Title switch
         {
-            "无线连接" => App.Services.GetRequiredService<WiFiConnectionViewModel>(),
+            "连接设备" => App.Services.GetRequiredService<ConnectDeviceViewModel>(),
             "任务管理" => App.Services.GetRequiredService<TaskManagerViewModel>(),
             "导入导出" => App.Services.GetRequiredService<ImportExportViewModel>(),
             "目标APP" => App.Services.GetRequiredService<TargetAppViewModel>(),
@@ -108,7 +108,7 @@ public partial class MainWindowViewModel : ObservableObject
             _deviceRequiredItems.Contains(current))
         {
             SelectedIndex = 0;
-            CurrentView = App.Services.GetRequiredService<WiFiConnectionViewModel>();
+            CurrentView = App.Services.GetRequiredService<ConnectDeviceViewModel>();
         }
     }
 }

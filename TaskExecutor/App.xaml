@@ -11,8 +11,8 @@
                 <ResourceDictionary Source="Styles/ApplicationStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <DataTemplate DataType="{x:Type vm:WiFiConnectionViewModel}">
-                <views:WiFiConnectionView />
+            <DataTemplate DataType="{x:Type vm:ConnectDeviceViewModel}">
+                <views:ConnectDeviceView />
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type vm:TaskManagerViewModel}">
