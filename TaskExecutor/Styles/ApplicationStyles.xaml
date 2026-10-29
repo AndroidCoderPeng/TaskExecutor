@@ -282,4 +282,79 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!--  FAQ 折叠项  -->
+    <Style x:Key="FaqExpanderStyle" TargetType="Expander">
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Padding" Value="14,12" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Expander">
+                    <Border BorderBrush="{StaticResource DividerBrush}" BorderThickness="0,0,0,1">
+                        <StackPanel>
+                            <!--  头部：整行可点击  -->
+                            <ToggleButton
+                                Padding="{TemplateBinding Padding}"
+                                HorizontalContentAlignment="Stretch"
+                                Content="{TemplateBinding Header}"
+                                ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                Cursor="Hand"
+                                IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border
+                                            x:Name="HeaderBorder"
+                                            Background="Transparent">
+                                            <ContentPresenter
+                                                Margin="{TemplateBinding Padding}"
+                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                VerticalAlignment="Center"
+                                                RecognizesAccessKey="True" />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource HoverOverlayBrush}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <!--  内容区：默认收起  -->
+                            <ContentPresenter
+                                x:Name="ExpandSite"
+                                Margin="{TemplateBinding Padding}"
+                                Visibility="Collapsed" />
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsExpanded" Value="True">
+                            <Setter TargetName="ExpandSite" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  FAQ 箭头：展开时旋转 90°  -->
+    <Style x:Key="FaqArrowStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource TextTertiaryBrush}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <RotateTransform Angle="0" />
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=Expander}}" Value="True">
+                <Setter Property="RenderTransform">
+                    <Setter.Value>
+                        <RotateTransform Angle="90" />
+                    </Setter.Value>
+                </Setter>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

@@ -15,10 +15,52 @@
                 FontWeight="SemiBold"
                 Foreground="White"
                 Text="常见问题" />
+
+            <TextBlock
+                Margin="20,16"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Foreground="{StaticResource TextTertiaryBrush}"
+                Text="无线连接 · MIUI / HyperOS 限制" />
         </DockPanel>
 
+        <!--  内容区  -->
         <Border Margin="20,16" Style="{StaticResource CommonBorderStyle}">
-            <ListBox Background="Transparent" BorderThickness="0" />
+            <ScrollViewer VerticalScrollBarVisibility="Hidden">
+                <ItemsControl ItemsSource="{Binding FaqItems}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Expander Style="{StaticResource FaqExpanderStyle}">
+                                <Expander.Header>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            FontSize="13"
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource TextPrimaryBrush}"
+                                            Text="{Binding Question}"
+                                            TextWrapping="Wrap" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Margin="12,0,0,0"
+                                            Style="{StaticResource FaqArrowStyle}"
+                                            Text="›" />
+                                    </Grid>
+                                </Expander.Header>
+                                <TextBlock
+                                    FontSize="12"
+                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                    LineHeight="20"
+                                    Text="{Binding Answer}"
+                                    TextWrapping="Wrap" />
+                            </Expander>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </Border>
     </StackPanel>
 </UserControl>

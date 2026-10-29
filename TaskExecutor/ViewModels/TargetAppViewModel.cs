@@ -38,13 +38,13 @@ public partial class TargetAppViewModel : ObservableObject
             {
                 Name = "企业微信",
                 PackageName = "com.tencent.wework",
-                Activity = "com.tencent.wework.biz.LaunchHomeActivity"
+                Activity = "com.tencent.wework.launch.LaunchSplashActivity"
             });
             _config.Apps.Add(new TargetAppRow
             {
                 Name = "飞书",
                 PackageName = "com.ss.android.lark",
-                Activity = "com.ss.android.lark.biz.LaunchHomeActivity"
+                Activity = "com.ss.android.lark.main.app.MainActivity"
             });
             TargetApps = new ObservableCollection<TargetAppRow>(_config.Apps);
         }
