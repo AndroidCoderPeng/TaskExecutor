@@ -17,7 +17,8 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty] private int _selectedIndex;
     [ObservableProperty] private ObservableObject _currentView;
     [ObservableProperty] private bool _isDeviceConnected;
-    [ObservableProperty] private string _deviceName = string.Empty;
+    [ObservableProperty] private string _deviceName = "-";
+    [ObservableProperty] private string _deviceIp = "-";
 
     #endregion
 
@@ -29,7 +30,7 @@ public partial class MainWindowViewModel : ObservableObject
     public MainWindowViewModel(IToastService toastService)
     {
         Toast = toastService;
-        
+
         var taskManager = new MenuItem { Group = "管理", Icon = "\ue63f", Title = "任务管理" };
         var importExport = new MenuItem { Group = "配置", Icon = "\ue629", Title = "导入导出" };
         var commandTest = new MenuItem { Group = "帮助", Icon = "\ue640", Title = "指令测试" };
@@ -66,17 +67,17 @@ public partial class MainWindowViewModel : ObservableObject
 
         SelectedIndex = 0;
         CurrentView = App.Services.GetRequiredService<ConnectDeviceViewModel>();
-        
+
         WeakReferenceMessenger.Default.Register<MessengerMessage.UpdateNavigationStateMessage>(this, (_, msg) =>
         {
-            if (msg.Value)
+            if (msg.Value.IsEnabled)
             {
                 // 设备已连接，启用全部导航栏并切换到任务管理
                 foreach (var item in _deviceRequiredItems)
                 {
                     item.IsEnabled = true;
                 }
-                
+
                 SelectedIndex = 1;
                 CurrentView = App.Services.GetRequiredService<TaskManagerViewModel>();
             }
@@ -88,6 +89,10 @@ public partial class MainWindowViewModel : ObservableObject
                     item.IsEnabled = false;
                 }
             }
+
+            IsDeviceConnected = msg.Value.IsEnabled;
+            DeviceName = msg.Value.DeviceName;
+            DeviceIp = msg.Value.DeviceIp;
         });
     }
 

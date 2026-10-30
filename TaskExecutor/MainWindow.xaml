@@ -172,8 +172,12 @@
 
                             <TextBlock
                                 Margin="0,6,0,0"
-                                Foreground="{StaticResource TextTertiaryBrush}"
-                                Text="{Binding DeviceName, FallbackValue=Pixel 6 · 192.168.1.100:5555}" />
+                                FontSize="10"
+                                Foreground="{StaticResource TextTertiaryBrush}">
+                                <Run Text="{Binding DeviceName}" />
+                                <Run Text=" · " />
+                                <Run Text="{Binding DeviceIp, StringFormat={}{0}:5555}" />
+                            </TextBlock>
                         </StackPanel>
                     </Border>
                 </Grid>
