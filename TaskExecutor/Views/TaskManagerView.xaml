@@ -198,13 +198,6 @@
             <Setter Property="RowStyle" Value="{StaticResource DataGridRowStyle}" />
         </Style>
 
-        <Style x:Key="ChipBorderStyle" TargetType="Border">
-            <Setter Property="Margin" Value="0,0,4,0" />
-            <Setter Property="Padding" Value="6,2" />
-            <Setter Property="Background" Value="{StaticResource ControlFillBrush}" />
-            <Setter Property="CornerRadius" Value="4" />
-        </Style>
-
         <Style x:Key="StatusPillStyle" TargetType="ToggleButton">
             <Setter Property="Padding" Value="8,2" />
             <Setter Property="FontSize" Value="11" />
@@ -511,30 +504,6 @@
                                     Width="13*"
                                     Binding="{Binding ExecuteTime}"
                                     Header="执行时间" />
-
-                                <DataGridTemplateColumn Width="28*" Header="动作链">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ItemsControl ItemsSource="{Binding Actions}">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <StackPanel Orientation="Horizontal" />
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Border Style="{StaticResource ChipBorderStyle}">
-                                                            <TextBlock
-                                                                FontSize="11"
-                                                                Foreground="{StaticResource TextSecondaryBrush}"
-                                                                Text="{Binding}" />
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
 
                                 <DataGridTextColumn
                                     Width="11*"

@@ -32,7 +32,6 @@ public class TaskRow
     public TargetAppRow TargetApp { get; set; } = new();
     public string ExecuteTime { get; set; } = "";
     public TimeRangeConfig TimeRange { get; set; } = new();
-    public List<string> Actions { get; set; } = [];
     public List<string> NotifyMethods { get; set; } = [];
     public bool IsEnabled { get; set; }
 }
