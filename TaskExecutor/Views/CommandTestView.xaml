@@ -11,7 +11,7 @@
     <UserControl.Resources>
         <Style x:Key="ActionButtonStyle" TargetType="Button">
             <Setter Property="Height" Value="94" />
-            <Setter Property="Background" Value="{StaticResource ControlFillBrush}" />
+            <Setter Property="Background" Value="{StaticResource CardBackgroundAltBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
@@ -98,7 +98,7 @@
                         Margin="8,0"
                         VerticalAlignment="Center"
                         Foreground="{StaticResource TextTertiaryBrush}"
-                        Text="{Binding DeviceName, FallbackValue=Pixel 6}" />
+                        Text="{Binding DeviceName}" />
                 </StackPanel>
 
                 <UniformGrid
