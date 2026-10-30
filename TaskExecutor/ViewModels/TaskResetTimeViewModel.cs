@@ -28,12 +28,12 @@ public partial class TaskResetTimeViewModel : ObservableObject
         if (!TimeSpan.TryParseExact(ResetTime, @"hh\:mm", null, out var timeSpan)
             || timeSpan >= TimeSpan.FromDays(1))
         {
-            _toastService.Show("请输入有效的重置时间（HH:MM，如 08:30）", ToastLevel.Error);
+            _toastService.Show("请输入有效的重置时间（HH:MM，如 08:30）", ToastType.Error);
             return;
         }
 
         _config.Time = timeSpan.ToString(@"hh\:mm");
         SettingsStore.Save(ConfigSections.FileName, ConfigSections.ResetTime, _config);
-        _toastService.Show("重置时间配置已保存", ToastLevel.Success);
+        _toastService.Show("重置时间配置已保存", ToastType.Success);
     }
 }

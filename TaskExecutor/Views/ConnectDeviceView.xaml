@@ -134,7 +134,7 @@
                         Width="240"
                         Margin="12,0"
                         Style="{StaticResource FieldTextBoxStyle}"
-                        Text="{Binding DeviceIp}" />
+                        Text="{Binding DeviceIp, UpdateSourceTrigger=PropertyChanged}" />
 
                     <TextBlock
                         VerticalAlignment="Center"

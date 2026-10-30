@@ -75,7 +75,7 @@ public partial class TaskScheduleViewModel : ObservableObject
                 });
                 CurrentYear = year.ToString();
                 LastSyncTime = syncTime;
-                _toastService.Show("节假日数据同步成功", ToastLevel.Success);
+                _toastService.Show("节假日数据同步成功", ToastType.Success);
                 return;
             }
             catch (Exception e)
@@ -84,6 +84,6 @@ public partial class TaskScheduleViewModel : ObservableObject
             }
         }
 
-        _toastService.Show("节假日数据同步失败，请检查网络后重试", ToastLevel.Error);
+        _toastService.Show("节假日数据同步失败，请检查网络后重试", ToastType.Error);
     }
 }

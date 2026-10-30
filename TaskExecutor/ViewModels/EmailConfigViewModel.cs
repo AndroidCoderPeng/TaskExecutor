@@ -41,7 +41,7 @@ public partial class EmailConfigViewModel : ObservableObject
 
         if (!SenderEmail.EndsWith("@qq.com"))
         {
-            _toastService.Show("发送邮箱必须是 QQ 邮箱", ToastLevel.Warning);
+            _toastService.Show("发送邮箱必须是 QQ 邮箱", ToastType.Warning);
             return;
         }
 
@@ -62,12 +62,12 @@ public partial class EmailConfigViewModel : ObservableObject
                        "收到本邮件说明邮箱配置正确，可以正常接收任务通知。"
             });
 
-            _toastService.Show($"测试邮件已发送至 {RecipientEmail.Trim()}", ToastLevel.Success);
+            _toastService.Show($"测试邮件已发送至 {RecipientEmail.Trim()}", ToastType.Success);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            _toastService.Show($"邮件发送失败：{ex.Message}", ToastLevel.Error);
+            _toastService.Show($"邮件发送失败：{ex.Message}", ToastType.Error);
         }
     }
 
@@ -83,7 +83,7 @@ public partial class EmailConfigViewModel : ObservableObject
         _config.RecipientEmail = RecipientEmail.Trim();
 
         SettingsStore.Save(ConfigSections.FileName, ConfigSections.Email, _config);
-        _toastService.Show("邮箱配置已保存", ToastLevel.Success);
+        _toastService.Show("邮箱配置已保存", ToastType.Success);
     }
 
     private bool CheckEmailConfig()
@@ -94,13 +94,13 @@ public partial class EmailConfigViewModel : ObservableObject
             string.IsNullOrEmpty(AuthorizationCode) ||
             string.IsNullOrEmpty(RecipientEmail))
         {
-            _toastService.Show("请填写有效的邮箱配置和端口", ToastLevel.Warning);
+            _toastService.Show("请填写有效的邮箱配置和端口", ToastType.Warning);
             return false;
         }
 
         if (!IsValidEmail(SenderEmail) || !IsValidEmail(RecipientEmail))
         {
-            _toastService.Show("请填写有效的邮箱地址", ToastLevel.Warning);
+            _toastService.Show("请填写有效的邮箱地址", ToastType.Warning);
             return false;
         }
 

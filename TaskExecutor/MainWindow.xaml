@@ -240,13 +240,13 @@
                             </DataTrigger.ExitActions>
                         </DataTrigger>
 
-                        <DataTrigger Binding="{Binding Toast.Level}" Value="Success">
+                        <DataTrigger Binding="{Binding Toast.Type}" Value="Success">
                             <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding Toast.Level}" Value="Warning">
+                        <DataTrigger Binding="{Binding Toast.Type}" Value="Warning">
                             <Setter Property="Background" Value="{StaticResource WarningBrush}" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding Toast.Level}" Value="Error">
+                        <DataTrigger Binding="{Binding Toast.Type}" Value="Error">
                             <Setter Property="Background" Value="{StaticResource DangerBrush}" />
                         </DataTrigger>
                     </Style.Triggers>

@@ -46,12 +46,12 @@ public partial class WxConfigViewModel : ObservableObject
                           "收到本消息说明企业微信配置正确，可以正常接收任务通知。"
             });
 
-            _toastService.Show("测试消息已发送，请在企业微信群中查收", ToastLevel.Success);
+            _toastService.Show("测试消息已发送，请在企业微信群中查收", ToastType.Success);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            _toastService.Show($"企业微信通知发送失败：{ex.Message}", ToastLevel.Error);
+            _toastService.Show($"企业微信通知发送失败：{ex.Message}", ToastType.Error);
         }
     }
 
@@ -65,14 +65,14 @@ public partial class WxConfigViewModel : ObservableObject
         _config.AttachScreenshot = AttachScreenshot;
 
         SettingsStore.Save(ConfigSections.FileName, ConfigSections.Wechat, _config);
-        _toastService.Show("企业微信配置已保存", ToastLevel.Success);
+        _toastService.Show("企业微信配置已保存", ToastType.Success);
     }
 
     private bool CheckWechatConfig()
     {
         if (string.IsNullOrEmpty(WebhookKey) || string.IsNullOrEmpty(MessageTitle))
         {
-            _toastService.Show("请填写有效的企业微信配置", ToastLevel.Warning);
+            _toastService.Show("请填写有效的企业微信配置", ToastType.Warning);
             return false;
         }
 

@@ -3,6 +3,7 @@ namespace TaskExecutor.Cache;
 public static class ConfigSections
 {
     public const string FileName = "app-config.json";
+    public const string DeviceIp = "DeviceIp";
     public const string Task = "Task";
     public const string TargetApp = "TargetApp";
     public const string Email = "Email";
@@ -12,6 +13,11 @@ public static class ConfigSections
     public const string TimeRange = "TimeRange";
     public const string TaskSchedule = "TaskSchedule";
     public const string ChinaHoliday = "ChinaHoliday";
+}
+
+public class DeviceIpConfig
+{
+    public string Ip { get; set; } = "";
 }
 
 public class TaskConfig

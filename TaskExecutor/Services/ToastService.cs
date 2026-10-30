@@ -10,7 +10,7 @@ public partial class ToastService : ObservableObject, IToastService
     #region VM
 
     [ObservableProperty] private string _message = string.Empty;
-    [ObservableProperty] private ToastLevel _level;
+    [ObservableProperty] private ToastType _type;
     [ObservableProperty] private bool _isVisible;
 
     #endregion
@@ -18,12 +18,12 @@ public partial class ToastService : ObservableObject, IToastService
     private readonly Dispatcher _dispatcher = Application.Current.Dispatcher;
     private CancellationTokenSource? _cts;
 
-    public void Show(string message, ToastLevel level = ToastLevel.Info, int durationMs = 2000)
+    public void Show(string message, ToastType type = ToastType.Info, int durationMs = 2000)
     {
         _dispatcher.Invoke(() =>
         {
             Message = message;
-            Level = level;
+            Type = type;
             IsVisible = true;
 
             _cts?.Cancel(); // 上一条未消失就作废

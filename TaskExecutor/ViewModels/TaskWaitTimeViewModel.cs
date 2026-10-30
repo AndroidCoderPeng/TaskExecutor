@@ -26,11 +26,11 @@ public partial class TaskWaitTimeViewModel : ObservableObject
     {
         if (WaitTime is <= 0 or >= 300)
         {
-            _toastService.Show("等待时间必须在 1 到 300 秒之间", ToastLevel.Error);
+            _toastService.Show("等待时间必须在 1 到 300 秒之间", ToastType.Error);
             return;
         }
         _config.Time = WaitTime;
         SettingsStore.Save(ConfigSections.FileName, ConfigSections.WaitTime, _config);
-        _toastService.Show("等待时间配置已保存", ToastLevel.Success);
+        _toastService.Show("等待时间配置已保存", ToastType.Success);
     }
 }

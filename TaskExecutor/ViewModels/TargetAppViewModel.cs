@@ -67,7 +67,7 @@ public partial class TargetAppViewModel : ObservableObject
         if (string.IsNullOrWhiteSpace(AppName) || string.IsNullOrWhiteSpace(PackageName) ||
             string.IsNullOrWhiteSpace(LauncherActivity))
         {
-            _toastService.Show("请填写完整的应用信息", ToastLevel.Warning);
+            _toastService.Show("请填写完整的应用信息", ToastType.Warning);
             return;
         }
 

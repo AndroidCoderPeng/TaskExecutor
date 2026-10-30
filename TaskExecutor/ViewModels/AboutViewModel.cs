@@ -28,7 +28,7 @@ public partial class AboutViewModel : ObservableObject
         }
         catch (Exception)
         {
-            _toastService.Show("打开浏览器失败", ToastLevel.Error);
+            _toastService.Show("打开浏览器失败", ToastType.Error);
         }
     }
 
@@ -39,11 +39,11 @@ public partial class AboutViewModel : ObservableObject
         try
         {
             Clipboard.SetText(ProjectHomePage);
-            _toastService.Show("已复制到剪贴板", ToastLevel.Success);
+            _toastService.Show("已复制到剪贴板", ToastType.Success);
         }
         catch
         {
-            _toastService.Show("复制失败，请手动复制", ToastLevel.Error); // Clipboard 可能被占用
+            _toastService.Show("复制失败，请手动复制", ToastType.Error); // Clipboard 可能被占用
         }
     }
 }
