@@ -23,7 +23,7 @@ public partial class App : Application
         services.AddSingleton<IToastService, ToastService>();
 
         services.AddSingleton<ConnectDeviceViewModel>(); // 需要保持状态，所以注册为单例
-        services.AddTransient<TaskManagerViewModel>();
+        services.AddSingleton<TaskManagerViewModel>(); // 需要保持状态，所以注册为单例
 
         services.AddTransient<ImportExportViewModel>();
         services.AddTransient<TargetAppViewModel>();

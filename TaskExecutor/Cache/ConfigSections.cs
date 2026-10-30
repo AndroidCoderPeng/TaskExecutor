@@ -33,7 +33,8 @@ public class TaskRow
     public string ExecuteTime { get; set; } = "";
     public TimeRangeConfig TimeRange { get; set; } = new();
     public List<string> Actions { get; set; } = [];
-    public bool State { get; set; }
+    public List<string> NotifyMethods { get; set; } = [];
+    public bool IsEnabled { get; set; }
 }
 
 public class LogRow

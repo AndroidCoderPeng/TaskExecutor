@@ -328,7 +328,7 @@
                             FontSize="20"
                             FontWeight="SemiBold"
                             Foreground="White"
-                            Text="{Binding DeviceName, FallbackValue=Pixel 6}" />
+                            Text="{Binding DeviceName}" />
                     </StackPanel>
                 </Border>
 
@@ -352,7 +352,7 @@
                             FontSize="20"
                             FontWeight="SemiBold"
                             Foreground="{StaticResource SuccessBrush}"
-                            Text="{Binding SuccessRate, StringFormat={}{0}%, FallbackValue=100%}" />
+                            Text="{Binding SuccessRate, StringFormat={}{0}%}" />
                     </StackPanel>
                 </Border>
 
@@ -364,7 +364,7 @@
                             FontSize="20"
                             FontWeight="SemiBold"
                             Foreground="{StaticResource PrimaryHoverBrush}"
-                            Text="{Binding NextNodeTime, FallbackValue=07:30}" />
+                            Text="{Binding NextTaskTime}" />
                     </StackPanel>
                 </Border>
             </UniformGrid>
@@ -427,8 +427,18 @@
                                 <TextBlock
                                     Margin="8,0,0,0"
                                     VerticalAlignment="Center"
-                                    Foreground="{StaticResource SuccessBrush}"
-                                    Text="{Binding TaskState, FallbackValue=任务调度中}" />
+                                    Foreground="{StaticResource SuccessBrush}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="调度已停止" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsTaskScheduled}" Value="True">
+                                                    <Setter Property="Text" Value="调度运行中" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </StackPanel>
                         </Border>
 
@@ -487,8 +497,11 @@
                                                     Margin="0,1,0,0"
                                                     FontSize="11"
                                                     Foreground="{StaticResource TextTertiaryBrush}"
-                                                    Text="{Binding Sub}"
-                                                    TextTrimming="CharacterEllipsis" />
+                                                    TextTrimming="CharacterEllipsis">
+                                                    <Run Text="{Binding TargetApp.Name}" />
+                                                    <Run Text=" · " />
+                                                    <Run Text="{Binding TargetApp.PackageName}" />
+                                                </TextBlock>
                                             </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -496,7 +509,7 @@
 
                                 <DataGridTextColumn
                                     Width="13*"
-                                    Binding="{Binding Time}"
+                                    Binding="{Binding ExecuteTime}"
                                     Header="执行时间" />
 
                                 <DataGridTemplateColumn Width="28*" Header="动作链">
@@ -525,7 +538,7 @@
 
                                 <DataGridTextColumn
                                     Width="11*"
-                                    Binding="{Binding Notify}"
+                                    Binding="{Binding NotifyMethods}"
                                     Header="通知方式" />
 
                                 <DataGridTemplateColumn Width="9*" Header="状态">
@@ -619,7 +632,7 @@
                         Background="Transparent"
                         BorderThickness="0"
                         DockPanel.Dock="Bottom"
-                        ItemsSource="{Binding RuntimeLog}" />
+                        ItemsSource="{Binding RuntimeLogs}" />
                 </DockPanel>
             </Border>
         </Grid>
