@@ -6,23 +6,17 @@
     <link rel="stylesheet" href="faq.css"/>
 </head>
 <body>
-<!-- ========== 分组一：邮箱配置 ========== -->
-<div class="section-divider">📧 邮箱发送</div>
-
 <details name="faq">
     <summary>邮件发送失败（535 认证错误）？<span class="arrow">›</span></summary>
     <div class="answer">
         <p>QQ 邮箱必须使用<strong>「授权码」</strong>而非登录密码。</p>
-        <ol>
+        <ul>
             <li>进入邮箱「设置 → 账户 → POP3/SMTP 服务」开启服务；</li>
             <li>生成<span class="inline-code">授权码</span>；</li>
             <li>粘贴到「邮箱配置 → 授权码」输入框。</li>
-        </ol>
+        </ul>
     </div>
 </details>
-
-<!-- ========== 分组二：企业微信通知 ========== -->
-<div class="section-divider">💬 企业微信通知</div>
 
 <details name="faq">
     <summary>企业微信群里收不到消息？<span class="arrow">›</span></summary>
@@ -34,9 +28,6 @@
         <p>可在「企业微信配置」页点击「测试企业微信通知」快速验证。</p>
     </div>
 </details>
-
-<!-- ========== 分组三：MIUI / HyperOS ADB 限制 ========== -->
-<div class="section-divider">🔒 MIUI / HyperOS ADB 限制</div>
 
 <details name="faq">
     <summary>为什么小米手机执行 adb shell input tap 没反应或报错？<span class="arrow">›</span></summary>
@@ -53,11 +44,11 @@
     <div class="answer">
         <p>进入手机 <strong>设置 → 更多设置 → 开发者选项</strong>（若未开启：设置 → 我的设备 → 全部参数 →
             连续点击「OS版本/MIUI版本」7次）。开启以下三项：</p>
-        <ol>
+        <ul>
             <li><strong>USB 调试</strong>（基础开关）</li>
             <li><strong class="key">USB 调试（安全设置）</strong> ← 关键！允许 ADB 模拟点击/按键注入</li>
             <li><strong>USB 安装</strong>（如需用 ADB 安装 APK）</li>
-        </ol>
+        </ul>
         <div class="warn-note">⚠️ 「USB 调试（安全设置）」和「USB 安装」通常<strong>要求登录小米账号且联网</strong>，部分机型还需插
             SIM 卡。选项可能置灰，需先登账号。
         </div>
