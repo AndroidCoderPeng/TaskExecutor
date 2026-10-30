@@ -5,10 +5,20 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
+    xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     d:DataContext="{d:DesignInstance Type=vm:FaqViewModel}"
     mc:Ignorable="d">
-    <StackPanel Orientation="Vertical">
-        <DockPanel Background="{StaticResource CardBackgroundBrush}" LastChildFill="True">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <DockPanel
+            Grid.Row="0"
+            Background="{StaticResource CardBackgroundBrush}"
+            LastChildFill="True">
             <TextBlock
                 Margin="20,16"
                 FontSize="16"
@@ -24,43 +34,32 @@
                 Text="无线连接 · MIUI / HyperOS 限制" />
         </DockPanel>
 
-        <!--  内容区  -->
-        <Border Margin="20,16" Style="{StaticResource CommonBorderStyle}">
-            <ScrollViewer VerticalScrollBarVisibility="Hidden">
-                <ItemsControl ItemsSource="{Binding FaqItems}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Expander Style="{StaticResource FaqExpanderStyle}">
-                                <Expander.Header>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock
-                                            FontSize="13"
-                                            FontWeight="SemiBold"
-                                            Foreground="{StaticResource TextPrimaryBrush}"
-                                            Text="{Binding Question}"
-                                            TextWrapping="Wrap" />
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="12,0,0,0"
-                                            Style="{StaticResource FaqArrowStyle}"
-                                            Text="›" />
-                                    </Grid>
-                                </Expander.Header>
-                                <TextBlock
-                                    FontSize="12"
-                                    Foreground="{StaticResource TextSecondaryBrush}"
-                                    LineHeight="20"
-                                    Text="{Binding Answer}"
-                                    TextWrapping="Wrap" />
-                            </Expander>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+        <Border
+            Grid.Row="1"
+            Margin="20,16"
+            Style="{StaticResource CommonBorderStyle}">
+            <Grid>
+                <wv2:WebView2 x:Name="FaqWebView" />
+
+                <ProgressBar
+                    x:Name="LoadingBar"
+                    Height="3"
+                    VerticalAlignment="Top"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Foreground="{StaticResource PrimaryBrush}"
+                    IsIndeterminate="True"
+                    Visibility="Collapsed" />
+
+                <TextBlock
+                    x:Name="FallbackText"
+                    Margin="24"
+                    FontSize="13"
+                    Foreground="{StaticResource TextTertiaryBrush}"
+                    Text="未检测到 WebView2 运行时，无法渲染富文本 FAQ。请安装 Microsoft Edge WebView2 Runtime 后重试。"
+                    TextWrapping="Wrap"
+                    Visibility="Collapsed" />
+            </Grid>
         </Border>
-    </StackPanel>
+    </Grid>
 </UserControl>

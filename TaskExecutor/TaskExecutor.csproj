@@ -10,13 +10,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Resource Include="DefaultData\FAQ.json" />
         <Resource Include="Fonts\iconfont.ttf" />
         <Resource Include="Images\*" />
     </ItemGroup>
 
     <ItemGroup>
       <Content Include="Images\application.ico" />
+      <Content Include="DefaultData\faq.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Include="DefaultData\faq.css">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>
@@ -31,6 +38,7 @@
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
         <PackageReference Include="MailKit" Version="4.18.2" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2957.106" />
         <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.161" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     </ItemGroup>
