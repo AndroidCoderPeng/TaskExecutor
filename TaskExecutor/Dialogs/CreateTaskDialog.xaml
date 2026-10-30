@@ -7,7 +7,7 @@
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
     Title="新建任务"
     Width="476"
-    Height="536"
+    Height="478"
     d:DataContext="{d:DesignInstance Type=vm:CreateTaskDialogViewModel}"
     Background="{StaticResource WindowBackgroundBrush}"
     ResizeMode="NoResize"
@@ -29,7 +29,10 @@
                     Foreground="{StaticResource TextSecondaryBrush}"
                     Text="执行设备：" />
 
-                <TextBlock Foreground="{StaticResource TextPrimaryBrush}" Text="{Binding DeviceName}" />
+                <TextBlock
+                    FontWeight="SemiBold"
+                    Foreground="{StaticResource TextPrimaryBrush}"
+                    Text="{Binding DeviceName}" />
 
                 <TextBlock
                     Margin="8,0"
@@ -54,5 +57,112 @@
             FontSize="14"
             Foreground="{StaticResource TextSecondaryBrush}"
             Text="执行时间" />
+
+        <TextBox
+            Style="{StaticResource PlaceHolderTextBoxStyle}"
+            Tag="HH:MM"
+            Text="{Binding TaskTime}" />
+
+        <Grid Margin="0,12,0,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                FontSize="14"
+                Foreground="{StaticResource TextSecondaryBrush}"
+                Text="随即偏移时间" />
+
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="0"
+                Foreground="{StaticResource PrimaryBrush}"
+                Text="{Binding Tips}" />
+
+            <CheckBox
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="0,0,-10,0"
+                FontSize="14"
+                IsChecked="{Binding IsRandomOffsetTime}"
+                Style="{StaticResource CheckBoxSwitchStyle}" />
+        </Grid>
+
+        <TextBlock
+            Margin="0,12,0,6"
+            FontSize="14"
+            Foreground="{StaticResource TextSecondaryBrush}"
+            Text="通知方式" />
+
+        <Grid>
+            <TextBlock
+                VerticalAlignment="Center"
+                FontSize="14"
+                Foreground="{StaticResource TextSecondaryBrush}"
+                Text="邮件通知" />
+
+            <CheckBox
+                Margin="0,0,-10,0"
+                HorizontalAlignment="Right"
+                FontSize="14"
+                IsChecked="{Binding IsNotifyByMail}"
+                Style="{StaticResource CheckBoxSwitchStyle}" />
+        </Grid>
+
+        <Grid Margin="0,8,0,16">
+            <TextBlock
+                VerticalAlignment="Center"
+                FontSize="14"
+                Foreground="{StaticResource TextSecondaryBrush}"
+                Text="企业微信通知" />
+
+            <CheckBox
+                Margin="0,0,-10,0"
+                HorizontalAlignment="Right"
+                FontSize="14"
+                IsChecked="{Binding IsNotifyByWechat}"
+                Style="{StaticResource CheckBoxSwitchStyle}" />
+        </Grid>
+
+        <Border
+            Background="Transparent"
+            BorderBrush="{StaticResource CardBorderBrush}"
+            BorderThickness="0,1,0,0">
+            <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Foreground="{StaticResource TextTertiaryBrush}"
+                    Text="保存后立即生效，节假日自动跳过" />
+
+                <Button
+                    Grid.Column="1"
+                    Margin="8,0"
+                    Command="{Binding CancelDialogCommand}"
+                    Content="取消"
+                    Style="{StaticResource CommonButtonStyle}" />
+
+                <Button
+                    Grid.Column="2"
+                    Padding="14,0"
+                    Command="{Binding SaveTaskCommand}"
+                    Content="保存任务"
+                    Style="{StaticResource PrimaryButtonStyle}" />
+            </Grid>
+        </Border>
     </StackPanel>
 </Window>
