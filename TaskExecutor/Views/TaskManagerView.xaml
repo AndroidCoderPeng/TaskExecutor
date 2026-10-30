@@ -374,7 +374,7 @@
 
             <Border
                 Grid.Row="1"
-                Height="298"
+                MinHeight="186"
                 Margin="0,12"
                 Style="{StaticResource CommonBorderStyle}">
                 <DockPanel LastChildFill="True">
@@ -489,7 +489,8 @@
                         <DataGrid
                             x:Name="TaskDataGrid"
                             ItemsSource="{Binding Tasks}"
-                            Style="{StaticResource CardDataGridStyle}">
+                            Style="{StaticResource CardDataGridStyle}"
+                            VerticalScrollBarVisibility="Hidden">
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn
                                     Width="*"
@@ -595,7 +596,7 @@
 
                         <!--  空态  -->
                         <TextBlock
-                            Margin="0,28"
+                            Margin="0,28,0,0"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             FontSize="13"
