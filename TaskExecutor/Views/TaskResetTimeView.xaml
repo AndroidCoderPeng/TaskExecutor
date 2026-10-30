@@ -13,7 +13,7 @@
                 Margin="20,16"
                 FontSize="16"
                 FontWeight="SemiBold"
-                Foreground="White"
+                Foreground="{StaticResource TextPrimaryBrush}"
                 Text="任务重置时间" />
 
             <TextBlock
@@ -45,7 +45,7 @@
                     <TextBlock
                         FontSize="15"
                         FontWeight="SemiBold"
-                        Foreground="White"
+                        Foreground="{StaticResource TextPrimaryBrush}"
                         Text="任务重置时间" />
 
                     <TextBlock

@@ -13,7 +13,7 @@
                 Margin="20,16"
                 FontSize="16"
                 FontWeight="SemiBold"
-                Foreground="White"
+                Foreground="{StaticResource TextPrimaryBrush}"
                 Text="常见问题" />
 
             <TextBlock

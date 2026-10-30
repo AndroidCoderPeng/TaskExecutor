@@ -13,7 +13,7 @@
                 Margin="20,16"
                 FontSize="16"
                 FontWeight="SemiBold"
-                Foreground="White"
+                Foreground="{StaticResource TextPrimaryBrush}"
                 Text="无线连接" />
 
             <TextBlock
@@ -54,7 +54,7 @@
                         Margin="16"
                         FontSize="15"
                         FontWeight="SemiBold"
-                        Foreground="White"
+                        Foreground="{StaticResource TextPrimaryBrush}"
                         Text="当前连接" />
 
                     <Button
@@ -89,11 +89,11 @@
                     VerticalAlignment="Center"
                     FontSize="14">
                     <Run Foreground="{StaticResource TextSecondaryBrush}" Text="设备状态" />
-                    <Run Foreground="White" Text="{Binding DeviceName}" />
-                    <Run Foreground="White" Text=" · " />
-                    <Run Foreground="White" Text="{Binding DeviceIp}" />
-                    <Run Foreground="White" Text=" · " />
-                    <Run Foreground="White" Text="{Binding ConnectionState}" />
+                    <Run Foreground="{StaticResource TextPrimaryBrush}" Text="{Binding DeviceName}" />
+                    <Run Foreground="{StaticResource TextPrimaryBrush}" Text=" · " />
+                    <Run Foreground="{StaticResource TextPrimaryBrush}" Text="{Binding DeviceIp}" />
+                    <Run Foreground="{StaticResource TextPrimaryBrush}" Text=" · " />
+                    <Run Foreground="{StaticResource TextPrimaryBrush}" Text="{Binding ConnectionState}" />
                 </TextBlock>
             </Grid>
         </Border>
@@ -117,7 +117,7 @@
                     Margin="16,12"
                     FontSize="15"
                     FontWeight="SemiBold"
-                    Foreground="White"
+                    Foreground="{StaticResource TextPrimaryBrush}"
                     Text="连接新设备" />
 
                 <StackPanel

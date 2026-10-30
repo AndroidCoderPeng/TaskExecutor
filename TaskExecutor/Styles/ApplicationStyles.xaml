@@ -133,7 +133,7 @@
         <Setter Property="Height" Value="34" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="FontSize" Value="13" />
-        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="Background" Value="{StaticResource WindowBackgroundBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />

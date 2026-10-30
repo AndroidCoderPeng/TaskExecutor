@@ -50,7 +50,7 @@
                 Margin="20,16"
                 FontSize="16"
                 FontWeight="SemiBold"
-                Foreground="White"
+                Foreground="{StaticResource TextPrimaryBrush}"
                 Text="数据导入导出" />
 
             <TextBlock
@@ -84,7 +84,7 @@
                         Grid.Row="0"
                         FontSize="15"
                         FontWeight="SemiBold"
-                        Foreground="White"
+                        Foreground="{StaticResource TextPrimaryBrush}"
                         Text="导出配置" />
 
                     <TextBlock
@@ -128,7 +128,7 @@
                         Grid.Row="0"
                         FontSize="15"
                         FontWeight="SemiBold"
-                        Foreground="White"
+                        Foreground="{StaticResource TextPrimaryBrush}"
                         Text="导入配置" />
 
                     <TextBlock

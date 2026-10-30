@@ -40,7 +40,7 @@
             <Setter Property="Padding" Value="10" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
             <Setter Property="FontSize" Value="13" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -174,7 +174,7 @@
                 Margin="20,16"
                 FontSize="16"
                 FontWeight="SemiBold"
-                Foreground="White"
+                Foreground="{StaticResource TextPrimaryBrush}"
                 Text="目标 APP" />
 
             <TextBlock
@@ -210,7 +210,7 @@
                         Margin="16,12,10,12"
                         FontSize="15"
                         FontWeight="SemiBold"
-                        Foreground="White"
+                        Foreground="{StaticResource TextPrimaryBrush}"
                         Text="包名映射" />
 
                     <Border

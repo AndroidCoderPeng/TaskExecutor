@@ -13,7 +13,7 @@
                 Margin="20,16"
                 FontSize="16"
                 FontWeight="SemiBold"
-                Foreground="White"
+                Foreground="{StaticResource TextPrimaryBrush}"
                 Text="邮箱配置" />
 
             <TextBlock
@@ -47,7 +47,7 @@
                         Margin="16,12,10,12"
                         FontSize="15"
                         FontWeight="SemiBold"
-                        Foreground="White"
+                        Foreground="{StaticResource TextPrimaryBrush}"
                         Text="邮箱（SMTP）" />
 
                     <TextBlock

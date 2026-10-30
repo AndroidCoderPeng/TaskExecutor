@@ -5,71 +5,71 @@
     <!--  primary 按钮/选中/链接基础色  -->
     <Color x:Key="PrimaryHoverColor">#FF3395FF</Color>
     <!--  primary-hover 按钮 hover  -->
-    <Color x:Key="InfoBrightColor">#FF4098FC</Color>
-    <!--  blue-bright 暗底提亮：链接/选中导航/焦点  -->
-    <Color x:Key="InfoDimColor">#29007AFF</Color>
-    <!--  blue-dim 选中导航背景（16% 主色）  -->
+    <Color x:Key="InfoBrightColor">#FF007AFF</Color>
+    <!--  blue-bright 亮底下主蓝即提亮色：链接/选中导航/焦点  -->
+    <Color x:Key="InfoDimColor">#1A007AFF</Color>
+    <!--  blue-dim 选中导航背景（10% 主色）  -->
     <Color x:Key="FocusGlowColor">#33007AFF</Color>
     <!--  输入框聚焦光环（20% 主色）  -->
 
     <!--  ========== 背景 / 卡片 ==========  -->
-    <Color x:Key="WindowBackgroundColor">#FF17181C</Color>
+    <Color x:Key="WindowBackgroundColor">#FFF5F6F8</Color>
     <!--  bg 窗体底色/输入框底色  -->
-    <Color x:Key="CardBackgroundColor">#FF222429</Color>
+    <Color x:Key="CardBackgroundColor">#FFFFFFFF</Color>
     <!--  card 卡片/标题栏/侧边栏  -->
-    <Color x:Key="CardBackgroundAltColor">#FF2A2D34</Color>
+    <Color x:Key="CardBackgroundAltColor">#FFF7F8FA</Color>
     <!--  card-2 / fill-2 弹窗底/次级填充  -->
-    <Color x:Key="ControlFillColor">#FF31343C</Color>
+    <Color x:Key="ControlFillColor">#FFECEEF2</Color>
     <!--  fill-3 chips/开关底/hover 高亮  -->
-    <Color x:Key="ScrollbarThumbColor">#FF3A3E48</Color>
+    <Color x:Key="ScrollbarThumbColor">#FFC9CDD4</Color>
     <!--  滚动条滑块  -->
 
     <!--  ========== 边框 / 分割线 ==========  -->
-    <Color x:Key="CardBorderColor">#FF33363E</Color>
+    <Color x:Key="CardBorderColor">#FFD9DDE3</Color>
     <!--  border 输入框/卡片边框  -->
-    <Color x:Key="DividerColor">#FF2C2F36</Color>
+    <Color x:Key="DividerColor">#FFE8EAEE</Color>
     <!--  divider 表格行/卡内分割线  -->
 
     <!--  ========== 文字（四级） ==========  -->
-    <Color x:Key="TextPrimaryColor">#FFF2F3F5</Color>
+    <Color x:Key="TextPrimaryColor">#FF1A1D21</Color>
     <!--  text-1 标题/任务名/主要文字  -->
-    <Color x:Key="TextSecondaryColor">#FFA9AEB8</Color>
+    <Color x:Key="TextSecondaryColor">#FF4E535C</Color>
     <!--  text-2 正文/描述  -->
-    <Color x:Key="TextTertiaryColor">#FF6E737D</Color>
+    <Color x:Key="TextTertiaryColor">#FF8A8F99</Color>
     <!--  text-3 次要文字/表头/占位提示  -->
-    <Color x:Key="TextDisabledColor">#FF52565E</Color>
+    <Color x:Key="TextDisabledColor">#FFB4B8C0</Color>
     <!--  text-4 禁用/最弱层级文字  -->
 
     <!--  ========== 语义色 ==========  -->
-    <Color x:Key="SuccessColor">#FF2EC258</Color>
-    <!--  green 成功/已启用/ADB 已连接  -->
-    <Color x:Key="SuccessDimColor">#242EC258</Color>
+    <Color x:Key="SuccessColor">#FF1FA84F</Color>
+    <!--  green 成功/已启用/ADB 已连接（亮底下加深保证对比度）  -->
+    <Color x:Key="SuccessDimColor">#1F1FA84F</Color>
     <Color x:Key="WarningColor">#FFF5A500</Color>
     <!--  yellow 警告/待处理  -->
     <Color x:Key="WarningDimColor">#24F5A500</Color>
     <!--  yellow-dim 警告徽章背景（14%）  -->
-    <Color x:Key="DangerColor">#FFF76560</Color>
+    <Color x:Key="DangerColor">#FFE5484D</Color>
     <!--  red 失败/删除/断开  -->
-    <Color x:Key="DangerDimColor">#80F76560</Color>
+    <Color x:Key="DangerDimColor">#80E5484D</Color>
     <!--  危险按钮 hover 边框（50%）  -->
 
     <!--  ========== 交互覆盖层 ==========  -->
-    <Color x:Key="HoverOverlayColor">#0AFFFFFF</Color>
-    <!--  表格行 hover（2.5% 白）  -->
-    <Color x:Key="ControlHoverOverlayColor">#14FFFFFF</Color>
-    <!--  标题栏窗口按钮 hover（8% 白）  -->
-    <Color x:Key="DialogMaskColor">#8C000000</Color>
-    <!--  弹窗遮罩（55% 黑）  -->
-    <Color x:Key="DropShadowColor">#66000000</Color>
-    <!--  弹窗/窗体投影（40% 黑）  -->
+    <Color x:Key="HoverOverlayColor">#08000000</Color>
+    <!--  表格行 hover（3% 黑）  -->
+    <Color x:Key="ControlHoverOverlayColor">#14000000</Color>
+    <!--  标题栏窗口按钮 hover（8% 黑）  -->
+    <Color x:Key="DialogMaskColor">#66000000</Color>
+    <!--  弹窗遮罩（40% 黑）  -->
+    <Color x:Key="DropShadowColor">#33000000</Color>
+    <!--  弹窗/窗体投影（20% 黑）  -->
     <Color x:Key="CloseButtonHoverColor">#FFC42B1C</Color>
     <!--  Windows 关闭按钮 hover 红  -->
 
     <!--  ========== 桌面背景渐变（可选：主窗口外层） ==========  -->
-    <Color x:Key="DesktopGradient1Color">#FF0B0D12</Color>
-    <Color x:Key="DesktopGradient2Color">#FF131A28</Color>
-    <Color x:Key="DesktopGradient3Color">#FF1A2436</Color>
-    <Color x:Key="DesktopGradient4Color">#FF263650</Color>
+    <Color x:Key="DesktopGradient1Color">#FFEDEFF2</Color>
+    <Color x:Key="DesktopGradient2Color">#FFE8EBF0</Color>
+    <Color x:Key="DesktopGradient3Color">#FFE3E8EF</Color>
+    <Color x:Key="DesktopGradient4Color">#FFDDE4EE</Color>
 
     <!--  ========== 画刷（与上方颜色一一对应） ==========  -->
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />

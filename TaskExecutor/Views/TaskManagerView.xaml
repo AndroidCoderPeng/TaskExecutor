@@ -276,7 +276,7 @@
                 Margin="20,16"
                 FontSize="16"
                 FontWeight="SemiBold"
-                Foreground="White"
+                Foreground="{StaticResource TextPrimaryBrush}"
                 Text="任务管理" />
 
             <Button
@@ -320,7 +320,7 @@
                             Margin="0,8,0,0"
                             FontSize="20"
                             FontWeight="SemiBold"
-                            Foreground="White"
+                            Foreground="{StaticResource TextPrimaryBrush}"
                             Text="{Binding DeviceName}" />
                     </StackPanel>
                 </Border>
@@ -332,7 +332,7 @@
                             Margin="0,8,0,0"
                             FontSize="20"
                             FontWeight="SemiBold"
-                            Foreground="White"
+                            Foreground="{StaticResource TextPrimaryBrush}"
                             Text="{Binding ScheduledTaskCount, StringFormat={}{0} 次, FallbackValue=0 次}" />
                     </StackPanel>
                 </Border>
@@ -381,7 +381,7 @@
                             Margin="16,16,10,16"
                             FontSize="15"
                             FontWeight="SemiBold"
-                            Foreground="White"
+                            Foreground="{StaticResource TextPrimaryBrush}"
                             Text="定时任务" />
 
                         <Border
@@ -587,7 +587,7 @@
                             DockPanel.Dock="Left"
                             FontSize="15"
                             FontWeight="SemiBold"
-                            Foreground="White"
+                            Foreground="{StaticResource TextPrimaryBrush}"
                             Text="运行日志" />
 
                         <Button

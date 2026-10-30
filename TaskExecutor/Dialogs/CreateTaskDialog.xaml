@@ -29,7 +29,7 @@
                     Foreground="{StaticResource TextSecondaryBrush}"
                     Text="执行设备：" />
 
-                <TextBlock Foreground="White" Text="{Binding DeviceName}" />
+                <TextBlock Foreground="{StaticResource TextPrimaryBrush}" Text="{Binding DeviceName}" />
 
                 <TextBlock
                     Margin="8,0"
