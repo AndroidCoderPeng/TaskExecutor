@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using TaskExecutor.Services;
 
 namespace TaskExecutor.ViewModels;
@@ -22,5 +23,35 @@ public partial class CommandTestViewModel : ObservableObject
         _toastService = toastService;
         
         DeviceName = string.IsNullOrEmpty(deviceViewModel.DeviceName) ? "-" : deviceViewModel.DeviceName;
+    }
+
+    [RelayCommand]
+    private void WakeupPhone()
+    {
+        
+    }
+    
+    [RelayCommand]
+    private void ScreenOffPhone()
+    {
+        
+    }
+    
+    [RelayCommand]
+    private void Screencap()
+    {
+        
+    }
+    
+    [RelayCommand]
+    private void OpenTargetApp()
+    {
+        
+    }
+    
+    [RelayCommand]
+    private void ForceStopApp()
+    {
+        
     }
 }

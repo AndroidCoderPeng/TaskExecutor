@@ -106,7 +106,10 @@
                     Margin="16,4,16,16"
                     Columns="5"
                     Rows="1">
-                    <Button Margin="0,0,6,0" Style="{StaticResource ActionButtonStyle}">
+                    <Button
+                        Margin="0,0,6,0"
+                        Command="{Binding WakeupPhoneCommand}"
+                        Style="{StaticResource ActionButtonStyle}">
                         <Button.Content>
                             <StackPanel Margin="16,0" Orientation="Vertical">
                                 <TextBlock
@@ -131,7 +134,10 @@
                         </Button.Content>
                     </Button>
 
-                    <Button Margin="6,0" Style="{StaticResource ActionButtonStyle}">
+                    <Button
+                        Margin="6,0"
+                        Command="{Binding ScreenOffPhoneCommand}"
+                        Style="{StaticResource ActionButtonStyle}">
                         <Button.Content>
                             <StackPanel Margin="16,0" Orientation="Vertical">
                                 <TextBlock
@@ -156,7 +162,10 @@
                         </Button.Content>
                     </Button>
 
-                    <Button Margin="6,0" Style="{StaticResource ActionButtonStyle}">
+                    <Button
+                        Margin="6,0"
+                        Command="{Binding ScreencapCommand}"
+                        Style="{StaticResource ActionButtonStyle}">
                         <Button.Content>
                             <StackPanel Margin="16,0" Orientation="Vertical">
                                 <TextBlock
@@ -181,7 +190,10 @@
                         </Button.Content>
                     </Button>
 
-                    <Button Margin="6,0" Style="{StaticResource ActionButtonStyle}">
+                    <Button
+                        Margin="6,0"
+                        Command="{Binding OpenTargetAppCommand}"
+                        Style="{StaticResource ActionButtonStyle}">
                         <Button.Content>
                             <StackPanel Margin="16,0" Orientation="Vertical">
                                 <TextBlock
@@ -208,6 +220,7 @@
 
                     <Button
                         Margin="6,0,0,0"
+                        Command="{Binding ForceStopAppCommand}"
                         Style="{StaticResource ActionButtonStyle}"
                         Tag="Danger">
                         <Button.Content>
