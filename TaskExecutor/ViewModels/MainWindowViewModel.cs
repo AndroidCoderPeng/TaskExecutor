@@ -1,9 +1,11 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using TaskExecutor.Model;
 using TaskExecutor.Services;
+using TaskExecutor.Utils;
 
 namespace TaskExecutor.ViewModels;
 
@@ -64,6 +66,29 @@ public partial class MainWindowViewModel : ObservableObject
 
         SelectedIndex = 0;
         CurrentView = App.Services.GetRequiredService<ConnectDeviceViewModel>();
+        
+        WeakReferenceMessenger.Default.Register<MessengerMessage.UpdateNavigationStateMessage>(this, (_, msg) =>
+        {
+            if (msg.Value)
+            {
+                // 设备已连接，启用全部导航栏并切换到任务管理
+                foreach (var item in _deviceRequiredItems)
+                {
+                    item.IsEnabled = true;
+                }
+                
+                SelectedIndex = 1;
+                CurrentView = App.Services.GetRequiredService<TaskManagerViewModel>();
+            }
+            else
+            {
+                // 设备已断开，禁用部分导航栏（不用切换到设备连接，因为已经在设备连接界面了）
+                foreach (var item in _deviceRequiredItems)
+                {
+                    item.IsEnabled = false;
+                }
+            }
+        });
     }
 
     [RelayCommand]

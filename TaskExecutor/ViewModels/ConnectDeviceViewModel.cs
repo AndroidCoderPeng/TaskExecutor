@@ -2,6 +2,7 @@ using System.IO;
 using System.Net;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using TaskExecutor.Cache;
 using TaskExecutor.Services;
 using TaskExecutor.Utils;
@@ -66,6 +67,9 @@ public partial class ConnectDeviceViewModel : ObservableObject
         DeviceName = string.Empty;
         ConnectionState = "未连接";
         _toastService.Show("设备已断开连接", ToastType.Success);
+        
+        // 更新侧边导航栏状态
+        WeakReferenceMessenger.Default.Send(new MessengerMessage.UpdateNavigationStateMessage(false));
     }
 
     [RelayCommand]
@@ -167,6 +171,9 @@ public partial class ConnectDeviceViewModel : ObservableObject
             SettingsStore.Save(ConfigSections.FileName, ConfigSections.DeviceIp, _config);
 
             _toastService.Show("设备连接成功", ToastType.Success);
+            
+            // 更新侧边导航栏状态
+            WeakReferenceMessenger.Default.Send(new MessengerMessage.UpdateNavigationStateMessage(true));
         }
         finally
         {
