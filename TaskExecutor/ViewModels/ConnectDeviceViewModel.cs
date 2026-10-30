@@ -80,7 +80,7 @@ public partial class ConnectDeviceViewModel : ObservableObject
         DeviceName = string.Empty;
         ConnectionState = "未连接";
     }
-    
+
     [RelayCommand]
     private async Task ConnectDeviceAsync()
     {
@@ -219,6 +219,12 @@ public partial class ConnectDeviceViewModel : ObservableObject
     private async Task<string> GetDeviceModelAsync()
     {
         var (_, output) = await RunAdbWithOutputAsync("shell", "getprop", "ro.product.model");
+        return output.FirstOrDefault()?.Trim() ?? string.Empty;
+    }
+
+    public async Task<string> GetDeviceSystemVersionAsync()
+    {
+        var (_, output) = await RunAdbWithOutputAsync("shell", "getprop", "ro.build.version.release");
         return output.FirstOrDefault()?.Trim() ?? string.Empty;
     }
 }

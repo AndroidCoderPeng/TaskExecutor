@@ -1,12 +1,17 @@
-﻿<Window x:Class="TaskExecutor.Dialogs.CreateTaskDialog"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:TaskExecutor.Dialogs"
-        mc:Ignorable="d"
-        Title="CreateTaskDialog" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+﻿<Window
+    x:Class="TaskExecutor.Dialogs.CreateTaskDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
+    Title="新建任务"
+    Width="476"
+    Height="536"
+    d:DataContext="{d:DesignInstance Type=vm:CreateTaskDialogViewModel}"
+    Background="{StaticResource WindowBackgroundBrush}"
+    ResizeMode="NoResize"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+    <Grid />
 </Window>

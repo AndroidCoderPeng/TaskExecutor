@@ -6,12 +6,26 @@ namespace TaskExecutor.ViewModels;
 
 public partial class CreateTaskDialogViewModel : ObservableObject, IDialogParameterReceiver, IDialogCloseRequester
 {
-    private string _deviceName = string.Empty;
+    #region VM
+
+    [ObservableProperty] private string _deviceName = string.Empty;
+    [ObservableProperty] private string _systemVersion = string.Empty;
+
+    #endregion
+
     public event Action<bool> CloseRequested;
 
     public void OnDialogOpened(object? parameter)
     {
-        _deviceName = parameter as string ?? string.Empty;
+        if (parameter is KeyValuePair<string, string> pair)
+        {
+            DeviceName = pair.Key;
+            SystemVersion = pair.Value;
+        }
+    }
+
+    public CreateTaskDialogViewModel()
+    {
     }
 
     [RelayCommand]

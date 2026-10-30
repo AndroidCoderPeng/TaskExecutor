@@ -57,13 +57,16 @@ public partial class TaskManagerViewModel : ObservableObject
 
             // 归位状态 + 通知导航栏
             _deviceViewModel.MarkDisconnected();
-            WeakReferenceMessenger.Default.Send(
-                new MessengerMessage.UpdateNavigationStateMessage(false, _deviceViewModel.DeviceName,
-                    _deviceViewModel.DeviceIp));
+            var message = new MessengerMessage.UpdateNavigationStateMessage(
+                false, _deviceViewModel.DeviceName, _deviceViewModel.DeviceIp
+            );
+            WeakReferenceMessenger.Default.Send(message);
             return;
         }
 
-        _dialogService.ShowDialog(typeof(CreateTaskDialog), DeviceName);
+        var systemVersion = await _deviceViewModel.GetDeviceSystemVersionAsync();
+        var parameter = new KeyValuePair<string, string>(DeviceName, systemVersion);
+        _dialogService.ShowDialog(typeof(CreateTaskDialog), parameter);
     }
 
     /// <summary>
