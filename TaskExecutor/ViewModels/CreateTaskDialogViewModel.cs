@@ -10,6 +10,7 @@ public partial class CreateTaskDialogViewModel : ObservableObject, IDialogParame
 
     [ObservableProperty] private string _deviceName = string.Empty;
     [ObservableProperty] private string _systemVersion = string.Empty;
+    [ObservableProperty] private string _taskName = string.Empty;
 
     #endregion
 

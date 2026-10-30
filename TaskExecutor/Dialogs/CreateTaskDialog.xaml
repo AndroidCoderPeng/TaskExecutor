@@ -13,5 +13,46 @@
     ResizeMode="NoResize"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
-    <Grid />
+    <StackPanel Margin="24" Orientation="Vertical">
+        <Border
+            Padding="12,8"
+            CornerRadius="4"
+            Style="{StaticResource CommonBorderStyle}">
+            <StackPanel Orientation="Horizontal">
+                <Ellipse
+                    Width="8"
+                    Height="8"
+                    Fill="{StaticResource SuccessBrush}" />
+
+                <TextBlock
+                    Margin="8,0,4,0"
+                    Foreground="{StaticResource TextSecondaryBrush}"
+                    Text="执行设备：" />
+
+                <TextBlock Foreground="White" Text="{Binding DeviceName}" />
+
+                <TextBlock
+                    Margin="8,0"
+                    Foreground="{StaticResource TextSecondaryBrush}"
+                    Text="{Binding SystemVersion, StringFormat={}· Android {0}}" />
+            </StackPanel>
+        </Border>
+
+        <TextBlock
+            Margin="0,16,0,6"
+            FontSize="14"
+            Foreground="{StaticResource TextSecondaryBrush}"
+            Text="任务名称" />
+
+        <TextBox
+            Style="{StaticResource PlaceHolderTextBoxStyle}"
+            Tag="请输入任务名称"
+            Text="{Binding TaskName}" />
+
+        <TextBlock
+            Margin="0,12,0,6"
+            FontSize="14"
+            Foreground="{StaticResource TextSecondaryBrush}"
+            Text="执行时间" />
+    </StackPanel>
 </Window>

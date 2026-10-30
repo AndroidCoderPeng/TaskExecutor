@@ -84,7 +84,7 @@ public class ResetTimeConfig
 
 public class TimeRangeConfig
 {
-    public int LowerLimitTime { get; set; } = 1;
+    public int LowerLimitTime { get; set; } = 0;
     public int UpperLimitTime { get; set; } = 30;
 }
 

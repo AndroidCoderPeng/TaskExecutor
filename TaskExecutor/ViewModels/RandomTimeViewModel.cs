@@ -10,7 +10,7 @@ public partial class RandomTimeViewModel : ObservableObject
 {
     #region VM
 
-    [ObservableProperty] private int _lowerLimitTime = 1;
+    [ObservableProperty] private int _lowerLimitTime = 0;
     [ObservableProperty] private int _upperLimitTime = 30;
 
     #endregion
