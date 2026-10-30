@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Text;
 
 namespace TaskExecutor.Utils;
@@ -54,6 +55,37 @@ public class CommandExecutor
     public Task<int> ExecuteAsync(string executor)
     {
         return Task.Run(() => Execute(executor));
+    }
+
+    /// <summary>
+    /// 异步执行命令并收集全部标准输出/标准错误行，返回 (退出码, 输出行列表)。
+    /// stdout 和 stderr 合并收集，行间顺序不保证；事件订阅仅在本方法执行期间生效。
+    /// </summary>
+    public async Task<(int Code, IReadOnlyList<string> Output)> ExecuteWithOutputAsync(string fileName)
+    {
+        var lines = new ConcurrentQueue<string>();
+
+        void OnLine(string? line)
+        {
+            if (line != null)
+            {
+                lines.Enqueue(line);
+            }
+        }
+
+        OnStandardOutput += OnLine;
+        OnStandardError += OnLine;
+
+        try
+        {
+            var code = await ExecuteAsync(fileName);
+            return (code, [.. lines]);
+        }
+        finally
+        {
+            OnStandardOutput -= OnLine;
+            OnStandardError -= OnLine;
+        }
     }
 
     /// <summary>
