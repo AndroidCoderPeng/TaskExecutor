@@ -506,7 +506,7 @@
                                                     Text="{Binding Name}"
                                                     TextTrimming="CharacterEllipsis" />
                                                 <TextBlock
-                                                    Margin="0,1,0,0"
+                                                    Margin="0,2,0,0"
                                                     FontSize="11"
                                                     Foreground="{StaticResource TextTertiaryBrush}"
                                                     TextTrimming="CharacterEllipsis">
@@ -539,7 +539,7 @@
                                     Binding="{Binding NotifyMethods, Converter={StaticResource MethodToTextConverterKey}}"
                                     Header="通知方式" />
 
-                                <DataGridTemplateColumn Width="100" Header="状态">
+                                <DataGridTemplateColumn Width="108" Header="状态">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ToggleButton
@@ -551,7 +551,7 @@
                                 </DataGridTemplateColumn>
 
                                 <DataGridTemplateColumn
-                                    Width="150"
+                                    Width="122"
                                     CellStyle="{StaticResource DataGridLastCellStyle}"
                                     Header="操作"
                                     HeaderStyle="{StaticResource DataGridLastColumnHeaderStyle}">

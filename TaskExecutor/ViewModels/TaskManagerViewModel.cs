@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -30,6 +31,7 @@ public partial class TaskManagerViewModel : ObservableObject
     private readonly IToastService _toastService;
     private readonly IDialogService _dialogService;
     private readonly TaskConfig _config;
+    private int _taskFilterOption; 
 
     public TaskManagerViewModel(ConnectDeviceViewModel deviceViewModel, IToastService toastService,
         IDialogService dialogService)
@@ -75,6 +77,7 @@ public partial class TaskManagerViewModel : ObservableObject
         {
             // 重新加载任务列表
             Tasks = new ObservableCollection<TaskRow>(_config.Tasks);
+            ApplyTaskFilter();
         }
     }
 
@@ -103,5 +106,23 @@ public partial class TaskManagerViewModel : ObservableObject
         var commandLine = new ArgumentCreator().Append(arguments).ToCommandLine();
         var (_, output) = await new CommandExecutor(commandLine).ExecuteWithOutputAsync(_adbPath);
         return output;
+    }
+    
+    [RelayCommand]
+    private void TaskOptionRadioChanged(string parameter)
+    {
+        _taskFilterOption = int.Parse(parameter);
+        ApplyTaskFilter();
+    }
+    
+    private void ApplyTaskFilter()
+    {
+        var view = CollectionViewSource.GetDefaultView(Tasks);
+        view.Filter = _taskFilterOption switch
+        {
+            1 => o => o is TaskRow { IsEnabled: true },
+            2 => o => o is TaskRow { IsEnabled: false },
+            _ => null,
+        };
     }
 }
