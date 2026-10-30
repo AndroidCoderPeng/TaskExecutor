@@ -30,7 +30,6 @@ public partial class TaskManagerViewModel : ObservableObject
     private readonly ConnectDeviceViewModel _deviceViewModel;
     private readonly IToastService _toastService;
     private readonly IDialogService _dialogService;
-    private readonly TaskConfig _config;
     private int _taskFilterOption; 
 
     public TaskManagerViewModel(ConnectDeviceViewModel deviceViewModel, IToastService toastService,
@@ -44,8 +43,8 @@ public partial class TaskManagerViewModel : ObservableObject
         // 进入页面时从唯一事实源拉取当前状态
         DeviceName = string.IsNullOrEmpty(deviceViewModel.DeviceName) ? "-" : deviceViewModel.DeviceName;
 
-        _config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
-        Tasks = new ObservableCollection<TaskRow>(_config.Tasks);
+        var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
+        Tasks = new ObservableCollection<TaskRow>(config.Tasks);
     }
 
     [RelayCommand]
@@ -76,7 +75,8 @@ public partial class TaskManagerViewModel : ObservableObject
         if (_dialogService.ShowDialog(typeof(CreateTaskDialog), parameter) == true)
         {
             // 重新加载任务列表
-            Tasks = new ObservableCollection<TaskRow>(_config.Tasks);
+            var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
+            Tasks = new ObservableCollection<TaskRow>(config.Tasks);
             ApplyTaskFilter();
         }
     }

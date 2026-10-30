@@ -152,7 +152,7 @@
                             FontSize="14"
                             Style="{StaticResource PrimaryButtonStyle}" />
                         <Button
-                            Content="导出包名映射"
+                            Content="导入包名映射"
                             FontSize="14"
                             Style="{StaticResource CommonButtonStyle}" />
                     </StackPanel>
