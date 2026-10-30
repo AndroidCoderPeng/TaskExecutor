@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.ObjectModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskExecutor.Cache;
@@ -19,6 +20,9 @@ public partial class CreateTaskDialogViewModel : ObservableObject, IDialogParame
     [ObservableProperty] private bool _isRandomOffsetTime;
     [ObservableProperty] private bool _isNotifyByMail;
     [ObservableProperty] private bool _isNotifyByWechat;
+    [ObservableProperty] private TargetAppRow? _selectedTargetApp;
+
+    public ObservableCollection<TargetAppRow> TargetApps { get; } = [];
 
     #endregion
 
@@ -44,6 +48,12 @@ public partial class CreateTaskDialogViewModel : ObservableObject, IDialogParame
 
         var range = SettingsStore.Load<TimeRangeConfig>(ConfigSections.FileName, ConfigSections.TimeRange);
         Tips = $"执行时间将随机偏移 {range.LowerLimitTime}~{range.UpperLimitTime} 分钟";
+
+        var appConfig = SettingsStore.Load<TargetAppConfig>(ConfigSections.FileName, ConfigSections.TargetApp);
+        foreach (var app in appConfig.Apps)
+        {
+            TargetApps.Add(app);
+        }
     }
 
     [RelayCommand]
@@ -68,6 +78,12 @@ public partial class CreateTaskDialogViewModel : ObservableObject, IDialogParame
             return;
         }
 
+        if (SelectedTargetApp == null || string.IsNullOrWhiteSpace(SelectedTargetApp.PackageName))
+        {
+            _toastService.Show("请选择目标 APP，可在「目标 APP」页维护映射", ToastType.Warning);
+            return;
+        }
+
         var notifyMethods = new List<string>();
         if (IsNotifyByMail) notifyMethods.Add("邮件");
         if (IsNotifyByWechat) notifyMethods.Add("企业微信");
@@ -77,6 +93,12 @@ public partial class CreateTaskDialogViewModel : ObservableObject, IDialogParame
         _config.Tasks.Add(new TaskRow
         {
             Name = TaskName,
+            TargetApp = new TargetAppRow
+            {
+                Name = SelectedTargetApp.Name,
+                PackageName = SelectedTargetApp.PackageName,
+                Activity = SelectedTargetApp.Activity
+            },
             ExecuteTime = executeTime.ToString(@"hh\:mm"),
             TimeRange = IsRandomOffsetTime ? timeRange : null,
             NotifyMethods = notifyMethods,

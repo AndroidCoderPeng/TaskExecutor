@@ -26,29 +26,6 @@ public partial class TargetAppViewModel : ObservableObject
         _toastService = toastService;
 
         _config = SettingsStore.Load<TargetAppConfig>(ConfigSections.FileName, ConfigSections.TargetApp);
-        if (_config.Apps.Count == 0)
-        {
-            _config.Apps.Add(new TargetAppRow
-            {
-                Name = "钉钉",
-                PackageName = "com.alibaba.android.rimet",
-                Activity = "com.alibaba.android.rimet.biz.LaunchHomeActivity"
-            });
-            _config.Apps.Add(new TargetAppRow
-            {
-                Name = "企业微信",
-                PackageName = "com.tencent.wework",
-                Activity = "com.tencent.wework.launch.LaunchSplashActivity"
-            });
-            _config.Apps.Add(new TargetAppRow
-            {
-                Name = "飞书",
-                PackageName = "com.ss.android.lark",
-                Activity = "com.ss.android.lark.main.app.MainActivity"
-            });
-            TargetApps = new ObservableCollection<TargetAppRow>(_config.Apps);
-        }
-
         TargetApps = new ObservableCollection<TargetAppRow>(_config.Apps);
     }
 

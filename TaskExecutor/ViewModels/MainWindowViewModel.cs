@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using TaskExecutor.Cache;
 using TaskExecutor.Model;
 using TaskExecutor.Services;
 using TaskExecutor.Utils;
@@ -94,6 +95,30 @@ public partial class MainWindowViewModel : ObservableObject
             DeviceName = msg.Value.DeviceName;
             DeviceIp = msg.Value.DeviceIp;
         });
+        
+        var config = SettingsStore.Load<TargetAppConfig>(ConfigSections.FileName, ConfigSections.TargetApp);
+        if (config.Apps.Count == 0)
+        {
+            config.Apps.Add(new TargetAppRow
+            {
+                Name = "钉钉",
+                PackageName = "com.alibaba.android.rimet",
+                Activity = "com.alibaba.android.rimet.biz.LaunchHomeActivity"
+            });
+            config.Apps.Add(new TargetAppRow
+            {
+                Name = "企业微信",
+                PackageName = "com.tencent.wework",
+                Activity = "com.tencent.wework.launch.LaunchSplashActivity"
+            });
+            config.Apps.Add(new TargetAppRow
+            {
+                Name = "飞书",
+                PackageName = "com.ss.android.lark",
+                Activity = "com.ss.android.lark.main.app.MainActivity"
+            });
+            SettingsStore.Save(ConfigSections.FileName, ConfigSections.TargetApp, config);
+        }
     }
 
     [RelayCommand]
