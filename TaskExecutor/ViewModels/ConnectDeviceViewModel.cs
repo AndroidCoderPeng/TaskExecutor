@@ -64,8 +64,7 @@ public partial class ConnectDeviceViewModel : ObservableObject
 
         await RunAdbWithOutputAsync("disconnect", $"{DeviceIp}:5555");
 
-        DeviceName = string.Empty;
-        ConnectionState = "未连接";
+        MarkDisconnected();
         _toastService.Show("设备已断开连接", ToastType.Success);
 
         // 更新侧边导航栏状态
@@ -73,6 +72,15 @@ public partial class ConnectDeviceViewModel : ObservableObject
             new MessengerMessage.UpdateNavigationStateMessage(false, DeviceName, DeviceIp));
     }
 
+    /// <summary>
+    /// 将连接状态归位为未连接（断开连接、二次检测失败时调用）。
+    /// </summary>
+    public void MarkDisconnected()
+    {
+        DeviceName = string.Empty;
+        ConnectionState = "未连接";
+    }
+    
     [RelayCommand]
     private async Task ConnectDeviceAsync()
     {
