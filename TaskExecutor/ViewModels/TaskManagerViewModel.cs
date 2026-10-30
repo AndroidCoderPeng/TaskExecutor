@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using TaskExecutor.Cache;
 using TaskExecutor.Dialogs;
+using TaskExecutor.Model;
 using TaskExecutor.Services;
 using TaskExecutor.Utils;
 
@@ -20,7 +21,7 @@ public partial class TaskManagerViewModel : ObservableObject
     [ObservableProperty] private string _nextTaskTime = "-";
     [ObservableProperty] private ObservableCollection<TaskRow> _tasks = [];
     [ObservableProperty] private bool _isTaskScheduled;
-    [ObservableProperty] private ObservableCollection<LogRow> _runtimeLogs = [];
+    [ObservableProperty] private ObservableCollection<RuntimeLog> _runtimeLogs = [];
 
     #endregion
 
@@ -28,6 +29,7 @@ public partial class TaskManagerViewModel : ObservableObject
     private readonly ConnectDeviceViewModel _deviceViewModel;
     private readonly IToastService _toastService;
     private readonly IDialogService _dialogService;
+    private readonly TaskConfig _config;
 
     public TaskManagerViewModel(ConnectDeviceViewModel deviceViewModel, IToastService toastService,
         IDialogService dialogService)
@@ -39,6 +41,9 @@ public partial class TaskManagerViewModel : ObservableObject
 
         // 进入页面时从唯一事实源拉取当前状态
         DeviceName = string.IsNullOrEmpty(deviceViewModel.DeviceName) ? "-" : deviceViewModel.DeviceName;
+
+        _config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
+        Tasks = new ObservableCollection<TaskRow>(_config.Tasks);
     }
 
     [RelayCommand]
@@ -66,7 +71,11 @@ public partial class TaskManagerViewModel : ObservableObject
 
         var systemVersion = await _deviceViewModel.GetDeviceSystemVersionAsync();
         var parameter = new KeyValuePair<string, string>(DeviceName, systemVersion);
-        _dialogService.ShowDialog(typeof(CreateTaskDialog), parameter);
+        if (_dialogService.ShowDialog(typeof(CreateTaskDialog), parameter) == true)
+        {
+            // 重新加载任务列表
+            Tasks = new ObservableCollection<TaskRow>(_config.Tasks);
+        }
     }
 
     /// <summary>

@@ -5,7 +5,6 @@ public static class ConfigSections
     public const string FileName = "app-config.json";
     public const string DeviceIp = "DeviceIp";
     public const string Task = "Task";
-    public const string Log = "Log";
     public const string TargetApp = "TargetApp";
     public const string Email = "Email";
     public const string Wechat = "Wechat";
@@ -34,18 +33,6 @@ public class TaskRow
     public TimeRangeConfig? TimeRange { get; set; }
     public List<string> NotifyMethods { get; set; } = [];
     public bool IsEnabled { get; set; }
-}
-
-public class LogConfig
-{
-    public List<LogRow> Logs { get; set; } = [];
-}
-
-public class LogRow
-{
-    public string Time { get; set; } = "";
-    public bool State { get; set; }
-    public string Content { get; set; } = "";
 }
 
 public class TargetAppConfig

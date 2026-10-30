@@ -203,7 +203,7 @@
             <Border.Style>
                 <Style TargetType="Border">
                     <Setter Property="Opacity" Value="0" />
-                    <Setter Property="Background" Value="{StaticResource ControlFillBrush}" />
+                    <Setter Property="Background" Value="{StaticResource TextTertiaryBrush}" />
 
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Toast.IsVisible}" Value="True">
