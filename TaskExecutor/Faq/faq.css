@@ -30,7 +30,7 @@ body {
 details {
     background: #F7F8FA;
     border: 1px solid #D9DDE3;
-    border-radius: 10px;
+    border-radius: 6px;
     margin-bottom: 10px;
     overflow: hidden;
 }
@@ -58,7 +58,8 @@ summary::-webkit-details-marker {
 
 .arrow {
     color: #8A8F99;
-    font-size: 15px;
+    font-size: 19px;
+    line-height: 1;
     flex-shrink: 0;
     transition: transform .15s ease;
 }

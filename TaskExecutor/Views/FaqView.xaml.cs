@@ -57,7 +57,7 @@ public partial class FaqView : UserControl
             coreWebView2.NavigationCompleted += (_, _) => HideLoading();
 
             // 加载随程序发布的静态页面
-            var htmlPath = Path.Combine(AppContext.BaseDirectory, "DefaultData", "faq.html");
+            var htmlPath = Path.Combine(AppContext.BaseDirectory, "Faq", "faq.html");
             if (!File.Exists(htmlPath))
             {
                 Console.WriteLine($"FAQ 页面文件缺失：{htmlPath}");

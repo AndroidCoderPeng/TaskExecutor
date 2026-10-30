@@ -16,11 +16,11 @@
 
     <ItemGroup>
       <Content Include="Images\application.ico" />
-      <Content Include="DefaultData\faq.html">
+      <Content Include="Faq\faq.html">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
-      <Content Include="DefaultData\faq.css">
+      <Content Include="Faq\faq.css">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
