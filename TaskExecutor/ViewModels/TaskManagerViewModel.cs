@@ -30,10 +30,14 @@ public partial class TaskManagerViewModel : ObservableObject
     private readonly ConnectDeviceViewModel _deviceViewModel;
     private readonly IToastService _toastService;
     private readonly IDialogService _dialogService;
-    private int _taskFilterOption; 
+    private int _taskFilterOption;
+
+    private DateOnly _statDate = DateOnly.FromDateTime(DateTime.Now);
+    private int _todayTotal;
+    private int _todaySuccess;
 
     public TaskManagerViewModel(ConnectDeviceViewModel deviceViewModel, IToastService toastService,
-        IDialogService dialogService)
+        IDialogService dialogService, TaskSchedulerService schedulerService)
     {
         _deviceViewModel = deviceViewModel;
         _toastService = toastService;
@@ -45,6 +49,26 @@ public partial class TaskManagerViewModel : ObservableObject
 
         var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
         Tasks = new ObservableCollection<TaskRow>(config.Tasks);
+
+        schedulerService.TaskExecuted += log =>
+        {
+            // 跨天自动归零统计（log.Time 前 10 位即日期）
+            if (DateOnly.TryParse(log.Time[..10], out var date) && date != _statDate)
+            {
+                _statDate = date;
+                _todayTotal = 0;
+                _todaySuccess = 0;
+            }
+
+            _todayTotal++;
+            if (log.State) _todaySuccess++;
+
+            ScheduledTaskCount = _todayTotal;
+            SuccessRate = _todayTotal == 0 ? 0 : (int)Math.Round(_todaySuccess * 100.0 / _todayTotal);
+            RuntimeLogs.Insert(0, log);
+        };
+        schedulerService.NextTaskTimeChanged += t => NextTaskTime = t?.ToString("HH:mm") ?? "-";
+        IsTaskScheduled = schedulerService.IsScheduled;
     }
 
     [RelayCommand]
@@ -107,14 +131,14 @@ public partial class TaskManagerViewModel : ObservableObject
         var (_, output) = await new CommandExecutor(commandLine).ExecuteWithOutputAsync(_adbPath);
         return output;
     }
-    
+
     [RelayCommand]
     private void TaskOptionRadioChanged(string parameter)
     {
         _taskFilterOption = int.Parse(parameter);
         ApplyTaskFilter();
     }
-    
+
     private void ApplyTaskFilter()
     {
         var view = CollectionViewSource.GetDefaultView(Tasks);
