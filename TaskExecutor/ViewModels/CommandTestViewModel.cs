@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
+using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskExecutor.Cache;
@@ -20,6 +22,9 @@ public partial class CommandTestViewModel : ObservableObject
     private readonly ConnectDeviceViewModel _deviceViewModel;
     private readonly IToastService _toastService;
 
+    [GeneratedRegex(@"^\s*(?:Override|Physical) size:\s*(\d+)\s*x\s*(\d+)\s*$")]
+    private static partial Regex ScreenSizeRegex();
+
     public CommandTestViewModel(ConnectDeviceViewModel deviceViewModel, IToastService toastService)
     {
         _deviceViewModel = deviceViewModel;
@@ -35,8 +40,46 @@ public partial class CommandTestViewModel : ObservableObject
     {
         if (!CheckConnected()) return;
 
-        var (code, _) = await RunAdbAsync("shell", "input", "keyevent", "KEYCODE_WAKEUP");
-        _toastService.Show(code == 0 ? "已发送亮屏指令" : "亮屏指令执行失败", code == 0 ? ToastType.Success : ToastType.Error);
+        var (wakeCode, _) = await RunAdbAsync("shell", "input", "keyevent", "KEYCODE_WAKEUP");
+        if (wakeCode != 0)
+        {
+            _toastService.Show("亮屏指令执行失败", ToastType.Error);
+            return;
+        }
+
+        var (sizeCode, output) = await RunAdbAsync("shell", "wm", "size");
+        if (sizeCode != 0)
+        {
+            Console.WriteLine($"获取屏幕尺寸失败，退出码: {sizeCode}, 输出: {string.Join("\n", output)}");
+            return;
+        }
+
+        // 设置过覆盖尺寸时，应使用覆盖尺寸而不是物理尺寸。
+        var sizeLine = output.FirstOrDefault(line =>
+                           line.TrimStart().StartsWith("Override size:", StringComparison.OrdinalIgnoreCase))
+                       ?? output.FirstOrDefault(line =>
+                           line.TrimStart().StartsWith("Physical size:", StringComparison.OrdinalIgnoreCase));
+        Console.WriteLine($"屏幕尺寸信息: {sizeLine}");
+
+        var match = ScreenSizeRegex().Match(sizeLine ?? "");
+        if (!match.Success
+            || !int.TryParse(match.Groups[1].Value, out var width)
+            || !int.TryParse(match.Groups[2].Value, out var height)
+            || width < 2 || height < 2)
+        {
+            Console.WriteLine("无法解析屏幕尺寸");
+            return;
+        }
+
+        await Task.Delay(500);
+        var x = (width / 2).ToString(CultureInfo.InvariantCulture);
+        var startY = ((int)(height * 0.8)).ToString(CultureInfo.InvariantCulture);
+        var endY = ((int)(height * 0.2)).ToString(CultureInfo.InvariantCulture);
+
+        var (swipeCode, _) = await RunAdbAsync("shell", "input", "swipe", x, startY, x, endY, "300");
+        _toastService.Show(
+            swipeCode == 0 ? "亮屏指令执行成功" : "亮屏指令执行失败",
+            swipeCode == 0 ? ToastType.Success : ToastType.Error);
     }
 
     [RelayCommand]
