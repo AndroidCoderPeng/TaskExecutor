@@ -185,23 +185,21 @@ public class TaskSchedulerService
     /// </summary>
     private async Task NotifyAsync(TaskRow task, string content)
     {
-        foreach (var method in task.NotifyMethods)
+        try
         {
-            try
+            switch (task.NotifyMethod)
             {
-                if (method == "邮件")
-                {
+                case "邮件":
                     await SendMailAsync(content);
-                }
-                else if (method == "企业微信")
-                {
+                    break;
+                case "企业微信":
                     await SendWechatAsync(content);
-                }
+                    break;
             }
-            catch (Exception e)
-            {
-                RaiseLog(false, $"任务「{task.Name}」{method}通知发送失败：{e.Message}");
-            }
+        }
+        catch (Exception e)
+        {
+            RaiseLog(false, $"任务「{task.Name}」{task.NotifyMethod}通知发送失败：{e.Message}");
         }
     }
 

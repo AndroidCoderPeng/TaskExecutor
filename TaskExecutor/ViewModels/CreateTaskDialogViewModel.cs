@@ -84,9 +84,9 @@ public partial class CreateTaskDialogViewModel : ObservableObject, IDialogParame
             return;
         }
 
-        var notifyMethods = new List<string>();
-        if (IsNotifyByMail) notifyMethods.Add("邮件");
-        if (IsNotifyByWechat) notifyMethods.Add("企业微信");
+        var notifyMethod = "";
+        if (IsNotifyByMail) notifyMethod = "邮件";
+        if (IsNotifyByWechat) notifyMethod = "企业微信";
 
         var timeRange = SettingsStore.Load<TimeRangeConfig>(ConfigSections.FileName, ConfigSections.TimeRange);
 
@@ -101,7 +101,7 @@ public partial class CreateTaskDialogViewModel : ObservableObject, IDialogParame
             },
             ExecuteTime = executeTime.ToString(@"hh\:mm"),
             TimeRange = IsRandomOffsetTime ? timeRange : null,
-            NotifyMethods = notifyMethods,
+            NotifyMethod = notifyMethod,
             IsEnabled = true
         });
         SettingsStore.Save(ConfigSections.FileName, ConfigSections.Task, _config);

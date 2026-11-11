@@ -5,6 +5,7 @@
     xmlns:cvt="clr-namespace:TaskExecutor.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:TaskExecutor.Model"
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
     d:DataContext="{d:DesignInstance Type=vm:TaskManagerViewModel}"
     mc:Ignorable="d">
@@ -273,7 +274,6 @@
         </Style>
 
         <cvt:TimeRangeConverter x:Key="TimeRangeConverterKey" />
-        <cvt:MethodToTextConverter x:Key="MethodToTextConverterKey" />
         <cvt:EnabledToTextConverter x:Key="EnabledToTextConverterKey" />
     </UserControl.Resources>
 
@@ -520,7 +520,7 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTemplateColumn Width="180" Header="执行时间">
+                                <DataGridTemplateColumn Width="176" Header="执行时间">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
@@ -536,11 +536,11 @@
                                 </DataGridTemplateColumn>
 
                                 <DataGridTextColumn
-                                    Width="220"
-                                    Binding="{Binding NotifyMethods, Converter={StaticResource MethodToTextConverterKey}}"
+                                    Width="128"
+                                    Binding="{Binding NotifyMethod}"
                                     Header="通知方式" />
 
-                                <DataGridTemplateColumn Width="108" Header="状态">
+                                <DataGridTemplateColumn Width="128" Header="状态">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ToggleButton
@@ -636,10 +636,71 @@
                     </DockPanel>
 
                     <ListBox
+                        Margin="8,0"
                         Background="Transparent"
                         BorderThickness="0"
                         DockPanel.Dock="Bottom"
-                        ItemsSource="{Binding RuntimeLogs}" />
+                        ItemsSource="{Binding RuntimeLogs}"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border
+                                                x:Name="ItemBorder"
+                                                Padding="8"
+                                                Background="Transparent"
+                                                CornerRadius="6">
+                                                <ContentPresenter />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource HoverOverlayBrush}" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="160" />
+                                        <ColumnDefinition Width="80" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <d:Style.DataContext>
+                                        <x:Type Type="model:RuntimeLog" />
+                                    </d:Style.DataContext>
+
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        VerticalAlignment="Center"
+                                        Foreground="{StaticResource TextTertiaryBrush}"
+                                        Text="{Binding Time}" />
+
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        VerticalAlignment="Center"
+                                        Text="{Binding State}" />
+
+                                    <!--  消息  -->
+                                    <TextBlock
+                                        Grid.Column="2"
+                                        VerticalAlignment="Center"
+                                        Foreground="{StaticResource TextSecondaryBrush}"
+                                        Text="{Binding Content}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
                 </DockPanel>
             </Border>
         </Grid>

@@ -43,6 +43,17 @@ public partial class TaskManagerViewModel : ObservableObject
         _toastService = toastService;
         _dialogService = dialogService;
 
+        // TODO: 这里的逻辑有点奇怪，应该在 TaskSchedulerService 内部维护一个状态对象，而不是在 VM 内部维护一堆状态变量
+        // TODO: 另外，TaskSchedulerService 内部应该有一个方法，返回当前状态，而不是在 VM 内部维护一堆状态变量
+        // TODO: 另外，TaskSchedulerService 内部应该有一个事件，通知 VM 状态变化，而不是在 VM 内部直接订阅 TaskSchedulerService 的事件
+        // TODO: 这样做的好处是，VM 内部不需要关心 TaskSchedulerService 的内部实现细节，只需要关心状态变化即可
+        // TODO: 添加测试 Log 数据
+        RuntimeLogs.Add(new RuntimeLog
+        {
+            Time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            State = true,
+            Content = "测试任务执行成功"
+        });
 
         // 进入页面时从唯一事实源拉取当前状态
         DeviceName = string.IsNullOrEmpty(deviceViewModel.DeviceName) ? "-" : deviceViewModel.DeviceName;
