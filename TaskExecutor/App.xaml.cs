@@ -21,10 +21,10 @@ public partial class App : Application
         var services = new ServiceCollection();
 
         services.AddSingleton<MainWindowViewModel>();
-        services.AddSingleton<TaskSchedulerService>();
 
         services.AddSingleton<IToastService, ToastService>();
         services.AddSingleton<IDialogService, DialogService>();
+        services.AddSingleton<ISchedulerService, SchedulerService>();
 
         services.AddSingleton<ConnectDeviceViewModel>(); // 需要保持状态，所以注册为单例
         services.AddSingleton<TaskManagerViewModel>(); // 需要保持状态，所以注册为单例
@@ -47,7 +47,7 @@ public partial class App : Application
         services.AddDialog<CreateTaskDialog, CreateTaskDialogViewModel>();
         
         Services = services.BuildServiceProvider();
-        Services.GetRequiredService<TaskSchedulerService>().Start(); // 主窗口显示前启动
+        Services.GetRequiredService<ISchedulerService>().Start(); // 主窗口显示前启动
 
         var mainWindow = new MainWindow
         {

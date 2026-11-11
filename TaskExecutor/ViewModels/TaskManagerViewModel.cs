@@ -37,7 +37,7 @@ public partial class TaskManagerViewModel : ObservableObject
     private int _todaySuccess;
 
     public TaskManagerViewModel(ConnectDeviceViewModel deviceViewModel, IToastService toastService,
-        IDialogService dialogService, TaskSchedulerService schedulerService)
+        IDialogService dialogService, ISchedulerService schedulerService)
     {
         _deviceViewModel = deviceViewModel;
         _toastService = toastService;

@@ -9,7 +9,7 @@ using TaskExecutor.ViewModels;
 
 namespace TaskExecutor.Services;
 
-public class TaskSchedulerService
+public class SchedulerService : ISchedulerService
 {
     private const string TimeFormat = "hh\\:mm";
 
@@ -28,7 +28,7 @@ public class TaskSchedulerService
     public event Action<DateTime?>? NextTaskTimeChanged;
     public bool IsScheduled { get; private set; }
 
-    public TaskSchedulerService(ConnectDeviceViewModel deviceViewModel)
+    public SchedulerService(ConnectDeviceViewModel deviceViewModel)
     {
         _deviceViewModel = deviceViewModel;
         _timer.Tick += OnTick;
@@ -339,7 +339,7 @@ public class TaskSchedulerService
     {
         TaskExecuted?.Invoke(new RuntimeLog
         {
-            Time = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
+            Time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
             State = state,
             Content = content
         });
