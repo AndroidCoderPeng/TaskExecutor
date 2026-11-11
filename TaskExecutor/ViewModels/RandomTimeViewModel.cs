@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using TaskExecutor.Cache;
 using TaskExecutor.Services;
 using TaskExecutor.Utils;
+using TaskExecutor.Enums;
 
 namespace TaskExecutor.ViewModels;
 
@@ -14,7 +15,7 @@ public partial class RandomTimeViewModel : ObservableObject
     [ObservableProperty] private int _upperLimitTime = 30;
 
     #endregion
-    
+
     private readonly IToastService _toastService;
     private readonly TimeRangeConfig _config;
 

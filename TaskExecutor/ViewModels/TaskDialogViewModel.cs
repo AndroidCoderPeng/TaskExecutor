@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using TaskExecutor.Cache;
 using TaskExecutor.Services;
 using TaskExecutor.Utils;
+using TaskExecutor.Enums;
 
 namespace TaskExecutor.ViewModels;
 
@@ -83,7 +84,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
             ?? TargetApps.FirstOrDefault(app => app.PackageName == target.PackageName);
 
         if (matched != null) return matched;
-        
+
         // 目标 APP 已在「目标 APP」页被删除：把任务里的旧值挂回列表，
         // 否则 ComboBox 选不中、保存时会被"请选择目标 APP"卡死
         var orphan = new TargetAppRow
@@ -95,7 +96,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         TargetApps.Add(orphan);
         return orphan;
     }
-    
+
     [RelayCommand]
     private void CancelDialog()
     {
@@ -119,7 +120,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
             _toastService.Show("请选择执行时间", ToastType.Warning);
             return;
         }
-        
+
         var isEditing = _editingIndex >= 0;
         // 名称是调度去重键（Name@date），创建后不可修改：仅新建时确定并校验唯一
         if (!isEditing)
@@ -133,7 +134,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
                 return;
             }
         }
-        
+
         var notifyMethod = IsNotifyByWechat ? "企业微信" : IsNotifyByMail ? "邮件" : "";
         var timeRange = SettingsStore.Load<TimeRangeConfig>(ConfigSections.FileName, ConfigSections.TimeRange);
 
@@ -156,7 +157,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         _toastService.Show(isEditing ? $"任务「{task.Name}」已更新" : "任务创建成功", ToastType.Success);
         CloseRequested.Invoke(true);
     }
-    
+
     /// <summary>
     /// 空名时生成唯一默认名：「新任务」「新任务 2」…
     /// </summary>

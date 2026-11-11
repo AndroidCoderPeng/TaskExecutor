@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using TaskExecutor.Cache;
 using TaskExecutor.Services;
 using TaskExecutor.Utils;
+using TaskExecutor.Enums;
 
 namespace TaskExecutor.ViewModels;
 
@@ -12,7 +13,7 @@ public partial class TaskWaitTimeViewModel : ObservableObject
 
     private readonly IToastService _toastService;
     private readonly WaitTimeConfig _config;
-    
+
     public TaskWaitTimeViewModel(IToastService toastService)
     {
         _toastService = toastService;
@@ -20,7 +21,7 @@ public partial class TaskWaitTimeViewModel : ObservableObject
         _config = SettingsStore.Load<WaitTimeConfig>(ConfigSections.FileName, ConfigSections.WaitTime);
         WaitTime = _config.Time;
     }
-    
+
     [RelayCommand]
     private void SaveConfig()
     {
@@ -29,6 +30,7 @@ public partial class TaskWaitTimeViewModel : ObservableObject
             _toastService.Show("等待时间必须在 1 到 300 秒之间", ToastType.Error);
             return;
         }
+
         _config.Time = WaitTime;
         SettingsStore.Save(ConfigSections.FileName, ConfigSections.WaitTime, _config);
         _toastService.Show("等待时间配置已保存", ToastType.Success);

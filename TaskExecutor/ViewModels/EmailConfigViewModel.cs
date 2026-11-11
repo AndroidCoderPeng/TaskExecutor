@@ -2,6 +2,7 @@ using System.Net.Mail;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskExecutor.Cache;
+using TaskExecutor.Enums;
 using TaskExecutor.Services;
 using TaskExecutor.Utils;
 

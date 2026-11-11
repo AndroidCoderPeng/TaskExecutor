@@ -1,4 +1,4 @@
-﻿namespace TaskExecutor.Utils;
+﻿namespace TaskExecutor.Enums;
 
 public enum ToastType
 {

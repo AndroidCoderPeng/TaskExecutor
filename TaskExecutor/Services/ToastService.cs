@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using TaskExecutor.Utils;
+using TaskExecutor.Enums;
 
 namespace TaskExecutor.Services;
 

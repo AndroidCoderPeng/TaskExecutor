@@ -1,4 +1,4 @@
-﻿using TaskExecutor.Utils;
+﻿using TaskExecutor.Enums;
 
 namespace TaskExecutor.Model;
 

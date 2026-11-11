@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using TaskExecutor.Cache;
 using TaskExecutor.Services;
 using TaskExecutor.Utils;
+using TaskExecutor.Enums;
 
 namespace TaskExecutor.ViewModels;
 
@@ -33,7 +34,7 @@ public partial class WxConfigViewModel : ObservableObject
     private async Task TestWebhookNotificationAsync()
     {
         if (!CheckWechatConfig()) return;
-        
+
         // 实现企业微信通知发送
         try
         {

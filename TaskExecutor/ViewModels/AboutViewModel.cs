@@ -2,8 +2,8 @@
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using TaskExecutor.Enums;
 using TaskExecutor.Services;
-using TaskExecutor.Utils;
 
 namespace TaskExecutor.ViewModels;
 

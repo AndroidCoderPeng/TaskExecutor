@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using TaskExecutor.Cache;
 using TaskExecutor.Services;
 using TaskExecutor.Utils;
+using TaskExecutor.Enums;
 
 namespace TaskExecutor.ViewModels;
 
@@ -40,7 +41,8 @@ public partial class TaskScheduleViewModel : ObservableObject
         IsSkipHoliday = config.IsSkipHoliday;
         IsResetDailyTask = config.IsResetDailyTask;
         CurrentYear = DateTime.Now.Year.ToString();
-        LastSyncTime = SettingsStore.Load<ChinaHolidayConfig>(ConfigSections.FileName, ConfigSections.ChinaHoliday).LastSyncTime;
+        LastSyncTime = SettingsStore.Load<ChinaHolidayConfig>(ConfigSections.FileName, ConfigSections.ChinaHoliday)
+            .LastSyncTime;
         PropertyChanged += (_, e) =>
         {
             if (e.PropertyName is nameof(IsNeedRandomTime) or nameof(IsSkipHoliday) or nameof(IsResetDailyTask))

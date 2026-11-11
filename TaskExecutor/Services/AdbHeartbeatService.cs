@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Windows.Threading;
+using TaskExecutor.Enums;
 using TaskExecutor.Model;
 using TaskExecutor.Utils;
 
@@ -117,7 +118,7 @@ public class AdbHeartbeatService : IAdbHeartbeatService
         _consecutiveFailures = 0;
         _generation++;
         _timer.Start();
-        
+
         // 连接成功即视为一次有效心跳，界面立刻从 0s 开始计时
         _lastSuccessTime = DateTime.Now;
         HeartbeatUpdated?.Invoke(_lastSuccessTime);
@@ -130,7 +131,7 @@ public class AdbHeartbeatService : IAdbHeartbeatService
         _consecutiveFailures = 0;
         _generation++;
         _timer.Stop();
-        
+
         _lastSuccessTime = null;
         HeartbeatUpdated?.Invoke(null);
     }
@@ -162,7 +163,7 @@ public class AdbHeartbeatService : IAdbHeartbeatService
             return false;
         }
     }
-    
+
     /// <summary>
     /// 探测成功：记录最近成功时间并通知界面，掉线后恢复时再触发 Beat
     /// </summary>
