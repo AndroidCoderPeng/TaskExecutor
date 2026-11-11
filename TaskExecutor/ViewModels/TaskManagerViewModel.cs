@@ -108,6 +108,50 @@ public partial class TaskManagerViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void EditTask(TaskRow task)
+    {
+    }
+
+    [RelayCommand]
+    private void ToggleTask(TaskRow task)
+    {
+        var index = Tasks.IndexOf(task);
+        if (index < 0) return;
+
+        task.IsEnabled = !task.IsEnabled;
+        Tasks[index] = task; // 触发 Replace，让绑定重新求值
+
+        SaveTasks();
+        ApplyTaskFilter();
+
+        _toastService.Show(
+            task.IsEnabled ? $"任务「{task.Name}」已启用" : $"任务「{task.Name}」已暂停",
+            task.IsEnabled ? ToastType.Success : ToastType.Info);
+    }
+
+    [RelayCommand]
+    private void DeleteTask(TaskRow task)
+    {
+        if (!Tasks.Remove(task)) return;
+
+        SaveTasks();
+        ApplyTaskFilter();
+
+        _toastService.Show($"任务「{task.Name}」已删除", ToastType.Success);
+    }
+
+    /// <summary>
+    /// 把界面上的任务列表整体写回 app-config.json 的 Task 段。
+    /// 调度器每 30s tick 都会重新加载配置，所以保存后无需重启、无需通知调度器。
+    /// </summary>
+    private void SaveTasks()
+    {
+        var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
+        config.Tasks = [.. Tasks];
+        SettingsStore.Save(ConfigSections.FileName, ConfigSections.Task, config);
+    }
+
+    [RelayCommand]
     private void TaskOptionRadioChanged(string parameter)
     {
         _taskFilterOption = int.Parse(parameter);
