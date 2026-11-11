@@ -11,6 +11,11 @@ namespace TaskExecutor.ViewModels;
 
 public partial class ConnectDeviceViewModel : ObservableObject, IDeviceStateProvider
 {
+    /// <summary>
+    /// adb devices 的一行记录；serial 含冒号的是网络连接（ip:port）。
+    /// </summary>
+    private sealed record AdbDeviceEntry(string Serial, string State);
+    
     #region VM
 
     [ObservableProperty] private string _deviceName = string.Empty;
@@ -19,6 +24,9 @@ public partial class ConnectDeviceViewModel : ObservableObject, IDeviceStateProv
 
     #endregion
 
+    // adb devices 中处于可用状态的标记
+    private const string DeviceState = "device";
+    
     public bool IsConnected => ConnectionState == "已连接";
     private readonly IToastService _toastService;
     private readonly IAdbHeartbeatService _heartbeatService;
@@ -50,7 +58,7 @@ public partial class ConnectDeviceViewModel : ObservableObject, IDeviceStateProv
                 ConnectionState = "已连接";
                 if (string.IsNullOrEmpty(DeviceName))
                 {
-                    DeviceName = await GetDeviceModelAsync();
+                    DeviceName = await GetDeviceModelAsync($"{DeviceIp}:5555");
                 }
 
                 WeakReferenceMessenger.Default.Send(
@@ -142,81 +150,70 @@ public partial class ConnectDeviceViewModel : ObservableObject, IDeviceStateProv
         _toastService.Show("正在连接设备...", ToastType.Info, 8000);
         ConnectionState = "连接中";
 
+        var target = $"{DeviceIp}:5555";
+        
         try
         {
-            // 枚举当前 adb 可见设备
-            var devices = await RunAdbAsync("devices");
-            var usbSerials = new List<string>();
-            var unauthorized = false;
+            var entries = await ListDevicesAsync();
+            
+            // 目标无线连接已就绪：直接成功，绝不再执行 tcpip（避免重启 adbd 打断同一台手机的无线连接）
+            var ready = entries.Any(e => e.Serial == target && e.State == DeviceState);
+            var usbDevices = entries.Where(e => !e.Serial.Contains(':')).ToList();
+            var otherNetwork = entries
+                .Where(e => e.Serial.Contains(':') && e.Serial != target && e.State == DeviceState)
+                .ToList();
 
-            foreach (var line in devices)
+            // 真·多设备才拒绝：同一台手机的 USB + 无线只是两条记录，不算多设备
+            if (usbDevices.Count > 1 || otherNetwork.Count > 0)
             {
-                var parts = line.Split('\t');
-                if (parts.Length != 2)
-                {
-                    // 跳过表头 "List of devices attached" 与空行
-                    continue;
-                }
-
-                var serial = parts[0].Trim();
-                var state = parts[1].Trim();
-
-                // 序列号不含冒号 => USB 设备（网络设备的序列号是 ip:port）
-                if (!serial.Contains(':'))
-                {
-                    if (state is "device" or "unauthorized" or "offline")
-                    {
-                        usbSerials.Add(serial);
-                    }
-
-                    if (state == "unauthorized")
-                    {
-                        unauthorized = true;
-                    }
-                }
-            }
-
-            // 多台设备直接拒绝后续流程
-            if (usbSerials.Count > 1)
-            {
-                _toastService.Show("检测到多台 USB 设备，请仅连接一台后重试", ToastType.Warning);
+                var detail = string.Join("、", usbDevices.Select(d => d.Serial).Concat(otherNetwork.Select(d => d.Serial)));
+                _toastService.Show($"检测到多台设备（{detail}），请只保留一台手机后重试", ToastType.Warning);
                 return;
             }
 
-            // 设备未授权时 tcpip 会失败，先提示
-            if (usbSerials.Count == 1 && unauthorized)
+            if (!ready && usbDevices.Count == 1)
             {
-                _toastService.Show("请在手机上允许 USB 调试授权后重试", ToastType.Warning);
-                return;
-            }
+                var usb = usbDevices[0];
 
-            // 插着 USB：切 TCP 模式，再等待 adbd 以网络方式重启
-            if (usbSerials.Count == 1)
-            {
+                if (usb.State == "unauthorized")
+                {
+                    _toastService.Show("请在手机上允许 USB 调试授权后重试", ToastType.Warning);
+                    return;
+                }
+
+                if (usb.State != DeviceState)
+                {
+                    _toastService.Show($"USB 设备状态异常（{usb.State}），请重新插拔数据线后重试", ToastType.Warning);
+                    return;
+                }
+
+                // USB 在线但无线未连：切 TCP 模式（会重启 adbd，之后必须等它重新上线）
                 var (code, output) = await RunAdbWithOutputAsync("tcpip", "5555");
-
                 if (code != 0 || !string.Join(" ", output).Contains("TCP mode"))
                 {
                     _toastService.Show("设备切换 TCP 模式失败", ToastType.Error);
                     return;
                 }
 
-                await Task.Delay(2000); // 给 adbd 重启留时间，过早 connect 会被拒绝
+                await Task.Delay(1000);
             }
-
-            // 无线连接（0 台 USB 设备时也走到这里：设备可能早已处于 tcpip 模式）
-            var (_, connectOutput) = await RunAdbWithOutputAsync("connect", $"{DeviceIp}:5555");
-            var connectResult = string.Join(" ", connectOutput);
-
-            // "connected to" 同时覆盖 "already connected to"；失败时是 "failed to connect"
-            if (!connectResult.Contains("connected to"))
+            
+            if (!ready)
             {
-                _toastService.Show("连接失败，请先用 USB 数据线连接设备后重试", ToastType.Error);
+                // 不信任 "connected to" 文本（"already connected to" 也可能是离线残留），只认 devices 里的真实状态
+                await RunAdbWithOutputAsync("connect", target);
+                ready = await WaitForDeviceAsync(target, TimeSpan.FromSeconds(6));
+            }
+            
+            if (!ready)
+            {
+                _toastService.Show("连接失败，请确认手机与电脑处于同一局域网，或先用 USB 数据线连接一次后重试",
+                    ToastType.Error);
                 return;
             }
 
             // 成功：取机型、更新状态、持久化 IP
-            DeviceName = await GetDeviceModelAsync();
+            DeviceName = await GetDeviceModelAsync(target);
             ConnectionState = "已连接";
 
             _config.Ip = DeviceIp;
@@ -240,6 +237,19 @@ public partial class ConnectDeviceViewModel : ObservableObject, IDeviceStateProv
     }
 
     /// <summary>
+    /// 解析 adb devices 输出（跳过表头与空行），得到 serial + 状态。
+    /// </summary>
+    private async Task<List<AdbDeviceEntry>> ListDevicesAsync()
+    {
+        var lines = await RunAdbAsync("devices");
+        return lines
+            .Select(line => line.Split('\t'))
+            .Where(parts => parts.Length == 2)
+            .Select(parts => new AdbDeviceEntry(parts[0].Trim(), parts[1].Trim()))
+            .ToList();
+    }
+    
+    /// <summary>
     /// 执行 adb 子命令，返回按行拆分的输出。
     /// </summary>
     private async Task<IReadOnlyList<string>> RunAdbAsync(string arguments)
@@ -249,6 +259,26 @@ public partial class ConnectDeviceViewModel : ObservableObject, IDeviceStateProv
         return output;
     }
 
+    /// <summary>
+    /// 轮询等待指定 serial 变为 device 状态（tcpip / connect 之后 adbd 需要时间恢复）。
+    /// </summary>
+    private async Task<bool> WaitForDeviceAsync(string serial, TimeSpan timeout)
+    {
+        var deadline = DateTime.Now + timeout;
+        while (DateTime.Now < deadline)
+        {
+            var entries = await ListDevicesAsync();
+            if (entries.Any(e => e.Serial == serial && e.State == DeviceState))
+            {
+                return true;
+            }
+
+            await Task.Delay(500);
+        }
+
+        return false;
+    }
+    
     private async Task<(int Code, IReadOnlyList<string> Output)> RunAdbWithOutputAsync(params string[] arguments)
     {
         var commandLine = new ArgumentCreator();
@@ -260,15 +290,21 @@ public partial class ConnectDeviceViewModel : ObservableObject, IDeviceStateProv
         return await new CommandExecutor(commandLine.ToCommandLine()).ExecuteWithOutputAsync(_adbPath);
     }
 
-    private async Task<string> GetDeviceModelAsync()
+    /// <summary>
+    /// 读取设备机型；必须带 -s，否则 USB 与无线同时在线时 adb 会报 more than one device。
+    /// </summary>
+    private async Task<string> GetDeviceModelAsync(string serial)
     {
-        var (_, output) = await RunAdbWithOutputAsync("shell", "getprop", "ro.product.model");
+        var (_, output) = await RunAdbWithOutputAsync("-s", serial, "shell", "getprop", "ro.product.model");
         return output.FirstOrDefault()?.Trim() ?? string.Empty;
     }
-
-    public async Task<string> GetDeviceSystemVersionAsync()
+    
+    /// <summary>
+    /// 读取系统版本；同样必须带 -s，避免多设备时命令失败。
+    /// </summary>
+    public async Task<string> GetDeviceSystemVersionAsync(string serial)
     {
-        var (_, output) = await RunAdbWithOutputAsync("shell", "getprop", "ro.build.version.release");
+        var (_, output) = await RunAdbWithOutputAsync("-s", serial, "shell", "getprop", "ro.build.version.release");
         return output.FirstOrDefault()?.Trim() ?? string.Empty;
     }
 }

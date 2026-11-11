@@ -96,7 +96,7 @@ public partial class TaskManagerViewModel : ObservableObject
             return;
         }
 
-        var systemVersion = await _deviceViewModel.GetDeviceSystemVersionAsync();
+        var systemVersion = await _deviceViewModel.GetDeviceSystemVersionAsync($"{_deviceViewModel.DeviceIp}:5555");
         var parameter = new KeyValuePair<string, string>(DeviceName, systemVersion);
         if (_dialogService.ShowDialog(typeof(CreateTaskDialog), parameter) == true)
         {
