@@ -41,17 +41,33 @@
     <!--  text-4 禁用/最弱层级文字  -->
 
     <!--  ========== 语义色 ==========  -->
-    <Color x:Key="SuccessColor">#FF1FA84F</Color>
     <!--  green 成功/已启用/ADB 已连接（亮底下加深保证对比度）  -->
     <Color x:Key="SuccessDimColor">#1F1FA84F</Color>
-    <Color x:Key="WarningColor">#FFF5A500</Color>
+    <Color x:Key="SuccessColor">#FF1FA84F</Color>
+
     <!--  yellow 警告/待处理  -->
     <Color x:Key="WarningDimColor">#24F5A500</Color>
-    <!--  yellow-dim 警告徽章背景（14%）  -->
-    <Color x:Key="DangerColor">#FFE5484D</Color>
+    <Color x:Key="WarningColor">#FFF5A500</Color>
+
     <!--  red 失败/删除/断开  -->
     <Color x:Key="DangerDimColor">#80E5484D</Color>
-    <!--  危险按钮 hover 边框（50%）  -->
+    <Color x:Key="DangerColor">#FFE5484D</Color>
+
+    <!-- 处理中：蓝 -->
+    <Color x:Key="ProcessingColor">#FF3478F6</Color>
+    <Color x:Key="ProcessingDimColor">#1A3478F6</Color>
+
+    <!-- 提示/特殊：紫 -->
+    <Color x:Key="AccentColor">#FF8250C8</Color>
+    <Color x:Key="AccentDimColor">#1F8250C8</Color>
+
+    <!-- 同步/辅助状态：青绿 -->
+    <Color x:Key="SyncColor">#FF0F9688</Color>
+    <Color x:Key="SyncDimColor">#1F0F9688</Color>
+
+    <!-- 中性/未知：灰 -->
+    <Color x:Key="NeutralColor">#FF687386</Color>
+    <Color x:Key="NeutralDimColor">#1A687386</Color>
 
     <!--  ========== 交互覆盖层 ==========  -->
     <Color x:Key="HoverOverlayColor">#08000000</Color>
@@ -98,6 +114,14 @@
     <SolidColorBrush x:Key="WarningDimBrush" Color="{StaticResource WarningDimColor}" />
     <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}" />
     <SolidColorBrush x:Key="DangerDimBrush" Color="{StaticResource DangerDimColor}" />
+    <SolidColorBrush x:Key="ProcessingBrush" Color="{StaticResource ProcessingColor}" />
+    <SolidColorBrush x:Key="ProcessingDimBrush" Color="{StaticResource ProcessingDimColor}" />
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+    <SolidColorBrush x:Key="AccentDimBrush" Color="{StaticResource AccentDimColor}" />
+    <SolidColorBrush x:Key="SyncBrush" Color="{StaticResource SyncColor}" />
+    <SolidColorBrush x:Key="SyncDimBrush" Color="{StaticResource SyncDimColor}" />
+    <SolidColorBrush x:Key="NeutralBrush" Color="{StaticResource NeutralColor}" />
+    <SolidColorBrush x:Key="NeutralDimBrush" Color="{StaticResource NeutralDimColor}" />
 
     <SolidColorBrush x:Key="HoverOverlayBrush" Color="{StaticResource HoverOverlayColor}" />
     <SolidColorBrush x:Key="ControlHoverOverlayBrush" Color="{StaticResource ControlHoverOverlayColor}" />
