@@ -276,12 +276,13 @@
                 Foreground="{StaticResource TextSecondaryBrush}"
                 Text="邮件通知" />
 
-            <CheckBox
+            <RadioButton
                 Margin="0,0,-10,0"
                 HorizontalAlignment="Right"
                 FontSize="14"
+                GroupName="NotifyMethod"
                 IsChecked="{Binding IsNotifyByMail}"
-                Style="{StaticResource CheckBoxSwitchStyle}" />
+                Style="{StaticResource RadioButtonSwitchStyle}" />
         </Grid>
 
         <Grid Margin="0,8,0,16">
@@ -291,12 +292,13 @@
                 Foreground="{StaticResource TextSecondaryBrush}"
                 Text="企业微信通知" />
 
-            <CheckBox
+            <RadioButton
                 Margin="0,0,-10,0"
                 HorizontalAlignment="Right"
                 FontSize="14"
+                GroupName="NotifyMethod"
                 IsChecked="{Binding IsNotifyByWechat}"
-                Style="{StaticResource CheckBoxSwitchStyle}" />
+                Style="{StaticResource RadioButtonSwitchStyle}" />
         </Grid>
 
         <Border
