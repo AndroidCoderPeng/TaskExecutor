@@ -572,23 +572,44 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTemplateColumn Width="150" Header="计划时间">
+                                <DataGridTemplateColumn Width="110" Header="计划时间">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
-                                                <TextBlock.Text>
-                                                    <MultiBinding Converter="{StaticResource TimeRangeConverterKey}">
-                                                        <Binding Path="PlannedAt" />
-                                                        <Binding Path="TimeRange" />
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
+                                            <StackPanel Orientation="Vertical">
+                                                <TextBlock
+                                                    FontWeight="SemiBold"
+                                                    Foreground="{StaticResource TextPrimaryBrush}"
+                                                    Text="{Binding PlannedAt}"
+                                                    TextTrimming="CharacterEllipsis" />
+
+                                                <TextBlock
+                                                    Margin="0,4,0,0"
+                                                    FontSize="10"
+                                                    Foreground="{StaticResource PrimaryBrush}"
+                                                    TextTrimming="CharacterEllipsis">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding Converter="{StaticResource TimeRangeConverterKey}">
+                                                            <Binding Path="PlannedAt" />
+                                                            <Binding Path="TimeRange" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <Trigger Property="Text" Value="">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
                                 <DataGridTextColumn
-                                    Width="80"
+                                    Width="90"
                                     Binding="{Binding TimeDisplay}"
                                     FontWeight="SemiBold"
                                     Foreground="{StaticResource SuccessBrush}"
@@ -603,12 +624,12 @@
                                 </DataGridTemplateColumn>
 
                                 <DataGridTextColumn
-                                    Width="80"
+                                    Width="90"
                                     Binding="{Binding NotifyMethod}"
                                     Header="通知方式" />
 
                                 <DataGridTemplateColumn
-                                    Width="88"
+                                    Width="90"
                                     CellStyle="{StaticResource DataGridLastCellStyle}"
                                     Header="状态"
                                     HeaderStyle="{StaticResource DataGridLastColumnHeaderStyle}">

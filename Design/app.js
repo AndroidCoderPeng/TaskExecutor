@@ -127,6 +127,22 @@
     if(acts.length>3)head.push(`<span class="chip" title="${acts.slice(3).map(id=>actMeta(id).name).join(" › ")}">+${acts.length-3}</span>`);
     return `<div class="chips">${head.join("")}</div>`;
   }
+  // 计划时间：两行文本 = 基准时间 + 实际随机执行窗口；k.time 形如 "07:30 ±5min" / "07:30 +0~5min" / "07:30 +2min" / "18:00"
+  function planHtml(time){
+    const m=/^(\d{1,2}:\d{2})(?:\s+(.+))?$/.exec((time||"").trim());
+    if(!m)return `<span class="plan-time">${time||"-"}</span>`;
+    const base=m[1],off=(m[2]||"").trim();
+    const hm=v=>String(Math.floor(v/60)%24).padStart(2,"0")+":"+String(Math.round(v%60)).padStart(2,"0");
+    let lo=null,hi=null,p;
+    if((p=/^±(\d+)min$/.exec(off))){lo=0;hi=+p[1];}
+    else if((p=/^\+(\d+)~(\d+)min$/.exec(off))){lo=+p[1];hi=+p[2];}
+    else if((p=/^\+(\d+)min$/.exec(off))){lo=hi=+p[1];}
+    const q=/^(\d{1,2}):(\d{2})$/.exec(base),mins=(+q[1])*60+ +q[2];
+    if(hi==null||hi<=0)
+      return `<span class="plan-txt" title="不做随机偏移，到点立即执行"><span class="plan-time">${base}</span><span class="plan-sub">准点执行</span></span>`;
+    const tip=`实际执行 = ${base} 后 ${off.replace(/^\+/,"")} 内随机 → ${hm(mins+lo)} ~ ${hm(mins+hi)}`;
+    return `<span class="plan-txt" title="${tip}"><span class="plan-time">${base}</span><span class="plan-win">${hm(mins+lo)} ~ ${hm(mins+hi)}</span></span>`;
+  }
   function render(){
     const list=tasks.filter(k=>filter==="all"||String(k.on)===(filter==="on"?"true":"false"));
     $("taskBody").innerHTML=list.length?list.map((k)=>{
@@ -134,7 +150,7 @@
       return `<tr data-i="${i}" class="${k.on?"":"disabled"}">
         <td><div class="task-name">${k.name}</div><div class="task-sub">${k.sub}</div></td>
         <td>${chipsHtml(k)}</td>
-        <td>${k.time}</td>
+        <td>${planHtml(k.time)}</td>
         <td>${k.notify}</td>
         <td><button class="status-pill ${k.on?"on":"off"}" data-act="toggle"><span class="dot"></span>${k.on?"已启用":"已停用"}</button></td>
         <td><div class="ops">
