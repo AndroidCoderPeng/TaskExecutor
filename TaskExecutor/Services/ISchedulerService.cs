@@ -1,15 +1,9 @@
-﻿using TaskExecutor.Model;
-using TaskExecutor.Utils;
+﻿using TaskExecutor.Utils;
 
 namespace TaskExecutor.Services;
 
 public interface ISchedulerService
 {
-    /// <summary>
-    /// 单条任务执行日志，供界面追加日志行。
-    /// </summary>
-    event Action<RuntimeLog>? TaskExecuted;
-
     /// <summary>
     /// 调度状态快照变化（启停、下次执行时刻、今日统计）。
     /// </summary>

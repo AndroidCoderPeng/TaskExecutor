@@ -24,6 +24,7 @@ public class LogStoreService : ILogStoreService
         Formatting = Formatting.None,
         Converters = { new StringEnumConverter() }
     };
+    public event Action<RuntimeLog>? Appended;
 
     public LogStoreService() => CleanupExpired();
 
@@ -42,6 +43,7 @@ public class LogStoreService : ILogStoreService
         {
             Console.WriteLine($"写入运行日志失败：{e.Message}");
         }
+        Appended?.Invoke(log);
     }
 
     /// <summary>

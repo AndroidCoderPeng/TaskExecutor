@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Newtonsoft.Json;
 using TaskExecutor.Cache;
 using TaskExecutor.Dialogs;
 using TaskExecutor.Model;
@@ -26,18 +26,20 @@ public partial class TaskManagerViewModel : ObservableObject
 
     #endregion
 
-    private readonly string _adbPath = Path.Combine(AppContext.BaseDirectory, "ADB", "adb.exe");
     private readonly ConnectDeviceViewModel _deviceViewModel;
     private readonly IToastService _toastService;
     private readonly IDialogService _dialogService;
+    private readonly IAdbHeartbeatService _heartbeatService;
     private int _taskFilterOption;
 
     public TaskManagerViewModel(ConnectDeviceViewModel deviceViewModel, IToastService toastService,
-        IDialogService dialogService, ISchedulerService schedulerService, ILogStoreService logStoreService)
+        IDialogService dialogService, ISchedulerService schedulerService, ILogStoreService logStoreService,
+        IAdbHeartbeatService heartbeatService)
     {
         _deviceViewModel = deviceViewModel;
         _toastService = toastService;
         _dialogService = dialogService;
+        _heartbeatService = heartbeatService;
 
         DeviceName = string.IsNullOrEmpty(deviceViewModel.DeviceName) ? "-" : deviceViewModel.DeviceName;
 
@@ -49,8 +51,12 @@ public partial class TaskManagerViewModel : ObservableObject
         {
             RuntimeLogs.Insert(0, log);
         }
-        
-        schedulerService.TaskExecuted += log => RuntimeLogs.Insert(0, log);
+
+        logStoreService.Appended += log =>
+        {
+            Console.WriteLine(JsonConvert.SerializeObject(log));
+            RuntimeLogs.Insert(0, log);
+        };
         schedulerService.StatusChanged += ApplyStatus;
 
         // 进入页面时从唯一事实源拉取当前状态
@@ -67,27 +73,26 @@ public partial class TaskManagerViewModel : ObservableObject
         SuccessRate = status.SuccessRate;
         NextTaskTime = status.NextTaskTime?.ToString("HH:mm") ?? "-";
     }
-    
+
     [RelayCommand]
     private async Task CreateTask()
     {
         // 需要二次检测设备是否被中途断开
-        if (_deviceViewModel.ConnectionState != "已连接")
+        if (!_deviceViewModel.IsConnected)
         {
             _toastService.Show("设备未连接，请先连接设备", ToastType.Warning);
             return;
         }
 
-        if (!await IsDeviceAliveAsync())
+        if (!await _heartbeatService.ProbeAsync($"{_deviceViewModel.DeviceIp}:5555"))
         {
             _toastService.Show("设备连接已中断，请重新连接", ToastType.Error);
 
-            // 归位状态 + 通知导航栏
+            // 归位状态 + 通知导航栏（心跳仍在跑，恢复后会自动把状态改回「已连接」）
+            var name = _deviceViewModel.DeviceName;
             _deviceViewModel.MarkDisconnected();
-            var message = new MessengerMessage.UpdateNavigationStateMessage(
-                false, _deviceViewModel.DeviceName, _deviceViewModel.DeviceIp
-            );
-            WeakReferenceMessenger.Default.Send(message);
+            WeakReferenceMessenger.Default.Send(new MessengerMessage.UpdateNavigationStateMessage(
+                false, name, _deviceViewModel.DeviceIp));
             return;
         }
 
@@ -100,33 +105,6 @@ public partial class TaskManagerViewModel : ObservableObject
             Tasks = new ObservableCollection<TaskRow>(config.Tasks);
             ApplyTaskFilter();
         }
-    }
-
-    /// <summary>
-    /// 向 adb 真实探测目标设备是否仍处于 device 状态。
-    /// </summary>
-    private async Task<bool> IsDeviceAliveAsync()
-    {
-        var lines = await RunAdbAsync("devices");
-        var target = $"{_deviceViewModel.DeviceIp}:5555";
-
-        return lines.Any(line =>
-        {
-            var parts = line.Split('\t');
-            return parts.Length == 2
-                   && parts[0].Trim() == target
-                   && parts[1].Trim() == "device";
-        });
-    }
-
-    /// <summary>
-    /// 执行 adb 子命令，返回按行拆分的输出。
-    /// </summary>
-    private async Task<IReadOnlyList<string>> RunAdbAsync(string arguments)
-    {
-        var commandLine = new ArgumentCreator().Append(arguments).ToCommandLine();
-        var (_, output) = await new CommandExecutor(commandLine).ExecuteWithOutputAsync(_adbPath);
-        return output;
     }
 
     [RelayCommand]

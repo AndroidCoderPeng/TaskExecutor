@@ -21,15 +21,55 @@ public partial class ConnectDeviceViewModel : ObservableObject, IDeviceStateProv
 
     public bool IsConnected => ConnectionState == "已连接";
     private readonly IToastService _toastService;
+    private readonly IAdbHeartbeatService _heartbeatService;
     private readonly string _adbPath = Path.Combine(AppContext.BaseDirectory, "ADB", "adb.exe");
     private readonly DeviceIpConfig _config;
 
-    public ConnectDeviceViewModel(IToastService toastService)
+    public ConnectDeviceViewModel(IToastService toastService, IAdbHeartbeatService heartbeatService)
     {
         _toastService = toastService;
+        _heartbeatService = heartbeatService;
+        _heartbeatService.Beat += OnHeartbeat;
 
         _config = SettingsStore.Load<DeviceIpConfig>(ConfigSections.FileName, ConfigSections.DeviceIp);
         DeviceIp = _config.Ip;
+    }
+
+    /// <summary>
+    /// 心跳状态翻转：掉线只归位界面状态（不弹 Toast，避免无人值守时刷屏），
+    /// 恢复时自动回到「已连接」并补齐机型名。心跳在 UI 线程触发。
+    /// </summary>
+    private async void OnHeartbeat(IAdbHeartbeatService.AdbHeartbeatResult result)
+    {
+        try
+        {
+            if (result.IsAlive)
+            {
+                if (IsConnected) return;
+
+                ConnectionState = "已连接";
+                if (string.IsNullOrEmpty(DeviceName))
+                {
+                    DeviceName = await GetDeviceModelAsync();
+                }
+
+                WeakReferenceMessenger.Default.Send(
+                    new MessengerMessage.UpdateNavigationStateMessage(true, DeviceName, DeviceIp));
+                return;
+            }
+
+            if (!IsConnected) return; // 已归位过，避免重复
+
+            // 先留一份机型名，MarkDisconnected 会清空 DeviceName
+            var name = DeviceName;
+            MarkDisconnected();
+            WeakReferenceMessenger.Default.Send(
+                new MessengerMessage.UpdateNavigationStateMessage(false, name, DeviceIp));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"处理 adb 心跳结果失败：{e.Message}");
+        }
     }
 
     [RelayCommand]
@@ -57,6 +97,8 @@ public partial class ConnectDeviceViewModel : ObservableObject, IDeviceStateProv
     [RelayCommand]
     private async Task DisconnectDeviceAsync()
     {
+        _heartbeatService.Stop(); // 主动断开：停心跳，避免 30s 后被自动连回来
+
         if (!File.Exists(_adbPath))
         {
             _toastService.Show("未找到 adb.exe", ToastType.Error);
@@ -181,6 +223,7 @@ public partial class ConnectDeviceViewModel : ObservableObject, IDeviceStateProv
             SettingsStore.Save(ConfigSections.FileName, ConfigSections.DeviceIp, _config);
 
             _toastService.Show("设备连接成功", ToastType.Success);
+            _heartbeatService.Start($"{DeviceIp}:5555");
 
             // 更新侧边导航栏状态
             WeakReferenceMessenger.Default.Send(

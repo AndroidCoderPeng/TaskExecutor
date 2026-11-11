@@ -26,6 +26,7 @@ public class SchedulerService : ISchedulerService
     private readonly string _adbPath = Path.Combine(AppContext.BaseDirectory, "ADB", "adb.exe");
     private readonly IDeviceStateProvider _deviceState;
     private readonly ILogStoreService _logStore;
+    private readonly IAdbHeartbeatService _heartbeatService;
 
     private HashSet<string> _executedKeys = []; // key = $"{taskName}@yyyy-MM-dd"
     private Dictionary<string, int> _randomOffsets = new(); // 每任务当天只抽一次随机偏移(分钟)
@@ -40,15 +41,16 @@ public class SchedulerService : ISchedulerService
     private int _todaySuccess;
     private SchedulerStatus _currentStatus = new();
 
-    public event Action<RuntimeLog>? TaskExecuted;
     public event Action<SchedulerStatus>? StatusChanged;
 
     public SchedulerStatus CurrentStatus => _currentStatus;
 
-    public SchedulerService(IDeviceStateProvider deviceState, ILogStoreService logStore)
+    public SchedulerService(IDeviceStateProvider deviceState, ILogStoreService logStore,
+        IAdbHeartbeatService heartbeatService)
     {
         _deviceState = deviceState;
         _logStore = logStore;
+        _heartbeatService = heartbeatService;
         _timer.Tick += OnTick;
     }
 
@@ -180,7 +182,7 @@ public class SchedulerService : ISchedulerService
         var serial = $"{_deviceState.DeviceIp}:5555";
 
         // 设备离线：记失败日志并跳过，不反复重试
-        if (!_deviceState.IsConnected || !await IsDeviceAliveAsync(serial))
+        if (!_deviceState.IsConnected || !await _heartbeatService.ProbeAsync(serial))
         {
             RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：设备离线");
             return;
@@ -324,28 +326,15 @@ public class SchedulerService : ISchedulerService
     }
 
     /// <summary>
-    /// 向 adb 真实探测设备是否仍处于 device 状态。
-    /// </summary>
-    private async Task<bool> IsDeviceAliveAsync(string serial)
-    {
-        var commandLine = new ArgumentCreator().Append("devices").ToCommandLine();
-        var (_, output) = await new CommandExecutor(commandLine).ExecuteWithOutputAsync(_adbPath);
-
-        return output.Any(line =>
-        {
-            var parts = line.Split('\t');
-            return parts.Length == 2
-                   && parts[0].Trim() == serial
-                   && parts[1].Trim() == "device";
-        });
-    }
-
-    /// <summary>
     /// 重启后从当天持久化日志恢复今日统计，避免统计随进程重启归零。
     /// </summary>
     private void RestoreTodayStats(DateOnly today)
     {
-        var logs = _logStore.LoadByDate(today);
+        // 心跳日志只用于排障，不计入今日任务执行统计
+        var logs = _logStore.LoadByDate(today)
+            .Where(l => !l.Content.StartsWith(IAdbHeartbeatService.LogPrefix, StringComparison.Ordinal))
+            .ToList();
+
         _statDate = today;
         _todayTotal = logs.Count;
         _todaySuccess = logs.Count(l => l.State == TaskState.Success);
@@ -382,8 +371,7 @@ public class SchedulerService : ISchedulerService
             _todaySuccess++;
         }
 
-        _logStore.Append(log); // 内部已容错，落盘失败不影响调度
-        TaskExecuted?.Invoke(log);
+        _logStore.Append(log);
         PublishStatus();
     }
 

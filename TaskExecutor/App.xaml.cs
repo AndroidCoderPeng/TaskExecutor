@@ -26,6 +26,7 @@ public partial class App : Application
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<ISchedulerService, SchedulerService>();
         services.AddSingleton<ILogStoreService, LogStoreService>();
+        services.AddSingleton<IAdbHeartbeatService, AdbHeartbeatService>();
 
         services.AddSingleton<ConnectDeviceViewModel>(); // 需要保持状态，所以注册为单例
         services.AddSingleton<TaskManagerViewModel>(); // 需要保持状态，所以注册为单例
