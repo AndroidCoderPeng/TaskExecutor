@@ -2,6 +2,7 @@
     x:Class="TaskExecutor.Dialogs.CreateTaskDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ctrl="clr-namespace:TaskExecutor.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
@@ -50,7 +51,7 @@
 
         <TextBox
             Style="{StaticResource PlaceHolderTextBoxStyle}"
-            Tag="请输入任务名称"
+            Tag="请输入任务名称（可选）"
             Text="{Binding TaskName}" />
 
         <TextBlock
@@ -59,10 +60,10 @@
             Foreground="{StaticResource TextSecondaryBrush}"
             Text="执行时间" />
 
-        <TextBox
-            Style="{StaticResource PlaceHolderTextBoxStyle}"
-            Tag="HH:MM"
-            Text="{Binding TaskTime}" />
+        <ctrl:TimePicker
+            VerticalAlignment="Center"
+            MinuteStep="1"
+            TimeText="{Binding TaskTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
         <TextBlock
             Margin="0,12,0,6"
@@ -118,7 +119,7 @@
         </Grid>
 
         <TextBlock
-            Margin="0,12,0,6"
+            Margin="0,12,0,8"
             FontSize="14"
             Foreground="{StaticResource TextSecondaryBrush}"
             Text="通知方式" />

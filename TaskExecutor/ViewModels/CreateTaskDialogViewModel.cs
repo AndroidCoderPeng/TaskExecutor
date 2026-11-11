@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskExecutor.Cache;
@@ -67,15 +66,7 @@ public partial class CreateTaskDialogViewModel : ObservableObject, IDialogParame
     {
         if (string.IsNullOrWhiteSpace(TaskName))
         {
-            _toastService.Show("请输入任务名称", ToastType.Warning);
-            return;
-        }
-
-        if (!TimeSpan.TryParseExact(TaskTime.Trim(), ["hh\\:mm", "h\\:mm"], CultureInfo.InvariantCulture,
-                out var executeTime) || executeTime >= TimeSpan.FromDays(1))
-        {
-            _toastService.Show("执行时间格式不正确，应为 HH:MM", ToastType.Warning);
-            return;
+            TaskName = "新任务";
         }
 
         if (SelectedTargetApp == null || string.IsNullOrWhiteSpace(SelectedTargetApp.PackageName))
@@ -99,7 +90,7 @@ public partial class CreateTaskDialogViewModel : ObservableObject, IDialogParame
                 PackageName = SelectedTargetApp.PackageName,
                 Activity = SelectedTargetApp.Activity
             },
-            ExecuteTime = executeTime.ToString(@"hh\:mm"),
+            ExecuteTime = TaskTime,
             TimeRange = IsRandomOffsetTime ? timeRange : null,
             NotifyMethod = notifyMethod,
             IsEnabled = true
