@@ -277,6 +277,86 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="TaskContextMenuStyle" TargetType="ContextMenu">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1.5" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="MinWidth" Value="138" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8">
+                            <StackPanel IsItemsHost="True" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TaskMenuItemStyle" TargetType="MenuItem">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border
+                            x:Name="MenuItemBorder"
+                            Padding="8,10"
+                            Background="Transparent"
+                            CornerRadius="8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding Icon}" />
+                                <ContentPresenter
+                                    Grid.Column="1"
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    ContentSource="Header"
+                                    RecognizesAccessKey="True" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!--  普通 hover：蓝色  -->
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="MenuItemBorder" Property="Background" Value="{StaticResource InfoDimBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                            </Trigger>
+
+                            <!--  danger hover：红色（声明在后，覆盖蓝色）  -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsHighlighted" Value="True" />
+                                    <Condition Property="Tag" Value="Danger" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="MenuItemBorder" Property="Background" Value="{StaticResource DangerDimBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                            </MultiTrigger>
+
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsHighlighted" Value="True" />
+                                    <Condition Property="Tag" Value="Run" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="MenuItemBorder" Property="Background" Value="{StaticResource SuccessDimBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <cvt:TimeRangeConverter x:Key="TimeRangeConverterKey" />
         <cvt:EnabledToTextConverter x:Key="EnabledToTextConverterKey" />
     </UserControl.Resources>
@@ -497,7 +577,7 @@
                             VerticalScrollBarVisibility="Hidden">
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn
-                                    Width="130"
+                                    Width="2*"
                                     CellStyle="{StaticResource DataGridFirstCellStyle}"
                                     Header="任务名称"
                                     HeaderStyle="{StaticResource DataGridFirstColumnHeaderStyle}">
@@ -514,22 +594,17 @@
                                                     Margin="0,4,0,0"
                                                     FontSize="12"
                                                     Foreground="{StaticResource TextTertiaryBrush}"
-                                                    Text="{Binding TargetApp.Name}"
-                                                    TextTrimming="CharacterEllipsis" />
+                                                    TextTrimming="CharacterEllipsis">
+                                                    <Run Text="{Binding TargetApp.Name}" />
+                                                    <Run Text=" · " />
+                                                    <Run Text="{Binding TargetApp.PackageName}" />
+                                                </TextBlock>
                                             </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTemplateColumn Width="*" Header="动作链">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ItemsControl ItemsSource="{Binding Actions}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-
-                                <DataGridTemplateColumn Width="130" Header="计划时间">
+                                <DataGridTemplateColumn Width="150" Header="计划时间">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
@@ -551,12 +626,24 @@
                                     Foreground="{StaticResource SuccessBrush}"
                                     Header="执行时间" />
 
+                                <DataGridTemplateColumn Width="3*" Header="动作链">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ItemsControl ItemsSource="{Binding Actions}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
                                 <DataGridTextColumn
                                     Width="80"
                                     Binding="{Binding NotifyMethod}"
                                     Header="通知方式" />
 
-                                <DataGridTemplateColumn Width="80" Header="状态">
+                                <DataGridTemplateColumn
+                                    Width="88"
+                                    CellStyle="{StaticResource DataGridLastCellStyle}"
+                                    Header="状态"
+                                    HeaderStyle="{StaticResource DataGridLastColumnHeaderStyle}">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ToggleButton
@@ -568,53 +655,75 @@
                                 </DataGridTemplateColumn>
 
                                 <DataGridTemplateColumn
-                                    Width="160"
+                                    Width="54"
                                     CellStyle="{StaticResource DataGridLastCellStyle}"
                                     Header="操作"
                                     HeaderStyle="{StaticResource DataGridLastColumnHeaderStyle}">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Button
-                                                    Margin="0,0,12,0"
-                                                    Command="{Binding DataContext.OnceTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                    CommandParameter="{Binding}"
-                                                    Content="运行"
-                                                    Style="{StaticResource LinkButtonStyle}"
-                                                    Tag="Run"
-                                                    ToolTip="按当前动作链试运行一次，不影响后续调度计划" />
-                                                <Button
-                                                    Command="{Binding DataContext.EditTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                    CommandParameter="{Binding}"
-                                                    Content="编辑"
-                                                    Style="{StaticResource LinkButtonStyle}" />
-                                                <Button
-                                                    Margin="12,0"
-                                                    Command="{Binding DataContext.ToggleTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                    CommandParameter="{Binding}"
-                                                    Tag="Mute">
-                                                    <Button.Style>
-                                                        <Style BasedOn="{StaticResource LinkButtonStyle}" TargetType="Button">
-                                                            <Setter Property="Content" Value="暂停" />
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsEnabled}" Value="True">
-                                                                    <Setter Property="Content" Value="启用" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Button.Style>
-                                                </Button>
-                                                <Button
-                                                    Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                    CommandParameter="{Binding}"
-                                                    Content="删除"
-                                                    Style="{StaticResource LinkButtonStyle}"
-                                                    Tag="Danger" />
-                                            </StackPanel>
+                                            <Button
+                                                Command="{Binding DataContext.ToggleTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                CommandParameter="{Binding}"
+                                                Tag="Mute">
+                                                <Button.Style>
+                                                    <Style BasedOn="{StaticResource LinkButtonStyle}" TargetType="Button">
+                                                        <Setter Property="Content" Value="暂停" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsEnabled}" Value="True">
+                                                                <Setter Property="Content" Value="启用" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
                             </DataGrid.Columns>
+
+                            <DataGrid.ContextMenu>
+                                <ContextMenu Style="{StaticResource TaskContextMenuStyle}">
+                                    <MenuItem
+                                        Command="{Binding OnceTaskCommand}"
+                                        CommandParameter="{Binding ElementName=TaskDataGrid, Path=SelectedItem}"
+                                        Header="运行"
+                                        Style="{StaticResource TaskMenuItemStyle}"
+                                        Tag="Run"
+                                        ToolTip="按当前动作链试运行一次，不影响后续调度计划">
+                                        <MenuItem.Icon>
+                                            <TextBlock
+                                                FontFamily="/TaskExecutor;component/Fonts/#iconfont"
+                                                FontSize="16"
+                                                Text="&#xe645;" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem
+                                        Command="{Binding EditTaskCommand}"
+                                        CommandParameter="{Binding ElementName=TaskDataGrid, Path=SelectedItem}"
+                                        Header="编辑"
+                                        Style="{StaticResource TaskMenuItemStyle}">
+                                        <MenuItem.Icon>
+                                            <TextBlock
+                                                FontFamily="/TaskExecutor;component/Fonts/#iconfont"
+                                                FontSize="16"
+                                                Text="&#xe662;" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem
+                                        Command="{Binding DeleteTaskCommand}"
+                                        CommandParameter="{Binding ElementName=TaskDataGrid, Path=SelectedItem}"
+                                        Header="删除"
+                                        Style="{StaticResource TaskMenuItemStyle}"
+                                        Tag="Danger">
+                                        <MenuItem.Icon>
+                                            <TextBlock
+                                                FontFamily="/TaskExecutor;component/Fonts/#iconfont"
+                                                FontSize="16"
+                                                Text="&#xe64c;" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </DataGrid.ContextMenu>
                         </DataGrid>
 
                         <!--  空态  -->

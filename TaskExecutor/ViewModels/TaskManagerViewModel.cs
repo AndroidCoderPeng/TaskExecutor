@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -48,7 +49,7 @@ public partial class TaskManagerViewModel : ObservableObject
             (_, msg) => { DeviceName = string.IsNullOrEmpty(msg.Value.DeviceName) ? "-" : msg.Value.DeviceName; });
 
         var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
-        Tasks = new ObservableCollection<TaskRow>(config.Tasks);
+        Tasks = [.. config.Tasks];
 
         // 日志以持久化存储为唯一事实源：先回填当天历史，再订阅增量
         foreach (var log in logStoreService.LoadByDate(DateOnly.FromDateTime(DateTime.Now)))
@@ -77,7 +78,7 @@ public partial class TaskManagerViewModel : ObservableObject
         ScheduledTaskCount = status.TodayTotal;
         SuccessRate = status.SuccessRate;
         NextTaskTime = status.NextTaskTime is { } next
-            ? next.ToString(next.Date == DateTime.Today ? "HH:mm" : "MM-dd HH:mm")
+            ? next.ToString(next.Date == DateTime.Today ? "HH:mm" : "MM-dd HH:mm", CultureInfo.InvariantCulture)
             : "-";
         ApplyTaskFilter();
     }
