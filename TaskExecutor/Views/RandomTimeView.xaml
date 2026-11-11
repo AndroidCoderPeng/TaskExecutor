@@ -71,7 +71,7 @@
                             Width="120"
                             Margin="12,0"
                             Style="{StaticResource FieldTextBoxStyle}"
-                            Text="{Binding LowerLimitTime, UpdateSourceTrigger=PropertyChanged}" />
+                            Text="{Binding MinLimitTime, UpdateSourceTrigger=PropertyChanged}" />
 
                         <TextBlock
                             VerticalAlignment="Center"
@@ -90,7 +90,7 @@
                             Width="120"
                             Margin="12,0"
                             Style="{StaticResource FieldTextBoxStyle}"
-                            Text="{Binding UpperLimitTime, UpdateSourceTrigger=PropertyChanged}" />
+                            Text="{Binding MaxLimitTime, UpdateSourceTrigger=PropertyChanged}" />
 
                         <TextBlock
                             VerticalAlignment="Center"

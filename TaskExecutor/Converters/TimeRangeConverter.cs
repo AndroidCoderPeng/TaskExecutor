@@ -10,7 +10,7 @@ public class TimeRangeConverter : IMultiValueConverter
     {
         if (values is [string executeTime, TimeRangeConfig range, ..])
         {
-            return $"{executeTime} + {range.LowerLimitTime}~{range.UpperLimitTime}min";
+            return $"{executeTime} + {range.MinLimitTime}~{range.MaxLimitTime}min";
         }
 
         return values.Length > 0 ? values[0] : null;

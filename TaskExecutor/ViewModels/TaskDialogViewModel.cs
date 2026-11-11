@@ -41,7 +41,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         _config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
 
         var range = SettingsStore.Load<TimeRangeConfig>(ConfigSections.FileName, ConfigSections.TimeRange);
-        Tips = $"执行时间将随机偏移 {range.LowerLimitTime}~{range.UpperLimitTime} 分钟";
+        Tips = $"执行时间将随机偏移 {range.MinLimitTime}~{range.MaxLimitTime} 分钟";
 
         var appConfig = SettingsStore.Load<TargetAppConfig>(ConfigSections.FileName, ConfigSections.TargetApp);
         foreach (var app in appConfig.Apps)
@@ -106,8 +106,6 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
     [RelayCommand]
     private void SaveTask()
     {
-        if (string.IsNullOrWhiteSpace(TaskName)) TaskName = "新任务";
-
         if (SelectedTargetApp == null || string.IsNullOrWhiteSpace(SelectedTargetApp.PackageName))
         {
             _toastService.Show("请选择目标 APP，可在「目标 APP」页维护映射", ToastType.Warning);

@@ -288,9 +288,9 @@ public class SchedulerService : ISchedulerService
             return offset;
         }
 
-        var lower = Math.Max(0, range?.LowerLimitTime ?? 0);
-        var upper = Math.Max(lower, range?.UpperLimitTime ?? 0);
-        offset = Random.Shared.Next(lower, upper + 1);
+        var min = Math.Max(0, range?.MinLimitTime ?? 0);
+        var max = Math.Max(min, range?.MaxLimitTime ?? 0);
+        offset = Random.Shared.Next(min, max + 1);
         _randomOffsets[key] = offset;
         return offset;
     }

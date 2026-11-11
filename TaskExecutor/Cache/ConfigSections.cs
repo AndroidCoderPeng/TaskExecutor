@@ -29,8 +29,9 @@ public class TaskRow
 {
     public string Name { get; set; } = "";
     public TargetAppRow TargetApp { get; set; } = new();
-    public string ExecuteTime { get; set; } = "";
+    public string ExecuteTime { get; set; } = ""; // 
     public TimeRangeConfig? TimeRange { get; set; }
+    public string PredictedTime { get; set; } = "";
     public string NotifyMethod { get; set; } = "";
     public bool IsEnabled { get; set; }
 }
@@ -75,8 +76,8 @@ public class ResetTimeConfig
 
 public class TimeRangeConfig
 {
-    public int LowerLimitTime { get; set; } = 0;
-    public int UpperLimitTime { get; set; } = 30;
+    public int MinLimitTime { get; set; }
+    public int MaxLimitTime { get; set; } = 30;
 }
 
 public class TaskScheduleConfig
