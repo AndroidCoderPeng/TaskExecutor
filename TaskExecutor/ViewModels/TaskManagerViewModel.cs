@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -30,17 +31,17 @@ public partial class TaskManagerViewModel : ObservableObject
     private readonly ConnectDeviceViewModel _deviceViewModel;
     private readonly IToastService _toastService;
     private readonly IDialogService _dialogService;
-    private readonly IAdbHeartbeatService _heartbeatService;
+    private readonly ISchedulerService _schedulerService;
+    private SchedulerStatus _schedulerStatus = new();
     private int _taskFilterOption;
 
     public TaskManagerViewModel(ConnectDeviceViewModel deviceViewModel, IToastService toastService,
-        IDialogService dialogService, ISchedulerService schedulerService, ILogStoreService logStoreService,
-        IAdbHeartbeatService heartbeatService)
+        IDialogService dialogService, ISchedulerService schedulerService, ILogStoreService logStoreService)
     {
         _deviceViewModel = deviceViewModel;
         _toastService = toastService;
         _dialogService = dialogService;
-        _heartbeatService = heartbeatService;
+        _schedulerService = schedulerService;
 
         DeviceName = string.IsNullOrEmpty(deviceViewModel.DeviceName) ? "-" : deviceViewModel.DeviceName;
         WeakReferenceMessenger.Default.Register<MessengerMessage.UpdateNavigationStateMessage>(this,
@@ -71,10 +72,14 @@ public partial class TaskManagerViewModel : ObservableObject
     /// </summary>
     private void ApplyStatus(SchedulerStatus status)
     {
+        _schedulerStatus = status;
         IsTaskScheduled = status.IsScheduled;
         ScheduledTaskCount = status.TodayTotal;
         SuccessRate = status.SuccessRate;
-        NextTaskTime = status.NextTaskTime?.ToString("HH:mm") ?? "-";
+        NextTaskTime = status.NextTaskTime is { } next
+            ? next.ToString(next.Date == DateTime.Today ? "HH:mm" : "MM-dd HH:mm")
+            : "-";
+        ApplyTaskFilter();
     }
 
     [RelayCommand]
@@ -95,7 +100,9 @@ public partial class TaskManagerViewModel : ObservableObject
     {
         var index = Tasks.IndexOf(task);
         if (index < 0) return;
-        
+        var wasSkipped = _schedulerStatus.PlannedTasks.Any(p => p.TaskName == task.Name &&
+                                                                p.State == PlannedTaskState.Skipped);
+
         // 因为是周期性执行任务，所以可以在主流程中直接修改任务项，等下次就会直接生效
         var systemVersion = _deviceViewModel.IsConnected
             ? await _deviceViewModel.GetDeviceSystemVersionAsync($"{_deviceViewModel.DeviceIp}:5555")
@@ -105,15 +112,20 @@ public partial class TaskManagerViewModel : ObservableObject
         if (_dialogService.ShowDialog(typeof(TaskDialog), parameter) != true) return;
 
         ReloadTasks();
+        if (!wasSkipped && _schedulerStatus.PlannedTasks.Any(p => p.TaskName == task.Name
+                                                                  && p.State == PlannedTaskState.Skipped
+                                                                  && p.ScheduledAt.Date >= DateTime.Today))
+            _toastService.Show($"任务「{task.Name}」的新计划时间已过，本周期跳过", ToastType.Warning);
     }
 
     private void ReloadTasks()
     {
         var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
         Tasks = new ObservableCollection<TaskRow>(config.Tasks);
+        _schedulerService.RefreshPlan();
         ApplyTaskFilter();
     }
-    
+
     [RelayCommand]
     private void ToggleTask(TaskRow task)
     {
@@ -124,11 +136,11 @@ public partial class TaskManagerViewModel : ObservableObject
         Tasks[index] = task; // 触发 Replace，让绑定重新求值
 
         SaveTasks();
-        ApplyTaskFilter();
-
         _toastService.Show(
             task.IsEnabled ? $"任务「{task.Name}」已启用" : $"任务「{task.Name}」已暂停",
             task.IsEnabled ? ToastType.Success : ToastType.Info);
+        _schedulerService.RefreshPlan();
+        ApplyTaskFilter();
     }
 
     [RelayCommand]
@@ -137,14 +149,14 @@ public partial class TaskManagerViewModel : ObservableObject
         if (!Tasks.Remove(task)) return;
 
         SaveTasks();
-        ApplyTaskFilter();
-
         _toastService.Show($"任务「{task.Name}」已删除", ToastType.Success);
+        _schedulerService.RefreshPlan();
+        ApplyTaskFilter();
     }
 
     /// <summary>
     /// 把界面上的任务列表整体写回 app-config.json 的 Task 段。
-    /// 调度器每 30s tick 都会重新加载配置，所以保存后无需重启、无需通知调度器。
+    /// 修改后刷新调度器计划；调度器也会定期重新加载配置。
     /// </summary>
     private void SaveTasks()
     {
@@ -162,12 +174,39 @@ public partial class TaskManagerViewModel : ObservableObject
 
     private void ApplyTaskFilter()
     {
+        foreach (var task in Tasks)
+        {
+            var plans = _schedulerStatus.PlannedTasks.Where(p => p.TaskName == task.Name).ToArray();
+            var plan = plans.FirstOrDefault(p => p.State == PlannedTaskState.Pending)
+                       ?? plans.LastOrDefault();
+            task.ExecuteTime = plan?.ScheduledAt;
+        }
+
         var view = CollectionViewSource.GetDefaultView(Tasks);
+        if (view is ListCollectionView listView) listView.CustomSort = TaskPlanComparer.Instance;
         view.Filter = _taskFilterOption switch
         {
             1 => o => o is TaskRow { IsEnabled: true },
             2 => o => o is TaskRow { IsEnabled: false },
             _ => null,
         };
+        view.Refresh();
+    }
+
+    /// <summary>
+    /// 按计划时间升序、任务名升序排序，空时间排在最后。
+    /// </summary>
+    private sealed class TaskPlanComparer : IComparer
+    {
+        public static readonly TaskPlanComparer Instance = new();
+
+        public int Compare(object? x, object? y)
+        {
+            if (x is not TaskRow a || y is not TaskRow b) return 0;
+            if (a.ExecuteTime == null && b.ExecuteTime != null) return 1;
+            if (a.ExecuteTime != null && b.ExecuteTime == null) return -1;
+            var comparison = Nullable.Compare(a.ExecuteTime, b.ExecuteTime);
+            return comparison != 0 ? comparison : StringComparer.Ordinal.Compare(a.Name, b.Name);
+        }
     }
 }

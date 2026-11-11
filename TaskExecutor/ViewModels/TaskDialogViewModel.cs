@@ -17,7 +17,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
     [ObservableProperty] private string _deviceSummary = "未连接设备（任务将在设备在线时执行）";
     [ObservableProperty] private bool _isEditing;
     [ObservableProperty] private string _taskName = string.Empty;
-    [ObservableProperty] private string _taskTime = string.Empty;
+    [ObservableProperty] private string _plannedTime = string.Empty;
     [ObservableProperty] private string _tips = string.Empty;
     [ObservableProperty] private bool _isRandomOffsetTime;
     [ObservableProperty] private bool _isNotifyByMail;
@@ -41,7 +41,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         _config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
 
         var range = SettingsStore.Load<TimeRangeConfig>(ConfigSections.FileName, ConfigSections.TimeRange);
-        Tips = $"执行时间将随机偏移 {range.MinLimitTime}~{range.MaxLimitTime} 分钟";
+        Tips = $"计划时间将随机偏移 {range.MinLimitTime}~{range.MaxLimitTime} 分钟";
 
         var appConfig = SettingsStore.Load<TargetAppConfig>(ConfigSections.FileName, ConfigSections.TargetApp);
         foreach (var app in appConfig.Apps)
@@ -70,7 +70,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         Title = "编辑任务";
         SaveButtonText = "保存修改";
         TaskName = task.Name;
-        TaskTime = task.ExecuteTime;
+        PlannedTime = task.PlannedAt;
         IsRandomOffsetTime = task.TimeRange != null;
         IsNotifyByMail = task.NotifyMethod.Contains("邮件");
         IsNotifyByWechat = task.NotifyMethod.Contains("企业微信");
@@ -113,9 +113,9 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         }
 
         // 时间格式非法时调度器会 TryParseExact 失败并静默跳过，任务永远不会跑
-        if (string.IsNullOrWhiteSpace(TaskTime))
+        if (string.IsNullOrWhiteSpace(PlannedTime))
         {
-            _toastService.Show("请选择执行时间", ToastType.Warning);
+            _toastService.Show("请选择计划时间", ToastType.Warning);
             return;
         }
 
@@ -144,7 +144,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
             PackageName = SelectedTargetApp.PackageName,
             Activity = SelectedTargetApp.Activity
         };
-        task.ExecuteTime = TaskTime;
+        task.PlannedAt = PlannedTime;
         task.TimeRange = IsRandomOffsetTime ? timeRange : null;
         task.NotifyMethod = notifyMethod;
 

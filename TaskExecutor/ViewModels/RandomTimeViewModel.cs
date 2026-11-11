@@ -18,10 +18,12 @@ public partial class RandomTimeViewModel : ObservableObject
 
     private readonly IToastService _toastService;
     private readonly TimeRangeConfig _config;
+    private readonly ISchedulerService _schedulerService;
 
-    public RandomTimeViewModel(IToastService toastService)
+    public RandomTimeViewModel(IToastService toastService, ISchedulerService schedulerService)
     {
         _toastService = toastService;
+        _schedulerService = schedulerService;
 
         _config = SettingsStore.Load<TimeRangeConfig>(ConfigSections.FileName, ConfigSections.TimeRange);
         MinLimitTime = _config.MinLimitTime;
@@ -47,5 +49,6 @@ public partial class RandomTimeViewModel : ObservableObject
         _config.MaxLimitTime = MaxLimitTime;
         SettingsStore.Save(ConfigSections.FileName, ConfigSections.TimeRange, _config);
         _toastService.Show("随机等待时间配置已保存", ToastType.Success);
+        _schedulerService.RefreshPlan();
     }
 }

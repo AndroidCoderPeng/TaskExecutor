@@ -62,12 +62,12 @@
             Margin="0,12,0,6"
             FontSize="14"
             Foreground="{StaticResource TextSecondaryBrush}"
-            Text="执行时间" />
+            Text="计划时间" />
 
         <ctrl:TimePicker
             VerticalAlignment="Center"
             MinuteStep="1"
-            TimeText="{Binding TaskTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            TimeText="{Binding PlannedTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
         <TextBlock
             Margin="0,12,0,6"

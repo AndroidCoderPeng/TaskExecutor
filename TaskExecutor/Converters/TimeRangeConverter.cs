@@ -8,9 +8,9 @@ public class TimeRangeConverter : IMultiValueConverter
 {
     public object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (values is [string executeTime, TimeRangeConfig range, ..])
+        if (values is [string plannedAt, TimeRangeConfig range, ..])
         {
-            return $"{executeTime} + {range.MinLimitTime}~{range.MaxLimitTime}min";
+            return $"{plannedAt} + {range.MinLimitTime}~{range.MaxLimitTime}min";
         }
 
         return values.Length > 0 ? values[0] : null;

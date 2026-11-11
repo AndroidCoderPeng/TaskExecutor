@@ -209,12 +209,12 @@
               </div>
               <table>
                 <colgroup>
-                  <col style="width:23%">
-                  <col style="width:26%">
+                  <col style="width:22%">
+                  <col style="width:25%">
                   <col style="width:13%">
                   <col style="width:11%">
                   <col style="width:11%">
-                  <col style="width:16%">
+                  <col style="width:18%">
                 </colgroup>
                 <thead>
                   <tr>
@@ -610,38 +610,53 @@
         <div class="device-strip">
           <span class="dot sm"></span>执行设备：<b>Pixel 6</b> · Android 14
         </div>
-        <div class="field">
-          <label>任务名称</label>
-          <div class="input" id="fName" contenteditable="true" data-ph="请输入任务名称"></div>
-        </div>
-        <div class="field">
-          <label>执行时间</label>
-          <div class="time-row">
-            <div class="input" id="fTime" contenteditable="true" data-ph="HH:MM"></div>
+        <div class="dlg-grid">
+          <div class="field">
+            <label>任务名称</label>
+            <div class="input" id="fName" contenteditable="true" data-ph="请输入任务名称"></div>
           </div>
-          <div class="toggle-row" style="margin-top:10px;">随机时间偏移<span class="switch on" id="offsetSwitch"></span></div>
-          <div class="offset-hint" id="offsetHint"></div>
+          <div class="field">
+            <label class="inline">执行时间<span class="switch on" id="offsetSwitch" title="随机偏移开关"></span></label>
+            <div class="input" id="fTime" contenteditable="true" data-ph="HH:MM"></div>
+            <div class="offset-hint" id="offsetHint"></div>
+          </div>
         </div>
-        <div class="field">
-          <label>目标 APP</label>
-          <select class="ui" id="fApp" style="width:100%;">
-            <option value="">请选择目标 APP</option>
-          </select>
+
+        <div class="dlg-grid">
+          <div class="field">
+            <label>目标 APP</label>
+            <select class="ui" id="fApp" style="width:100%;">
+              <option value="">请选择目标 APP</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>通知方式</label>
+            <div class="tag-toggles">
+              <span class="tag-tg on" data-tag>邮件</span>
+              <span class="tag-tg" data-tag>企业微信</span>
+            </div>
+          </div>
         </div>
+
+        <div class="dlg-divider"></div>
+
         <div class="field">
-          <label>任务动作<span class="label-hint">至少 1 个 · 至多全部 · 按编号顺序依次执行</span></label>
-          <div class="act-grid" id="fActs"></div>
-          <div class="act-payload" id="fPayloadWrap">
-            <input class="ui" id="fPayload" placeholder="要发送的文本，如：巡检完成">
+          <label>任务动作<span class="label-hint">拖入或点击添加 · 拖拽调整顺序</span></label>
+          <div class="builder">
+            <div class="palette">
+              <div class="panel-title">积木库</div>
+              <div class="pal-list" id="palList"></div>
+            </div>
+            <div class="chain-wrap">
+              <div class="chain-head">
+                <span>执行序列</span>
+                <span class="chain-count" id="chainCount">0 步</span>
+                <span class="link" id="chainClear">清空</span>
+              </div>
+              <div class="chain" id="chain"></div>
+            </div>
           </div>
           <div class="act-summary" id="actSummary"></div>
-        </div>
-        <div class="field">
-          <label>通知方式</label>
-          <div class="toggles">
-            <div class="toggle-row">邮件通知<span class="switch on"></span></div>
-            <div class="toggle-row">企业微信通知<span class="switch"></span></div>
-          </div>
         </div>
         <div class="dlg-foot">
           <span class="hint">保存后立即生效，节假日自动跳过</span>

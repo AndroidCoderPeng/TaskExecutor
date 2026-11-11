@@ -497,7 +497,7 @@
                             VerticalScrollBarVisibility="Hidden">
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn
-                                    Width="*"
+                                    Width="130"
                                     CellStyle="{StaticResource DataGridFirstCellStyle}"
                                     Header="任务名称"
                                     HeaderStyle="{StaticResource DataGridFirstColumnHeaderStyle}">
@@ -505,20 +505,17 @@
                                         <DataTemplate>
                                             <StackPanel VerticalAlignment="Center">
                                                 <TextBlock
-                                                    FontSize="13"
+                                                    FontSize="14"
                                                     FontWeight="Medium"
                                                     Foreground="{StaticResource TextPrimaryBrush}"
                                                     Text="{Binding Name}"
                                                     TextTrimming="CharacterEllipsis" />
                                                 <TextBlock
-                                                    Margin="0,2,0,0"
-                                                    FontSize="11"
+                                                    Margin="0,4,0,0"
+                                                    FontSize="12"
                                                     Foreground="{StaticResource TextTertiaryBrush}"
-                                                    TextTrimming="CharacterEllipsis">
-                                                    <Run Text="{Binding TargetApp.Name}" />
-                                                    <Run Text=" · " />
-                                                    <Run Text="{Binding TargetApp.PackageName}" />
-                                                </TextBlock>
+                                                    Text="{Binding TargetApp.Name}"
+                                                    TextTrimming="CharacterEllipsis" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -532,13 +529,13 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTemplateColumn Width="150" Header="执行时间">
+                                <DataGridTemplateColumn Width="130" Header="计划时间">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
                                                 <TextBlock.Text>
                                                     <MultiBinding Converter="{StaticResource TimeRangeConverterKey}">
-                                                        <Binding Path="ExecuteTime" />
+                                                        <Binding Path="PlannedAt" />
                                                         <Binding Path="TimeRange" />
                                                     </MultiBinding>
                                                 </TextBlock.Text>
@@ -548,11 +545,18 @@
                                 </DataGridTemplateColumn>
 
                                 <DataGridTextColumn
-                                    Width="100"
+                                    Width="80"
+                                    Binding="{Binding TimeDisplay}"
+                                    FontWeight="SemiBold"
+                                    Foreground="{StaticResource SuccessBrush}"
+                                    Header="执行时间" />
+
+                                <DataGridTextColumn
+                                    Width="80"
                                     Binding="{Binding NotifyMethod}"
                                     Header="通知方式" />
 
-                                <DataGridTemplateColumn Width="100" Header="状态">
+                                <DataGridTemplateColumn Width="80" Header="状态">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ToggleButton

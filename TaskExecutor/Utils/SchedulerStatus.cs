@@ -1,4 +1,8 @@
-﻿namespace TaskExecutor.Utils;
+﻿using TaskExecutor.Enums;
+
+namespace TaskExecutor.Utils;
+
+public sealed record ScheduledTaskInfo(string TaskName, DateTime ScheduledAt, PlannedTaskState State);
 
 /// <summary>
 /// 调度器状态快照：由 SchedulerService 内部维护，ViewModel 只读。
@@ -8,6 +12,8 @@ public class SchedulerStatus
     public bool IsScheduled { get; init; }
 
     public DateTime? NextTaskTime { get; init; }
+
+    public IReadOnlyList<ScheduledTaskInfo> PlannedTasks { get; init; } = [];
 
     public int TodayTotal { get; init; }
 

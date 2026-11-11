@@ -17,4 +17,6 @@ public interface ISchedulerService
     void Start();
 
     void Stop();
+
+    void RefreshPlan();
 }

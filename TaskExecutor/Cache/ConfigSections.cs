@@ -1,3 +1,6 @@
+using System.Globalization;
+using Newtonsoft.Json;
+
 namespace TaskExecutor.Cache;
 
 public static class ConfigSections
@@ -29,11 +32,18 @@ public class TaskRow
 {
     public string Name { get; set; } = "";
     public TargetAppRow TargetApp { get; set; } = new();
-    public string ExecuteTime { get; set; } = ""; // 
+    public string PlannedAt { get; set; } = "";
     public TimeRangeConfig? TimeRange { get; set; }
-    public string PredictedTime { get; set; } = "";
     public string NotifyMethod { get; set; } = "";
     public bool IsEnabled { get; set; }
+    
+    // 表示序列化或反序列化时忽略这个属性
+    [JsonIgnore] public DateTime? ExecuteTime { get; set; }
+
+    [JsonIgnore]
+    public string TimeDisplay => ExecuteTime is { } time
+        ? time.ToString("HH:mm", CultureInfo.InvariantCulture)
+        : "—";
 }
 
 public class TargetAppConfig

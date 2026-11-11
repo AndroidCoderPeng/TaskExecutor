@@ -1,17 +1,26 @@
   // ===== 数据 =====
   const DEVICE="Pixel 6";
 
-  // 动作目录：与 C# 的 TaskChainAction 枚举一一对应，数组下标即执行顺序
+  // 动作目录：与 C# 的 TaskChainAction 枚举一一对应；数组顺序=积木库展示顺序，执行顺序由用户编排
   const ACTIONS=[
     {id:"ScreenOn",   name:"亮屏",     desc:"唤醒屏幕并上滑解锁",      cmd:"input keyevent KEYCODE_WAKEUP"},
-    {id:"OpenTarget", name:"打开应用", desc:"启动所选目标 APP",        cmd:"am start -n",  needApp:true},
+    {id:"OpenTarget", name:"打开应用", desc:"启动所选目标 APP",        cmd:"am start -n"},
     {id:"ScreenCapture",name:"截屏",   desc:"截图并保存到本地目录",    cmd:"screencap -p"},
-    {id:"SendMessage",name:"发送消息", desc:"向当前焦点输入框发送文本", cmd:"input text",   needPayload:true},
-    {id:"KillTarget", name:"关闭应用", desc:"强制结束目标 APP",        cmd:"am force-stop", needApp:true},
+    {id:"SendMessage",name:"发送消息", desc:"向当前焦点输入框发送文本", cmd:"input text"},
+    {id:"KillTarget", name:"关闭应用", desc:"强制结束目标 APP",        cmd:"am force-stop"},
     {id:"ScreenOff",  name:"息屏",     desc:"发送按键指令关闭屏幕",    cmd:"input keyevent KEYCODE_SLEEP"},
   ];
   const actMeta=id=>ACTIONS.find(a=>a.id===id)||{name:id,desc:"",cmd:""};
-  const actSort=(a,b)=>ACTIONS.findIndex(x=>x.id===a)-ACTIONS.findIndex(x=>x.id===b);
+  // 积木分类色：任务表 chip 与积木同色，保持"同一动作=同一颜色"的视觉关联
+  const ACT_KIND={
+    ScreenOn:{cat:"屏幕",color:"#007AFF"},
+    OpenTarget:{cat:"应用",color:"#7B5CFA"},
+    ScreenCapture:{cat:"采集",color:"#12A594"},
+    SendMessage:{cat:"消息",color:"#E8930C"},
+    KillTarget:{cat:"应用",color:"#7B5CFA"},
+    ScreenOff:{cat:"屏幕",color:"#007AFF"},
+  };
+  const actColor=id=>(ACT_KIND[id]||{}).color||"#007AFF";
 
   let tasks=[
     {name:"工作日打卡",sub:"钉钉 · com.alibaba.android.rimet",time:"07:30 ±5min",notify:"邮件 + 企微",on:true,
@@ -100,7 +109,7 @@
   function renderLogs(){
     const list=logExpanded?logs.concat(logsMore):logs;
     $("logList").innerHTML=list.map(l=>`
-      <div class="log-row"><span class="t">${l.t}</span><span class="task${l.task?"":" sys"}">${l.task||"系统"}</span><span class="lv ${l.lv}">${l.l}</span><span class="m">${l.act?`<span class="log-act">${l.act}</span>`:""}${l.m}</span></div>`).join("");
+      <div class="log-row"><span class="t">${l.t}</span><span class="task${l.task?"":" sys"}">${l.task||"系统"}</span><span class="lv ${l.lv}">${l.l}</span><span class="m"><span class="log-act${l.act?"":" none"}">${l.act||""}</span>${l.m}</span></div>`).join("");
     $("logToggle").textContent=logExpanded?"收起":"查看全部";
   }
   $("logToggle").onclick=()=>{logExpanded=!logExpanded;renderLogs();};
@@ -112,7 +121,8 @@
     const head=acts.slice(0,3).map(id=>{
       const a=actMeta(id);
       const tip=id==="SendMessage"&&k.payload?`${a.name}：${k.payload}`:`${a.name} · ${a.desc}`;
-      return `<span class="chip blue" title="${tip}">${a.name}</span>`;
+      const c=actColor(id);
+      return `<span class="chip" style="color:${c};background:${c}1f" title="${tip}">${a.name}</span>`;
     });
     if(acts.length>3)head.push(`<span class="chip" title="${acts.slice(3).map(id=>actMeta(id).name).join(" › ")}">+${acts.length-3}</span>`);
     return `<div class="chips">${head.join("")}</div>`;
@@ -211,12 +221,12 @@
   }
   function updateOffsetHint(){
     const el=$("offsetHint"),v=$("fTime").textContent.trim();
-    if(!offsetEnabled){el.textContent="到达设定时间后立即执行，不做随机偏移";return;}
+    if(!offsetEnabled){el.textContent="不做随机偏移，到点立即执行";return;}
     const lo=randCfg.min,hi=randCfg.max;
-    if(lo>hi){el.textContent="随机时间范围设置有误：下限不能大于上限";return;}
+    if(lo>hi){el.textContent="随机范围设置有误：下限不能大于上限";return;}
     const mm=/^(\d{1,2}):(\d{1,2})$/.exec(v);
-    if(!mm){el.textContent=`实际执行时间 = 设定时间 + ${lo}~${hi} 分钟（输入时间后预览）`;return;}
-    el.textContent=`实际执行时间：${fmtHM(+mm[1]*60+ +mm[2]+lo)} ~ ${fmtHM(+mm[1]*60+ +mm[2]+hi)} 之间随机`;
+    if(!mm){el.textContent=`设定时间 + ${lo}~${hi} 分钟随机`;return;}
+    el.textContent=`实际 ${fmtHM(+mm[1]*60+ +mm[2]+lo)} ~ ${fmtHM(+mm[1]*60+ +mm[2]+hi)} 随机执行`;
   }
   function refreshOffsetUI(){
     $("offsetSwitch").classList.toggle("on",offsetEnabled);
@@ -226,34 +236,146 @@
     $("fApp").innerHTML='<option value="">请选择目标 APP</option>'
       +apps.map(a=>`<option value="${a.pkg}" ${a.pkg===selectedPkg?"selected":""}>${a.name} · ${a.pkg}</option>`).join("");
   }
-  // 动作多选：勾选集合始终按目录顺序排列，序号即执行顺序
-  let draftActs=[];
-  function renderActs(){
-    $("fActs").innerHTML=ACTIONS.map(a=>{
-      const idx=draftActs.indexOf(a.id),on=idx>=0;
-      const need=a.needPayload?'<span class="need">需填写内容</span>':"";
-      return `<div class="act-item${on?" on":""}" data-id="${a.id}" title="${a.cmd}">
-        <span class="act-order">${on?idx+1:""}</span>
-        <div class="act-body">
-          <div class="act-name">${a.name}</div>
-          <div class="act-desc">${a.desc}${need}</div>
-        </div>
-      </div>`;
-    }).join("");
+  // ===== 动作积木（积木式编排）=====
+  let draftActs=[];     // 序列顺序即执行顺序，由用户拖拽决定
+  let draftPayload="";  // 「发送消息」积木的内联参数
+  let dragSrc=null;     // {id, from:"pal"|"chain"}
+  let saveTried=false;  // 只有点击保存后才把空序列标红
 
-    $("fPayloadWrap").classList.toggle("show",draftActs.includes("SendMessage"));
-    $("actSummary").innerHTML=draftActs.length
-      ? `${draftActs.map(id=>`<span class="chip blue">${actMeta(id).name}</span>`).join('<span class="arrow">›</span>')}<span class="count">共 ${draftActs.length} 个动作</span>`
-      : `<span class="empty">尚未选择动作 · 至少选择 1 个才能保存</span>`;
+  function palHtml(a){
+    const added=draftActs.includes(a.id),c=actColor(a.id);
+    return `<div class="pal-chip${added?" added":""}" data-id="${a.id}"
+      draggable="${!added}" title="${a.cmd}" style="--c:${c};--c-bg:${c}1c">
+      <span>${a.name}</span><span class="plus">${added?"✓":"+"}</span>
+    </div>`;
   }
-  $("fActs").addEventListener("click",e=>{
-    const item=e.target.closest(".act-item");
-    if(!item)return;
-    const id=item.dataset.id;
-    const i=draftActs.indexOf(id);
-    if(i>=0)draftActs.splice(i,1);
-    else draftActs.push(id);
-    draftActs.sort(actSort);
+
+  function blkHtml(id,idx){
+    const a=actMeta(id),c=actColor(id);
+    let param;
+    if(id==="SendMessage"){
+      param=`<input class="bin" id="fPayload" draggable="false" placeholder="要发送的文本…" value="${draftPayload.replace(/"/g,"&quot;")}">`;
+    }else if(id==="OpenTarget"||id==="KillTarget"){
+      param=`<span class="bmeta">→ 所选目标 APP</span>`;
+    }else{
+      param=`<span class="bmeta">${a.cmd}</span>`;
+    }
+    return `<div class="blk" data-id="${id}" draggable="true" style="--c:${c};--c-bg:${c}1c">
+      <span class="no">${idx+1}</span>
+      <span class="bname">${a.name}</span>
+      ${param}
+      <span class="del" data-del="${id}" title="移除该动作">✕</span>
+    </div>`;
+  }
+
+  function renderActs(){
+    $("palList").innerHTML=ACTIONS.map(palHtml).join("");
+    // 已编排的块 + 底部拖放提示；全部 6 块都在时不再显示
+    const tail=draftActs.length>0&&draftActs.length<ACTIONS.length
+      ?`<div class="chain-tail">拖到这里继续添加</div>`:"";
+    $("chain").innerHTML=draftActs.length
+      ? draftActs.map(blkHtml).join("")+tail
+      : `<div class="chain-empty">把左边的动作积木拖到这里<br><small>也可以直接点击积木添加</small></div>`;
+    $("chainCount").textContent=draftActs.length+" 步";
+    $("actSummary").innerHTML=draftActs.length
+      ? `从上到下依次执行，某一步失败会中止后续动作`
+      : saveTried
+        ? `<span class="empty">至少加入 1 个动作积木才能保存</span>`
+        : `从积木库点选或拖入，编排从上到下执行的动作`;
+
+    // 积木内联参数：只更新状态不重渲染，避免输入时丢焦点
+    const input=$("fPayload");
+    if(input){
+      input.addEventListener("input",e=>{draftPayload=e.target.value;});
+      input.addEventListener("mousedown",e=>e.stopPropagation());
+      input.addEventListener("dragstart",e=>e.preventDefault());
+    }
+  }
+
+  // —— 积木库：点击追加到序列末尾 ——
+  $("palList").addEventListener("click",e=>{
+    const el=e.target.closest(".pal-chip");
+    if(!el||el.classList.contains("added"))return;
+    draftActs.push(el.dataset.id);
+    renderActs();
+  });
+
+  $("palList").addEventListener("dragstart",e=>{
+    const el=e.target.closest(".pal-chip");
+    if(!el||el.classList.contains("added")){e.preventDefault();return;}
+    dragSrc={id:el.dataset.id,from:"pal"};
+    e.dataTransfer.effectAllowed="copy";
+    e.dataTransfer.setData("text/plain",el.dataset.id);
+  });
+
+  $("palList").addEventListener("dragend",()=>{dragSrc=null;});
+
+  // —— 执行序列：删除 / 拖拽排序 / 插入 ——
+  function clearDropMarks(){
+    document.querySelectorAll(".blk.drop-before,.blk.dragging").forEach(x=>x.classList.remove("drop-before","dragging"));
+  }
+  function hoverBlock(e){
+    const el=document.elementFromPoint(e.clientX,e.clientY);
+    return el?el.closest(".blk"):null;
+  }
+
+  $("chain").addEventListener("click",e=>{
+    const del=e.target.closest("[data-del]");
+    if(!del)return;
+    draftActs=draftActs.filter(id=>id!==del.dataset.del);
+    renderActs();
+  });
+
+  $("chain").addEventListener("dragstart",e=>{
+    const blk=e.target.closest(".blk");
+    if(!blk)return;
+    dragSrc={id:blk.dataset.id,from:"chain"};
+    e.dataTransfer.effectAllowed="move";
+    e.dataTransfer.setData("text/plain",blk.dataset.id);
+    blk.classList.add("dragging");
+  });
+
+  $("chain").addEventListener("dragover",e=>{
+    e.preventDefault();
+    document.querySelectorAll(".blk.drop-before").forEach(x=>x.classList.remove("drop-before"));
+    const blk=hoverBlock(e);
+    if(blk&&(!dragSrc||blk.dataset.id!==dragSrc.id))blk.classList.add("drop-before");
+    $("chain").classList.add("drop");
+  });
+
+  $("chain").addEventListener("dragleave",e=>{
+    // 只在真正离开画布时清理，避免子元素间移动导致指示线闪烁
+    if(e.relatedTarget&&$("chain").contains(e.relatedTarget))return;
+    $("chain").classList.remove("drop");
+    clearDropMarks();
+  });
+
+  $("chain").addEventListener("drop",e=>{
+    e.preventDefault();
+    const blk=hoverBlock(e);
+    const targetId=blk?blk.dataset.id:null;
+    const src=dragSrc;
+    dragSrc=null;
+    $("chain").classList.remove("drop");
+    clearDropMarks();
+    if(!src)return;
+    if(src.from==="chain"&&targetId===src.id)return;
+
+    if(src.from==="chain")draftActs=draftActs.filter(x=>x!==src.id);
+    const at=targetId?draftActs.indexOf(targetId):-1;
+    draftActs.splice(at<0?draftActs.length:at,0,src.id);
+    renderActs();
+  });
+
+  $("chain").addEventListener("dragend",()=>{
+    dragSrc=null;
+    $("chain").classList.remove("drop");
+    clearDropMarks();
+  });
+
+  $("chainClear").addEventListener("click",()=>{
+    if(!draftActs.length)return;
+    draftActs=[];
     renderActs();
   });
 
@@ -266,9 +388,10 @@
     offsetEnabled=mode==="edit"?parseOffset(t):true;
     fillAppOptions(mode==="edit"?(tasks[i].sub.split(" · ")[1]||""):"");
 
-    // 新建默认「亮屏 + 打开应用」，与旧版本任务的迁移结果保持一致
+    // 新建默认预置「亮屏 → 打开应用」，与旧任务的迁移结果保持一致
     draftActs=mode==="edit"?(tasks[i].acts||[]).slice():["ScreenOn","OpenTarget"];
-    $("fPayload").value=mode==="edit"?(tasks[i].payload||""):"";
+    draftPayload=mode==="edit"?(tasks[i].payload||""):"";
+    saveTried=false;
     renderActs();
     refreshOffsetUI();
     overlay.classList.add("show");
@@ -293,14 +416,14 @@
     const time=$("fTime").textContent.trim()||"08:00";
     const pkg=$("fApp").value;
     if(!pkg){toast("请选择目标 APP");return;}
-    if(!draftActs.length){toast("请至少选择一个任务动作");return;}
-    if(draftActs.includes("SendMessage")&&!$("fPayload").value.trim()){toast("请输入要发送的消息内容");return;}
+    if(!draftActs.length){saveTried=true;renderActs();toast("请至少加入一个动作积木");return;}
+    if(draftActs.includes("SendMessage")&&!draftPayload.trim()){toast("请填写「发送消息」积木的内容");return;}
 
     const app=apps.find(a=>a.pkg===pkg);
     const sub=app?`${app.name} · ${app.pkg}`:"";
     const label=time+offsetSuffix();
     const acts=draftActs.slice();
-    const payload=draftActs.includes("SendMessage")?$("fPayload").value.trim():"";
+    const payload=draftActs.includes("SendMessage")?draftPayload.trim():"";
     const chain=acts.map(id=>actMeta(id).name).join(" → ");
 
     if(editIndex>=0){
@@ -376,6 +499,7 @@
     s.classList.toggle("on");
     toast("开关已"+(s.classList.contains("on")?"开启":"关闭"));
   }));
+  document.querySelectorAll("[data-tag]").forEach(t=>t.addEventListener("click",()=>t.classList.toggle("on")));
 
   // 节假日同步
   $("syncHoliday").onclick=()=>{

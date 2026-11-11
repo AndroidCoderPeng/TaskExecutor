@@ -1,6 +1,6 @@
-using System.Globalization;
 using System.IO;
 using System.Windows.Threading;
+using Newtonsoft.Json;
 using TaskExecutor.Cache;
 using TaskExecutor.Enums;
 using TaskExecutor.Model;
@@ -20,19 +20,19 @@ public class SchedulerService : ISchedulerService
         TimeRangeConfig GlobalRange,
         WaitTimeConfig Wait);
 
-    private const string TimeFormat = "hh\\:mm";
-
     // 30s 一次 tick，UI 线程回调，方便直接更新 VM
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(30) };
     private readonly string _adbPath = Path.Combine(AppContext.BaseDirectory, "ADB", "adb.exe");
     private readonly IDeviceStateProvider _deviceState;
     private readonly ILogStoreService _logStore;
     private readonly IAdbHeartbeatService _heartbeatService;
+    private readonly IToastService _toastService;
+    private readonly ExecutionPlanStore _planStore = new();
+    private ExecutionPlan _plan = new(new ExecutionPlanState());
+    private bool _planLoaded;
+    private bool _planDirty;
+    private bool _planErrorReported;
 
-    private HashSet<string> _executedKeys = []; // key = $"{taskName}@yyyy-MM-dd"
-    private Dictionary<string, int> _randomOffsets = new(); // 每任务当天只抽一次随机偏移(分钟)
-    private DateOnly _currentDate;
-    private DateOnly _resetAppliedDate; // ResetTime 当天是否已应用过
     private bool _isExecuting; // 防重入（串行执行期间跳过 tick）
 
     private bool _isScheduled;
@@ -47,11 +47,12 @@ public class SchedulerService : ISchedulerService
     public SchedulerStatus CurrentStatus => _currentStatus;
 
     public SchedulerService(IDeviceStateProvider deviceState, ILogStoreService logStore,
-        IAdbHeartbeatService heartbeatService)
+        IAdbHeartbeatService heartbeatService, IToastService toastService)
     {
         _deviceState = deviceState;
         _logStore = logStore;
         _heartbeatService = heartbeatService;
+        _toastService = toastService;
         _timer.Tick += OnTick;
     }
 
@@ -59,11 +60,24 @@ public class SchedulerService : ISchedulerService
     {
         if (_isScheduled) return;
 
-        _currentDate = DateOnly.FromDateTime(DateTime.Now);
-        RestoreTodayStats(_currentDate); // 重启后从持久化日志恢复今日统计
+        if (!_planLoaded)
+        {
+            try
+            {
+                _plan = new ExecutionPlan(_planStore.Load());
+                _planLoaded = true;
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException)
+            {
+                ReportPlanError(e);
+                return;
+            }
+        }
+
+        RestoreTodayStats(DateOnly.FromDateTime(DateTime.Now));
         _isScheduled = true;
+        RefreshPlan();
         _timer.Start();
-        PublishStatus();
     }
 
     public void Stop()
@@ -80,30 +94,40 @@ public class SchedulerService : ISchedulerService
         _isExecuting = true;
         try
         {
-            var now = DateTime.Now;
-            var today = DateOnly.FromDateTime(now);
-
-            // 一次 tick 只加载一次配置：新建/编辑/启停任务无需重启即生效
             var snapshot = LoadSnapshot();
+            var now = DateTime.Now;
+            if (!TrySyncPlan(snapshot, now)) return;
+            PublishStatus(snapshot);
 
-            ResetIfNeeded(today, now, snapshot);
+            if (snapshot.Schedule.IsSkipHoliday && HolidayHelper.IsRestDay(DateOnly.FromDateTime(now))) return;
 
-            if (snapshot.Schedule.IsSkipHoliday && HolidayHelper.IsRestDay(today))
+            while (_isScheduled)
             {
-                return;
-            }
+                snapshot = LoadSnapshot();
+                now = DateTime.Now;
+                if (!TrySyncPlan(snapshot, now)) break;
+                if (snapshot.Schedule.IsSkipHoliday && HolidayHelper.IsRestDay(DateOnly.FromDateTime(now))) break;
 
-            // 收集今天已到点且未执行的任务
-            var dueTasks = CollectDueTasks(snapshot, today, now);
+                var enabled = snapshot.Tasks.Tasks
+                    .Where(t => t.IsEnabled)
+                    .ToDictionary(t => t.Name, StringComparer.Ordinal);
+                var entry = _plan.FindNextDue(now, enabled.Keys.ToHashSet(StringComparer.Ordinal));
+                if (entry == null) break;
+                var task = enabled[entry.TaskName];
 
-            // 按实际触发时刻排序，串行执行（任务之间隔 WaitTime 秒）
-            foreach (var task in dueTasks)
-            {
+                entry.State = PlannedTaskState.Triggered;
+                _planDirty = true;
+                if (!TrySavePlan())
+                {
+                    entry.State = PlannedTaskState.Pending;
+                    break;
+                }
+
+                PublishStatus(snapshot);
                 await ExecuteTaskAsync(task, snapshot.Wait);
             }
 
-            _nextTaskTime = GetNextTaskTime(snapshot, today, now);
-            PublishStatus();
+            RefreshPlan();
         }
         finally
         {
@@ -111,68 +135,70 @@ public class SchedulerService : ISchedulerService
         }
     }
 
-    /// <summary>
-    /// 跨天 / ResetTime 到点时的状态重置。
-    /// </summary>
-    private void ResetIfNeeded(DateOnly today, DateTime now, ConfigSnapshot snapshot)
+    public void RefreshPlan()
     {
-        // 跨天重置：清空已执行标记、重抽随机偏移、统计归零
-        if (today != _currentDate)
-        {
-            _currentDate = today;
-            _executedKeys = [];
-            _randomOffsets = [];
-            _resetAppliedDate = default;
+        if (!_planLoaded) return;
+        var snapshot = LoadSnapshot();
+        if (TrySyncPlan(snapshot, DateTime.Now)) PublishStatus(snapshot);
+    }
 
+    private bool TrySyncPlan(ConfigSnapshot snapshot, DateTime now)
+    {
+        var duplicate = snapshot.Tasks.Tasks
+            .GroupBy(t => t.Name, StringComparer.Ordinal)
+            .FirstOrDefault(group => group.Count() > 1);
+        if (duplicate != null)
+        {
+            ReportPlanError(new InvalidDataException($"任务名称「{duplicate.Key}」重复，请先修改配置。"));
+            return false;
+        }
+
+        var today = DateOnly.FromDateTime(now);
+        if (today != _statDate)
+        {
             _statDate = today;
             _todayTotal = 0;
             _todaySuccess = 0;
-            return;
         }
 
-        if (_resetAppliedDate == today) return;
-        if (!TimeSpan.TryParseExact(snapshot.Reset.Time, [TimeFormat], CultureInfo.InvariantCulture,
-                out var resetTime)) return;
-        if (now.TimeOfDay < resetTime) return;
+        _planDirty |= _plan.Reconcile(now, snapshot.Tasks, snapshot.Schedule, snapshot.GlobalRange, snapshot.Reset);
+        if (!TrySavePlan()) return false;
+        _planErrorReported = false;
+        return true;
+    }
 
-        // ResetTime 到点重置（IsResetDailyTask 开启时才清空，实现当日可二次运行）
-        _resetAppliedDate = today;
-        if (snapshot.Schedule.IsResetDailyTask)
+    private bool TrySavePlan()
+    {
+        if (!_planDirty) return true;
+        try
         {
-            _executedKeys = [];
-            _randomOffsets = [];
+            _planStore.Save(_plan.State);
+            _planDirty = false;
+            _planErrorReported = false;
+            return true;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException)
+        {
+            ReportPlanError(e);
+            return false;
         }
     }
 
-    /// <summary>
-    /// 收集今天已到点且未执行过的任务（按触发时刻升序）。
-    /// </summary>
-    private List<TaskRow> CollectDueTasks(ConfigSnapshot snapshot, DateOnly today, DateTime now)
+    private void ReportPlanError(Exception e)
     {
-        var dueTasks = new List<(TaskRow Task, DateTime ScheduledAt)>();
-
-        foreach (var task in snapshot.Tasks.Tasks.Where(t => t.IsEnabled))
+        Console.WriteLine($"执行计划异常：{e}");
+        if (_planErrorReported) return;
+        _planErrorReported = true;
+        _currentStatus = new SchedulerStatus
         {
-            if (!TimeSpan.TryParseExact(task.ExecuteTime, [TimeFormat], CultureInfo.InvariantCulture, out var time))
-            {
-                continue;
-            }
-
-            var scheduledAt = today.ToDateTime(TimeOnly.FromTimeSpan(time));
-            if (snapshot.Schedule.IsNeedRandomTime)
-            {
-                scheduledAt =
-                    scheduledAt.AddMinutes(GetRandomOffset(task.Name, task.TimeRange ?? snapshot.GlobalRange));
-            }
-
-            if (scheduledAt > now) continue;
-            // Add 返回 false 说明 key 已存在 => 今天已执行过
-            if (!_executedKeys.Add($"{task.Name}@{today:yyyy-MM-dd}")) continue;
-
-            dueTasks.Add((task, scheduledAt));
-        }
-
-        return dueTasks.OrderBy(x => x.ScheduledAt).Select(x => x.Task).ToList();
+            IsScheduled = false,
+            NextTaskTime = _currentStatus.NextTaskTime,
+            PlannedTasks = _currentStatus.PlannedTasks,
+            TodayTotal = _todayTotal,
+            TodaySuccess = _todaySuccess
+        };
+        StatusChanged?.Invoke(_currentStatus);
+        _toastService.Show($"执行计划异常，调度已暂停：{e.Message}", ToastType.Error);
     }
 
     /// <summary>
@@ -201,10 +227,9 @@ public class SchedulerService : ISchedulerService
         var (code, output) = await new CommandExecutor(commandLine).ExecuteWithOutputAsync(_adbPath);
 
         var failed = code != 0 || output.Any(line => line.Contains("Error", StringComparison.OrdinalIgnoreCase));
-        RaiseLog(failed ? TaskState.Failed : TaskState.Success,
-            failed
-                ? $"任务「{task.Name}」执行失败：启动 {task.TargetApp.Name} 失败"
-                : $"任务「{task.Name}」执行成功：已启动 {task.TargetApp.Name}");
+        RaiseLog(failed ? TaskState.Failed : TaskState.Success, failed
+            ? $"任务「{task.Name}」执行失败：启动 {task.TargetApp.Name} 失败"
+            : $"任务「{task.Name}」执行成功：已启动 {task.TargetApp.Name}");
 
         if (!failed)
         {
@@ -278,55 +303,6 @@ public class SchedulerService : ISchedulerService
     }
 
     /// <summary>
-    /// 每任务每天只抽一次随机偏移并缓存，避免每 30s tick 不断重抽导致时刻漂移。
-    /// </summary>
-    private int GetRandomOffset(string taskName, TimeRangeConfig? range)
-    {
-        var key = $"{taskName}@{_currentDate:yyyy-MM-dd}";
-        if (_randomOffsets.TryGetValue(key, out var offset))
-        {
-            return offset;
-        }
-
-        var min = Math.Max(0, range?.MinLimitTime ?? 0);
-        var max = Math.Max(min, range?.MaxLimitTime ?? 0);
-        offset = Random.Shared.Next(min, max + 1);
-        _randomOffsets[key] = offset;
-        return offset;
-    }
-
-    /// <summary>
-    /// 计算下一个待执行时刻（含随机偏移），无待执行任务时返回 null。
-    /// </summary>
-    private DateTime? GetNextTaskTime(ConfigSnapshot snapshot, DateOnly today, DateTime now)
-    {
-        DateTime? next = null;
-
-        foreach (var task in snapshot.Tasks.Tasks.Where(t => t.IsEnabled))
-        {
-            if (!TimeSpan.TryParseExact(task.ExecuteTime, [TimeFormat], CultureInfo.InvariantCulture, out var time))
-            {
-                continue;
-            }
-
-            var scheduledAt = today.ToDateTime(TimeOnly.FromTimeSpan(time));
-            if (snapshot.Schedule.IsNeedRandomTime)
-            {
-                scheduledAt =
-                    scheduledAt.AddMinutes(GetRandomOffset(task.Name, task.TimeRange ?? snapshot.GlobalRange));
-            }
-
-            if (scheduledAt <= now) continue;
-            if (next == null || scheduledAt < next)
-            {
-                next = scheduledAt;
-            }
-        }
-
-        return next;
-    }
-
-    /// <summary>
     /// 重启后从当天持久化日志恢复今日统计，避免统计随进程重启归零。
     /// </summary>
     private void RestoreTodayStats(DateOnly today)
@@ -376,12 +352,30 @@ public class SchedulerService : ISchedulerService
         PublishStatus();
     }
 
-    private void PublishStatus()
+    private void PublishStatus(ConfigSnapshot? snapshot = null)
     {
+        snapshot ??= LoadSnapshot();
+        var enabled = snapshot.Tasks.Tasks
+            .Where(t => t.IsEnabled)
+            .Select(t => t.Name)
+            .ToHashSet(StringComparer.Ordinal);
+        
+        var planned = _plan.State.Tasks
+            .Where(p => enabled.Contains(p.TaskName))
+            .OrderBy(p => p.ScheduledAt)
+            .Select(p => new ScheduledTaskInfo(p.TaskName, p.ScheduledAt, p.State))
+            .ToArray();
+        
+        _nextTaskTime = planned
+            .Where(p => p.State == PlannedTaskState.Pending)
+            .Select(p => (DateTime?)p.ScheduledAt)
+            .FirstOrDefault();
+        
         _currentStatus = new SchedulerStatus
         {
             IsScheduled = _isScheduled,
             NextTaskTime = _nextTaskTime,
+            PlannedTasks = Array.AsReadOnly(planned),
             TodayTotal = _todayTotal,
             TodaySuccess = _todaySuccess
         };

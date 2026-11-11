@@ -32,7 +32,7 @@ public partial class TaskScheduleViewModel : ObservableObject
         "https://registry.npmmirror.com/chinese-days/latest/files/dist/years/%s.json"
     ];
 
-    public TaskScheduleViewModel(IToastService toastService)
+    public TaskScheduleViewModel(IToastService toastService, ISchedulerService schedulerService)
     {
         _toastService = toastService;
 
@@ -51,6 +51,7 @@ public partial class TaskScheduleViewModel : ObservableObject
                 config.IsSkipHoliday = IsSkipHoliday;
                 config.IsResetDailyTask = IsResetDailyTask;
                 SettingsStore.Save(ConfigSections.FileName, ConfigSections.TaskSchedule, config);
+                schedulerService.RefreshPlan();
             }
         };
     }
