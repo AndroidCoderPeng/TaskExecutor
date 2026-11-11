@@ -42,6 +42,8 @@ public partial class TaskManagerViewModel : ObservableObject
         _heartbeatService = heartbeatService;
 
         DeviceName = string.IsNullOrEmpty(deviceViewModel.DeviceName) ? "-" : deviceViewModel.DeviceName;
+        WeakReferenceMessenger.Default.Register<MessengerMessage.UpdateNavigationStateMessage>(this,
+            (_, msg) => { DeviceName = string.IsNullOrEmpty(msg.Value.DeviceName) ? "-" : msg.Value.DeviceName; });
 
         var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
         Tasks = new ObservableCollection<TaskRow>(config.Tasks);
@@ -77,39 +79,32 @@ public partial class TaskManagerViewModel : ObservableObject
     [RelayCommand]
     private async Task CreateTask()
     {
-        // 需要二次检测设备是否被中途断开
-        if (!_deviceViewModel.IsConnected)
-        {
-            _toastService.Show("设备未连接，请先连接设备", ToastType.Warning);
-            return;
-        }
+        var systemVersion = _deviceViewModel.IsConnected
+            ? await _deviceViewModel.GetDeviceSystemVersionAsync($"{_deviceViewModel.DeviceIp}:5555")
+            : null;
 
-        if (!await _heartbeatService.ProbeAsync($"{_deviceViewModel.DeviceIp}:5555"))
-        {
-            _toastService.Show("设备连接已中断，请重新连接", ToastType.Error);
+        var parameter = new TaskDialogContext(_deviceViewModel.DeviceName, systemVersion);
+        if (_dialogService.ShowDialog(typeof(TaskDialog), parameter) != true) return;
 
-            // 归位状态 + 通知导航栏（心跳仍在跑，恢复后会自动把状态改回「已连接」）
-            var name = _deviceViewModel.DeviceName;
-            _deviceViewModel.MarkDisconnected();
-            WeakReferenceMessenger.Default.Send(new MessengerMessage.UpdateNavigationStateMessage(
-                false, name, _deviceViewModel.DeviceIp));
-            return;
-        }
-
-        var systemVersion = await _deviceViewModel.GetDeviceSystemVersionAsync($"{_deviceViewModel.DeviceIp}:5555");
-        var parameter = new KeyValuePair<string, string>(DeviceName, systemVersion);
-        if (_dialogService.ShowDialog(typeof(TaskDialog), parameter) == true)
-        {
-            // 重新加载任务列表
-            var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
-            Tasks = new ObservableCollection<TaskRow>(config.Tasks);
-            ApplyTaskFilter();
-        }
+        var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
+        Tasks = new ObservableCollection<TaskRow>(config.Tasks);
+        ApplyTaskFilter();
     }
 
     [RelayCommand]
-    private void EditTask(TaskRow task)
+    private async Task EditTask(TaskRow task)
     {
+        // 因为是周期性执行任务，所以可以在主流程中直接修改任务项，等下次就会直接生效
+        var systemVersion = _deviceViewModel.IsConnected
+            ? await _deviceViewModel.GetDeviceSystemVersionAsync($"{_deviceViewModel.DeviceIp}:5555")
+            : null;
+
+        var parameter = new TaskDialogContext(_deviceViewModel.DeviceName, systemVersion, task);
+        if (_dialogService.ShowDialog(typeof(TaskDialog), parameter) != true) return;
+
+        var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
+        Tasks = new ObservableCollection<TaskRow>(config.Tasks);
+        ApplyTaskFilter();
     }
 
     [RelayCommand]

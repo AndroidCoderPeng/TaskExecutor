@@ -6,9 +6,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
-    Title="新建任务"
+    Title="{Binding Title}"
     Width="476"
-    Height="550"
+    Height="552"
     d:DataContext="{d:DesignInstance Type=vm:TaskDialogViewModel}"
     Background="{StaticResource WindowBackgroundBrush}"
     ResizeMode="NoResize"
@@ -34,12 +34,7 @@
                 <TextBlock
                     FontWeight="SemiBold"
                     Foreground="{StaticResource TextPrimaryBrush}"
-                    Text="{Binding DeviceName}" />
-
-                <TextBlock
-                    Margin="8,0"
-                    Foreground="{StaticResource TextSecondaryBrush}"
-                    Text="{Binding SystemVersion, StringFormat={}· Android {0}}" />
+                    Text="{Binding DeviceSummary}" />
             </StackPanel>
         </Border>
 

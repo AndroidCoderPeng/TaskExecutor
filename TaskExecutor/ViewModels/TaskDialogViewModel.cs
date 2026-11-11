@@ -11,8 +11,8 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
 {
     #region VM
 
-    [ObservableProperty] private string _deviceName = string.Empty;
-    [ObservableProperty] private string _systemVersion = string.Empty;
+    [ObservableProperty] private string _title = "新建任务";
+    [ObservableProperty] private string _deviceSummary = "未连接设备（任务将在设备在线时执行）";
     [ObservableProperty] private string _taskName = string.Empty;
     [ObservableProperty] private string _taskTime = string.Empty;
     [ObservableProperty] private string _tips = string.Empty;
@@ -29,10 +29,27 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
 
     public void OnDialogOpened(object? parameter)
     {
-        if (parameter is KeyValuePair<string, string> pair)
+        if (parameter is TaskDialogContext context)
         {
-            DeviceName = pair.Key;
-            SystemVersion = pair.Value;
+            DeviceSummary = string.IsNullOrEmpty(context.DeviceName)
+                ? "未连接设备（任务将在设备在线时执行）"
+                : string.IsNullOrEmpty(context.SystemVersion)
+                    ? context.DeviceName
+                    : $"{context.DeviceName} · Android {context.SystemVersion}";
+
+            if (context.Task != null)
+            {
+                Title = "编辑任务";
+                TaskName = context.Task.Name;
+                TaskTime = context.Task.ExecuteTime;
+                IsRandomOffsetTime = context.Task.TimeRange != null;
+                IsNotifyByMail = context.Task.NotifyMethod.Contains("邮件");
+                IsNotifyByWechat = context.Task.NotifyMethod.Contains("企业微信");
+
+                SelectedTargetApp = TargetApps.FirstOrDefault(app =>
+                    app.PackageName == context.Task.TargetApp.PackageName &&
+                    app.Activity == context.Task.TargetApp.Activity);
+            }
         }
     }
 
