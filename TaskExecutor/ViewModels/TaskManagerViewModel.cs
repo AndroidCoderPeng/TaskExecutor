@@ -97,6 +97,29 @@ public partial class TaskManagerViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void ToggleTask(TaskRow task)
+    {
+        var index = Tasks.IndexOf(task);
+        if (index < 0) return;
+
+        task.IsEnabled = !task.IsEnabled;
+        Tasks[index] = task; // 触发 Replace，让绑定重新求值
+
+        SaveTasks();
+        _toastService.Show(
+            task.IsEnabled ? $"任务「{task.Name}」已启用" : $"任务「{task.Name}」已暂停",
+            task.IsEnabled ? ToastType.Success : ToastType.Info);
+        _schedulerService.RefreshPlan();
+        ApplyTaskFilter();
+    }
+
+    [RelayCommand]
+    private async Task RunTaskOnce(TaskRow task)
+    {
+        
+    }
+    
+    [RelayCommand]
     private async Task EditTask(TaskRow task)
     {
         var index = Tasks.IndexOf(task);
@@ -122,28 +145,11 @@ public partial class TaskManagerViewModel : ObservableObject
     private void ReloadTasks()
     {
         var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
-        Tasks = new ObservableCollection<TaskRow>(config.Tasks);
+        Tasks = [.. config.Tasks];
         _schedulerService.RefreshPlan();
         ApplyTaskFilter();
     }
-
-    [RelayCommand]
-    private void ToggleTask(TaskRow task)
-    {
-        var index = Tasks.IndexOf(task);
-        if (index < 0) return;
-
-        task.IsEnabled = !task.IsEnabled;
-        Tasks[index] = task; // 触发 Replace，让绑定重新求值
-
-        SaveTasks();
-        _toastService.Show(
-            task.IsEnabled ? $"任务「{task.Name}」已启用" : $"任务「{task.Name}」已暂停",
-            task.IsEnabled ? ToastType.Success : ToastType.Info);
-        _schedulerService.RefreshPlan();
-        ApplyTaskFilter();
-    }
-
+    
     [RelayCommand]
     private void DeleteTask(TaskRow task)
     {

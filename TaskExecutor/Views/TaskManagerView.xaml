@@ -684,8 +684,8 @@
                             <DataGrid.ContextMenu>
                                 <ContextMenu Style="{StaticResource TaskContextMenuStyle}">
                                     <MenuItem
-                                        Command="{Binding OnceTaskCommand}"
-                                        CommandParameter="{Binding ElementName=TaskDataGrid, Path=SelectedItem}"
+                                        Command="{Binding RunTaskOnceCommand}"
+                                        CommandParameter="{Binding PlacementTarget.(Selector.SelectedItem), RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                         Header="运行"
                                         Style="{StaticResource TaskMenuItemStyle}"
                                         Tag="Run"
@@ -699,7 +699,7 @@
                                     </MenuItem>
                                     <MenuItem
                                         Command="{Binding EditTaskCommand}"
-                                        CommandParameter="{Binding ElementName=TaskDataGrid, Path=SelectedItem}"
+                                        CommandParameter="{Binding PlacementTarget.(Selector.SelectedItem), RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                         Header="编辑"
                                         Style="{StaticResource TaskMenuItemStyle}">
                                         <MenuItem.Icon>
@@ -711,7 +711,7 @@
                                     </MenuItem>
                                     <MenuItem
                                         Command="{Binding DeleteTaskCommand}"
-                                        CommandParameter="{Binding ElementName=TaskDataGrid, Path=SelectedItem}"
+                                        CommandParameter="{Binding PlacementTarget.(Selector.SelectedItem), RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                         Header="删除"
                                         Style="{StaticResource TaskMenuItemStyle}"
                                         Tag="Danger">
