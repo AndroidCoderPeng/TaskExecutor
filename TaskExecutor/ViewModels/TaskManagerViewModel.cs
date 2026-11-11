@@ -86,27 +86,33 @@ public partial class TaskManagerViewModel : ObservableObject
         var parameter = new TaskDialogContext(_deviceViewModel.DeviceName, systemVersion);
         if (_dialogService.ShowDialog(typeof(TaskDialog), parameter) != true) return;
 
-        var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
-        Tasks = new ObservableCollection<TaskRow>(config.Tasks);
-        ApplyTaskFilter();
+        ReloadTasks();
     }
 
     [RelayCommand]
     private async Task EditTask(TaskRow task)
     {
+        var index = Tasks.IndexOf(task);
+        if (index < 0) return;
+        
         // 因为是周期性执行任务，所以可以在主流程中直接修改任务项，等下次就会直接生效
         var systemVersion = _deviceViewModel.IsConnected
             ? await _deviceViewModel.GetDeviceSystemVersionAsync($"{_deviceViewModel.DeviceIp}:5555")
             : null;
 
-        var parameter = new TaskDialogContext(_deviceViewModel.DeviceName, systemVersion, task);
+        var parameter = new TaskDialogContext(_deviceViewModel.DeviceName, systemVersion, index);
         if (_dialogService.ShowDialog(typeof(TaskDialog), parameter) != true) return;
 
+        ReloadTasks();
+    }
+
+    private void ReloadTasks()
+    {
         var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
         Tasks = new ObservableCollection<TaskRow>(config.Tasks);
         ApplyTaskFilter();
     }
-
+    
     [RelayCommand]
     private void ToggleTask(TaskRow task)
     {

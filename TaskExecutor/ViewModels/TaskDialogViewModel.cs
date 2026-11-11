@@ -12,7 +12,9 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
     #region VM
 
     [ObservableProperty] private string _title = "新建任务";
+    [ObservableProperty] private string _saveButtonText = "保存任务";
     [ObservableProperty] private string _deviceSummary = "未连接设备（任务将在设备在线时执行）";
+    [ObservableProperty] private bool _isEditing;
     [ObservableProperty] private string _taskName = string.Empty;
     [ObservableProperty] private string _taskTime = string.Empty;
     [ObservableProperty] private string _tips = string.Empty;
@@ -27,34 +29,9 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
 
     public event Action<bool> CloseRequested = delegate { };
 
-    public void OnDialogOpened(object? parameter)
-    {
-        if (parameter is TaskDialogContext context)
-        {
-            DeviceSummary = string.IsNullOrEmpty(context.DeviceName)
-                ? "未连接设备（任务将在设备在线时执行）"
-                : string.IsNullOrEmpty(context.SystemVersion)
-                    ? context.DeviceName
-                    : $"{context.DeviceName} · Android {context.SystemVersion}";
-
-            if (context.Task != null)
-            {
-                Title = "编辑任务";
-                TaskName = context.Task.Name;
-                TaskTime = context.Task.ExecuteTime;
-                IsRandomOffsetTime = context.Task.TimeRange != null;
-                IsNotifyByMail = context.Task.NotifyMethod.Contains("邮件");
-                IsNotifyByWechat = context.Task.NotifyMethod.Contains("企业微信");
-
-                SelectedTargetApp = TargetApps.FirstOrDefault(app =>
-                    app.PackageName == context.Task.TargetApp.PackageName &&
-                    app.Activity == context.Task.TargetApp.Activity);
-            }
-        }
-    }
-
     private readonly IToastService _toastService;
     private readonly TaskConfig _config;
+    private int _editingIndex = -1;
 
     public TaskDialogViewModel(IToastService toastService)
     {
@@ -72,6 +49,53 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         }
     }
 
+    public void OnDialogOpened(object? parameter)
+    {
+        if (parameter is not TaskDialogContext context) return;
+
+        DeviceSummary = string.IsNullOrEmpty(context.DeviceName)
+            ? "未连接设备（任务将在设备在线时执行）"
+            : string.IsNullOrEmpty(context.SystemVersion)
+                ? context.DeviceName
+                : $"{context.DeviceName} · Android {context.SystemVersion}";
+
+        // 下标越界（理论上不会，除非配置被外部改动）：降级为新建
+        if (context.EditIndex < 0 || context.EditIndex >= _config.Tasks.Count) return;
+
+        _editingIndex = context.EditIndex;
+        var task = _config.Tasks[_editingIndex];
+
+        IsEditing = true;
+        Title = "编辑任务";
+        SaveButtonText = "保存修改";
+        TaskName = task.Name;
+        TaskTime = task.ExecuteTime;
+        IsRandomOffsetTime = task.TimeRange != null;
+        IsNotifyByMail = task.NotifyMethod.Contains("邮件");
+        IsNotifyByWechat = task.NotifyMethod.Contains("企业微信");
+        SelectedTargetApp = MatchTargetApp(task.TargetApp);
+    }
+
+    private TargetAppRow MatchTargetApp(TargetAppRow target)
+    {
+        var matched =
+            TargetApps.FirstOrDefault(app => app.PackageName == target.PackageName && app.Activity == target.Activity)
+            ?? TargetApps.FirstOrDefault(app => app.PackageName == target.PackageName);
+
+        if (matched != null) return matched;
+        
+        // 目标 APP 已在「目标 APP」页被删除：把任务里的旧值挂回列表，
+        // 否则 ComboBox 选不中、保存时会被"请选择目标 APP"卡死
+        var orphan = new TargetAppRow
+        {
+            Name = target.Name,
+            PackageName = target.PackageName,
+            Activity = target.Activity
+        };
+        TargetApps.Add(orphan);
+        return orphan;
+    }
+    
     [RelayCommand]
     private void CancelDialog()
     {
@@ -81,10 +105,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
     [RelayCommand]
     private void SaveTask()
     {
-        if (string.IsNullOrWhiteSpace(TaskName))
-        {
-            TaskName = "新任务";
-        }
+        if (string.IsNullOrWhiteSpace(TaskName)) TaskName = "新任务";
 
         if (SelectedTargetApp == null || string.IsNullOrWhiteSpace(SelectedTargetApp.PackageName))
         {
@@ -92,29 +113,62 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
             return;
         }
 
-        var notifyMethod = "";
-        if (IsNotifyByMail) notifyMethod = "邮件";
-        if (IsNotifyByWechat) notifyMethod = "企业微信";
+        // 时间格式非法时调度器会 TryParseExact 失败并静默跳过，任务永远不会跑
+        if (string.IsNullOrWhiteSpace(TaskTime))
+        {
+            _toastService.Show("请选择执行时间", ToastType.Warning);
+            return;
+        }
+        
+        var isEditing = _editingIndex >= 0;
+        // 名称是调度去重键（Name@date），创建后不可修改：仅新建时确定并校验唯一
+        if (!isEditing)
+        {
+            if (string.IsNullOrWhiteSpace(TaskName)) TaskName = NextDefaultName();
+            TaskName = TaskName.Trim();
 
+            if (_config.Tasks.Any(t => t.Name == TaskName))
+            {
+                _toastService.Show($"已存在同名任务「{TaskName}」，请换一个名称", ToastType.Warning);
+                return;
+            }
+        }
+        
+        var notifyMethod = IsNotifyByWechat ? "企业微信" : IsNotifyByMail ? "邮件" : "";
         var timeRange = SettingsStore.Load<TimeRangeConfig>(ConfigSections.FileName, ConfigSections.TimeRange);
 
-        _config.Tasks.Add(new TaskRow
+        var task = isEditing ? _config.Tasks[_editingIndex] : new TaskRow { Name = TaskName, IsEnabled = true };
+
+        task.TargetApp = new TargetAppRow
         {
-            Name = TaskName,
-            TargetApp = new TargetAppRow
-            {
-                Name = SelectedTargetApp.Name,
-                PackageName = SelectedTargetApp.PackageName,
-                Activity = SelectedTargetApp.Activity
-            },
-            ExecuteTime = TaskTime,
-            TimeRange = IsRandomOffsetTime ? timeRange : null,
-            NotifyMethod = notifyMethod,
-            IsEnabled = true
-        });
+            Name = SelectedTargetApp.Name,
+            PackageName = SelectedTargetApp.PackageName,
+            Activity = SelectedTargetApp.Activity
+        };
+        task.ExecuteTime = TaskTime;
+        task.TimeRange = IsRandomOffsetTime ? timeRange : null;
+        task.NotifyMethod = notifyMethod;
+
+        if (!isEditing) _config.Tasks.Add(task);
+
         SettingsStore.Save(ConfigSections.FileName, ConfigSections.Task, _config);
 
-        _toastService.Show("任务创建成功", ToastType.Success);
+        _toastService.Show(isEditing ? $"任务「{task.Name}」已更新" : "任务创建成功", ToastType.Success);
         CloseRequested.Invoke(true);
+    }
+    
+    /// <summary>
+    /// 空名时生成唯一默认名：「新任务」「新任务 2」…
+    /// </summary>
+    private string NextDefaultName()
+    {
+        var name = "新任务";
+        var suffix = 2;
+        while (_config.Tasks.Any(t => t.Name == name))
+        {
+            name = $"新任务 {suffix++}";
+        }
+
+        return name;
     }
 }

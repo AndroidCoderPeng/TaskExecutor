@@ -44,10 +44,19 @@
             Foreground="{StaticResource TextSecondaryBrush}"
             Text="任务名称" />
 
-        <TextBox
-            Style="{StaticResource PlaceHolderTextBoxStyle}"
-            Tag="请输入任务名称（可选）"
-            Text="{Binding TaskName}" />
+        <TextBox Tag="请输入任务名称，名称创建后不可修改（可选）" Text="{Binding TaskName}">
+            <TextBox.Style>
+                <Style BasedOn="{StaticResource PlaceHolderTextBoxStyle}" TargetType="TextBox">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                            <Setter Property="IsReadOnly" Value="True" />
+                            <Setter Property="Cursor" Value="No" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+
 
         <TextBlock
             Margin="0,12,0,6"
@@ -179,7 +188,7 @@
                     Grid.Column="2"
                     Padding="14,0"
                     Command="{Binding SaveTaskCommand}"
-                    Content="保存任务"
+                    Content="{Binding SaveButtonText}"
                     Style="{StaticResource PrimaryButtonStyle}" />
             </Grid>
         </Border>

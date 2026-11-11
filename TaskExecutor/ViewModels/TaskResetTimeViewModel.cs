@@ -24,6 +24,12 @@ public partial class TaskResetTimeViewModel : ObservableObject
     [RelayCommand]
     private void SaveConfig()
     {
+        if (string.IsNullOrWhiteSpace(ResetTime))
+        {
+            _toastService.Show("请选择重置时间", ToastType.Warning);
+            return;
+        }
+        
         _config.Time = ResetTime;
         SettingsStore.Save(ConfigSections.FileName, ConfigSections.ResetTime, _config);
         _toastService.Show("重置时间配置已保存", ToastType.Success);
