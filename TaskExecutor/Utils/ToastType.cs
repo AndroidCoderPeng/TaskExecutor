@@ -1,3 +1,9 @@
 ﻿namespace TaskExecutor.Utils;
 
-public enum ToastType { Info, Success, Warning, Error }
+public enum ToastType
+{
+    Info,
+    Success,
+    Warning,
+    Error
+}
