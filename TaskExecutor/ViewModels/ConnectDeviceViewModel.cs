@@ -9,7 +9,7 @@ using TaskExecutor.Utils;
 
 namespace TaskExecutor.ViewModels;
 
-public partial class ConnectDeviceViewModel : ObservableObject
+public partial class ConnectDeviceViewModel : ObservableObject, IDeviceStateProvider
 {
     #region VM
 
@@ -19,6 +19,7 @@ public partial class ConnectDeviceViewModel : ObservableObject
 
     #endregion
 
+    public bool IsConnected => ConnectionState == "已连接";
     private readonly IToastService _toastService;
     private readonly string _adbPath = Path.Combine(AppContext.BaseDirectory, "ADB", "adb.exe");
     private readonly DeviceIpConfig _config;

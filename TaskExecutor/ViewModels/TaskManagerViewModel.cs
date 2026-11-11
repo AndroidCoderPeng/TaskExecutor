@@ -32,52 +32,42 @@ public partial class TaskManagerViewModel : ObservableObject
     private readonly IDialogService _dialogService;
     private int _taskFilterOption;
 
-    private DateOnly _statDate = DateOnly.FromDateTime(DateTime.Now);
-    private int _todayTotal;
-    private int _todaySuccess;
-
     public TaskManagerViewModel(ConnectDeviceViewModel deviceViewModel, IToastService toastService,
-        IDialogService dialogService, ISchedulerService schedulerService)
+        IDialogService dialogService, ISchedulerService schedulerService, ILogStoreService logStoreService)
     {
         _deviceViewModel = deviceViewModel;
         _toastService = toastService;
         _dialogService = dialogService;
 
-        // TODO: 这里的逻辑有点奇怪，应该在 TaskSchedulerService 内部维护一个状态对象，而不是在 VM 内部维护一堆状态变量
-        // TODO: 另外，TaskSchedulerService 内部应该有一个方法，返回当前状态，而不是在 VM 内部维护一堆状态变量
-        // TODO: 另外，TaskSchedulerService 内部应该有一个事件，通知 VM 状态变化，而不是在 VM 内部直接订阅 TaskSchedulerService 的事件
-        // TODO: 这样做的好处是，VM 内部不需要关心 TaskSchedulerService 的内部实现细节，只需要关心状态变化即可
-
-        // 进入页面时从唯一事实源拉取当前状态
         DeviceName = string.IsNullOrEmpty(deviceViewModel.DeviceName) ? "-" : deviceViewModel.DeviceName;
 
         var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
         Tasks = new ObservableCollection<TaskRow>(config.Tasks);
 
-        schedulerService.TaskExecuted += log =>
+        // 日志以持久化存储为唯一事实源：先回填当天历史，再订阅增量
+        foreach (var log in logStoreService.LoadByDate(DateOnly.FromDateTime(DateTime.Now)))
         {
-            // 跨天自动归零统计（log.Time 前 10 位即日期）
-            if (DateOnly.TryParse(log.Time[..10], out var date) && date != _statDate)
-            {
-                _statDate = date;
-                _todayTotal = 0;
-                _todaySuccess = 0;
-            }
-
-            _todayTotal++;
-            if (log.State == TaskState.Success)
-            {
-                _todaySuccess++;
-            }
-
-            ScheduledTaskCount = _todayTotal;
-            SuccessRate = _todayTotal == 0 ? 0 : (int)Math.Round(_todaySuccess * 100.0 / _todayTotal);
             RuntimeLogs.Insert(0, log);
-        };
-        schedulerService.NextTaskTimeChanged += t => NextTaskTime = t?.ToString("HH:mm") ?? "-";
-        IsTaskScheduled = schedulerService.IsScheduled;
+        }
+        
+        schedulerService.TaskExecuted += log => RuntimeLogs.Insert(0, log);
+        schedulerService.StatusChanged += ApplyStatus;
+
+        // 进入页面时从唯一事实源拉取当前状态
+        ApplyStatus(schedulerService.CurrentStatus);
     }
 
+    /// <summary>
+    /// 把调度器状态快照映射到界面属性。
+    /// </summary>
+    private void ApplyStatus(SchedulerStatus status)
+    {
+        IsTaskScheduled = status.IsScheduled;
+        ScheduledTaskCount = status.TodayTotal;
+        SuccessRate = status.SuccessRate;
+        NextTaskTime = status.NextTaskTime?.ToString("HH:mm") ?? "-";
+    }
+    
     [RelayCommand]
     private async Task CreateTask()
     {

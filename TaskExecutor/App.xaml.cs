@@ -25,9 +25,12 @@ public partial class App : Application
         services.AddSingleton<IToastService, ToastService>();
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<ISchedulerService, SchedulerService>();
+        services.AddSingleton<ILogStoreService, LogStoreService>();
 
         services.AddSingleton<ConnectDeviceViewModel>(); // 需要保持状态，所以注册为单例
         services.AddSingleton<TaskManagerViewModel>(); // 需要保持状态，所以注册为单例
+
+        services.AddSingleton<IDeviceStateProvider>(sp => sp.GetRequiredService<ConnectDeviceViewModel>());
 
         services.AddTransient<ImportExportViewModel>();
         services.AddTransient<TargetAppViewModel>();
@@ -45,7 +48,7 @@ public partial class App : Application
 
         //  module dialog registrations
         services.AddDialog<CreateTaskDialog, CreateTaskDialogViewModel>();
-        
+
         Services = services.BuildServiceProvider();
         Services.GetRequiredService<ISchedulerService>().Start(); // 主窗口显示前启动
 
