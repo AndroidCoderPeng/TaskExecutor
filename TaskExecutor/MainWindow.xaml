@@ -8,10 +8,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
     Title="TaskExecutor - 定时任务自动化"
-    Width="1280"
-    Height="800"
-    MinWidth="1280"
-    MinHeight="800"
+    Width="1296"
+    Height="808"
+    MinWidth="1296"
+    MinHeight="808"
     d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}"
     Background="{StaticResource WindowBackgroundBrush}"
     WindowStartupLocation="CenterScreen"
@@ -30,8 +30,8 @@
             <Border
                 Background="{StaticResource CardBackgroundBrush}"
                 BorderBrush="{StaticResource DividerBrush}"
-                BorderThickness="0,0,1,0">
-                <Grid Width="216">
+                BorderThickness="0,1,1,0">
+                <Grid Width="214">
                     <Grid.RowDefinitions>
                         <RowDefinition />
                         <RowDefinition Height="Auto" />
@@ -50,12 +50,18 @@
                             <GroupStyle>
                                 <GroupStyle.HeaderTemplate>
                                     <DataTemplate>
-                                        <TextBlock
-                                            Margin="8"
-                                            d:DataContext="{d:DesignInstance Type=data:CollectionViewGroup}"
-                                            FontWeight="SemiBold"
-                                            Foreground="{StaticResource TextDisabledBrush}"
-                                            Text="{Binding Name}" />
+                                        <DockPanel Margin="8,8,0,8" LastChildFill="True">
+                                            <TextBlock
+                                                d:DataContext="{d:DesignInstance Type=data:CollectionViewGroup}"
+                                                FontWeight="SemiBold"
+                                                Foreground="{StaticResource TextDisabledBrush}"
+                                                Text="{Binding Name}" />
+
+                                            <Grid
+                                                Height="0.25"
+                                                Margin="8,0,0,0"
+                                                Background="{StaticResource TextDisabledBrush}" />
+                                        </DockPanel>
                                     </DataTemplate>
                                 </GroupStyle.HeaderTemplate>
                             </GroupStyle>
@@ -140,8 +146,17 @@
                         Background="{StaticResource CardBackgroundAltBrush}"
                         CornerRadius="6">
                         <StackPanel Margin="10" Orientation="Vertical">
-                            <DockPanel>
-                                <Ellipse Width="10" Height="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Ellipse
+                                    Grid.Column="0"
+                                    Width="10"
+                                    Height="10">
                                     <Ellipse.Style>
                                         <Style TargetType="Ellipse">
                                             <Setter Property="Fill" Value="{StaticResource TextDisabledBrush}" />
@@ -154,7 +169,7 @@
                                     </Ellipse.Style>
                                 </Ellipse>
 
-                                <TextBlock Margin="8,0,0,0">
+                                <TextBlock Grid.Column="1" Margin="8,0">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Text" Value="设备未连接" />
@@ -168,7 +183,22 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
-                            </DockPanel>
+
+                                <TextBlock Grid.Column="2" FontSize="10">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="心跳 -" />
+                                            <Setter Property="Foreground" Value="{StaticResource TextTertiaryBrush}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsDeviceConnected}" Value="True">
+                                                    <Setter Property="Text" Value="{Binding HeartBeat, StringFormat={}心跳 {0}}" />
+                                                    <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
 
                             <TextBlock
                                 Margin="0,6,0,0"
@@ -184,10 +214,12 @@
             </Border>
 
             <!--  内容区  -->
-            <ContentControl Content="{Binding CurrentView}" />
+            <Border BorderBrush="{StaticResource DividerBrush}" BorderThickness="0,1,0,0">
+                <ContentControl Content="{Binding CurrentView}" />
+            </Border>
         </DockPanel>
 
-        <!--  数值越大，控件越显示在其他兄弟控件的上方。  -->
+        <!--  ZIndex数值越大，控件越显示在其他兄弟控件的上方。  -->
         <Border
             Margin="0,32"
             HorizontalAlignment="Center"
