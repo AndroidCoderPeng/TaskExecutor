@@ -190,10 +190,22 @@
                                             <Setter Property="Text" Value="心跳 -" />
                                             <Setter Property="Foreground" Value="{StaticResource TextTertiaryBrush}" />
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsDeviceConnected}" Value="True">
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsDeviceConnected}" Value="True" />
+                                                        <Condition Binding="{Binding IsHeartbeatAlive}" Value="True" />
+                                                    </MultiDataTrigger.Conditions>
                                                     <Setter Property="Text" Value="{Binding HeartBeat, StringFormat={}心跳 {0}}" />
                                                     <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
-                                                </DataTrigger>
+                                                </MultiDataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsDeviceConnected}" Value="True" />
+                                                        <Condition Binding="{Binding IsHeartbeatAlive}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Text" Value="{Binding HeartBeat, StringFormat={}心跳 {0}}" />
+                                                    <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                                                </MultiDataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </TextBlock.Style>

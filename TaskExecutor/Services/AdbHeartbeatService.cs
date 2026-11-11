@@ -26,6 +26,10 @@ public class AdbHeartbeatService : IAdbHeartbeatService
     private int _generation; // Start/Stop 代次，防止过期的探测结果回写状态
 
     public event Action<IAdbHeartbeatService.AdbHeartbeatResult>? Beat;
+    public event Action<DateTime?>? HeartbeatUpdated;
+
+    private DateTime? _lastSuccessTime;
+    public DateTime? LastSuccessTime => _lastSuccessTime;
 
     public bool IsRunning => _serial != null;
 
@@ -49,13 +53,13 @@ public class AdbHeartbeatService : IAdbHeartbeatService
             {
                 if (generation != _generation) return;
                 _consecutiveFailures = 0;
-                RaiseIfRestored(serial);
+                MarkSuccess(serial);
                 return;
             }
 
             if (generation != _generation) return;
 
-            // 掉线：先尝试一次 adb connect（Wi-Fi 抖动、设备休眠断链可自愈）
+            // adb connect 重试成功后同样算一次有效心跳
             await new CommandExecutor(new ArgumentCreator().Append("connect").Append(serial).ToCommandLine())
                 .ExecuteWithOutputAsync(_adbPath);
 
@@ -63,7 +67,7 @@ public class AdbHeartbeatService : IAdbHeartbeatService
             {
                 if (generation != _generation) return;
                 _consecutiveFailures = 0;
-                RaiseIfRestored(serial);
+                MarkSuccess(serial);
                 return;
             }
 
@@ -98,14 +102,14 @@ public class AdbHeartbeatService : IAdbHeartbeatService
         AppendLog(TaskState.Success, $"{IAdbHeartbeatService.LogPrefix}：设备已恢复连接（{serial}）");
         Beat?.Invoke(new IAdbHeartbeatService.AdbHeartbeatResult(true, serial, "设备已恢复连接"));
     }
-    
+
     private void AppendLog(TaskState state, string content) => _logStore.Append(new RuntimeLog
     {
         Time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
         State = state,
         Content = content
     });
-    
+
     public void Start(string serial)
     {
         _serial = serial;
@@ -113,6 +117,10 @@ public class AdbHeartbeatService : IAdbHeartbeatService
         _consecutiveFailures = 0;
         _generation++;
         _timer.Start();
+        
+        // 连接成功即视为一次有效心跳，界面立刻从 0s 开始计时
+        _lastSuccessTime = DateTime.Now;
+        HeartbeatUpdated?.Invoke(_lastSuccessTime);
     }
 
     public void Stop()
@@ -122,6 +130,9 @@ public class AdbHeartbeatService : IAdbHeartbeatService
         _consecutiveFailures = 0;
         _generation++;
         _timer.Stop();
+        
+        _lastSuccessTime = null;
+        HeartbeatUpdated?.Invoke(null);
     }
 
     /// <summary>
@@ -150,5 +161,16 @@ public class AdbHeartbeatService : IAdbHeartbeatService
             Console.WriteLine($"adb 心跳探测失败：{e.Message}");
             return false;
         }
+    }
+    
+    /// <summary>
+    /// 探测成功：记录最近成功时间并通知界面，掉线后恢复时再触发 Beat
+    /// </summary>
+    /// <param name="serial"></param>
+    private void MarkSuccess(string serial)
+    {
+        _lastSuccessTime = DateTime.Now;
+        HeartbeatUpdated?.Invoke(_lastSuccessTime);
+        RaiseIfRestored(serial);
     }
 }

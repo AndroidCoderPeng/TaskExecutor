@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -20,6 +21,8 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty] private bool _isDeviceConnected;
     [ObservableProperty] private string _deviceName = "-";
     [ObservableProperty] private string _deviceIp = "-";
+    [ObservableProperty] private string _heartBeat = "-";
+    [ObservableProperty] private bool _isHeartbeatAlive;
 
     #endregion
 
@@ -28,9 +31,26 @@ public partial class MainWindowViewModel : ObservableObject
     // 需要设备连接后才可点击的菜单项
     private readonly MenuItem[] _deviceRequiredItems;
 
-    public MainWindowViewModel(IToastService toastService)
+    // 超过 90s 没有成功探测视为停滞（30s 一次探测 + 连续 2 次失败判定）
+    private static readonly TimeSpan HeartbeatStaleThreshold = TimeSpan.FromSeconds(90);
+    private readonly DispatcherTimer _heartbeatTimer = new() { Interval = TimeSpan.FromSeconds(1) };
+    private DateTime? _lastHeartbeatTime;
+
+    public MainWindowViewModel(IToastService toastService, IAdbHeartbeatService heartbeatService)
     {
         Toast = toastService;
+
+        // 心跳时间变化即刷新；再用 1s 定时器把"秒数"滚起来，界面才看得出心还在跳
+        heartbeatService.HeartbeatUpdated += time =>
+        {
+            _lastHeartbeatTime = time;
+            RefreshHeartBeat();
+        };
+        _lastHeartbeatTime = heartbeatService.LastSuccessTime;
+        RefreshHeartBeat();
+
+        _heartbeatTimer.Tick += (_, _) => RefreshHeartBeat();
+        _heartbeatTimer.Start();
 
         var taskManager = new MenuItem { Group = "管理", Icon = "\ue63f", Title = "任务管理" };
         var importExport = new MenuItem { Group = "配置", Icon = "\ue629", Title = "导入导出" };
@@ -95,7 +115,7 @@ public partial class MainWindowViewModel : ObservableObject
             DeviceName = msg.Value.DeviceName;
             DeviceIp = msg.Value.DeviceIp;
         });
-        
+
         var config = SettingsStore.Load<TargetAppConfig>(ConfigSections.FileName, ConfigSections.TargetApp);
         if (config.Apps.Count == 0)
         {
@@ -119,6 +139,26 @@ public partial class MainWindowViewModel : ObservableObject
             });
             SettingsStore.Save(ConfigSections.FileName, ConfigSections.TargetApp, config);
         }
+    }
+
+    /// <summary>
+    /// 把「最近成功心跳时间」换算成界面文本：连接正常时显示 3s / 12s，
+    /// 超过阈值显示「无响应」（配合 XAML 里的 StringFormat，最终呈现为「心跳 3s」）。
+    /// </summary>
+    private void RefreshHeartBeat()
+    {
+        if (_lastHeartbeatTime is not { } last)
+        {
+            IsHeartbeatAlive = false;
+            HeartBeat = "-";
+            return;
+        }
+
+        var elapsed = DateTime.Now - last;
+        IsHeartbeatAlive = elapsed < HeartbeatStaleThreshold;
+        HeartBeat = IsHeartbeatAlive
+            ? $"{(int)elapsed.TotalSeconds}s"
+            : $"无响应 {(int)elapsed.TotalMinutes}min";
     }
 
     [RelayCommand]
