@@ -48,7 +48,7 @@ public partial class App : Application
         services.AddTransient<AboutViewModel>();
 
         //  module dialog registrations
-        services.AddDialog<CreateTaskDialog, CreateTaskDialogViewModel>();
+        services.AddDialog<TaskDialog, TaskDialogViewModel>();
 
         Services = services.BuildServiceProvider();
         Services.GetRequiredService<ISchedulerService>().Start(); // 主窗口显示前启动

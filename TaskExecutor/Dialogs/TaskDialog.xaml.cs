@@ -2,9 +2,9 @@
 
 namespace TaskExecutor.Dialogs;
 
-public partial class CreateTaskDialog : Window
+public partial class TaskDialog : Window
 {
-    public CreateTaskDialog()
+    public TaskDialog()
     {
         InitializeComponent();
     }

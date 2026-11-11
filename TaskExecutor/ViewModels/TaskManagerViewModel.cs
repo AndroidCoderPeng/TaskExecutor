@@ -98,7 +98,7 @@ public partial class TaskManagerViewModel : ObservableObject
 
         var systemVersion = await _deviceViewModel.GetDeviceSystemVersionAsync($"{_deviceViewModel.DeviceIp}:5555");
         var parameter = new KeyValuePair<string, string>(DeviceName, systemVersion);
-        if (_dialogService.ShowDialog(typeof(CreateTaskDialog), parameter) == true)
+        if (_dialogService.ShowDialog(typeof(TaskDialog), parameter) == true)
         {
             // 重新加载任务列表
             var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);

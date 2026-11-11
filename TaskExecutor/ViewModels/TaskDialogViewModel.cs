@@ -7,7 +7,7 @@ using TaskExecutor.Utils;
 
 namespace TaskExecutor.ViewModels;
 
-public partial class CreateTaskDialogViewModel : ObservableObject, IDialogParameterReceiver, IDialogCloseRequester
+public partial class TaskDialogViewModel : ObservableObject, IDialogParameterReceiver, IDialogCloseRequester
 {
     #region VM
 
@@ -39,7 +39,7 @@ public partial class CreateTaskDialogViewModel : ObservableObject, IDialogParame
     private readonly IToastService _toastService;
     private readonly TaskConfig _config;
 
-    public CreateTaskDialogViewModel(IToastService toastService)
+    public TaskDialogViewModel(IToastService toastService)
     {
         _toastService = toastService;
 
