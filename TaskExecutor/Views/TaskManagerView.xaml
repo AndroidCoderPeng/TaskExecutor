@@ -245,38 +245,6 @@
             </Setter>
         </Style>
 
-        <Style x:Key="LinkButtonStyle" TargetType="Button">
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Foreground" Value="{StaticResource InfoBrightBrush}" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="Transparent">
-                            <ContentPresenter
-                                x:Name="LinkSite"
-                                VerticalAlignment="Center"
-                                TextElement.Foreground="{TemplateBinding Foreground}" />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="Tag" Value="Run">
-                    <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
-                </Trigger>
-                <Trigger Property="Tag" Value="Mute">
-                    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
-                </Trigger>
-                <Trigger Property="Tag" Value="Danger">
-                    <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Opacity" Value="0.75" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
         <Style x:Key="TaskContextMenuStyle" TargetType="ContextMenu">
             <Setter Property="Background" Value="White" />
             <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
@@ -666,8 +634,23 @@
                                                 CommandParameter="{Binding}"
                                                 Tag="Mute">
                                                 <Button.Style>
-                                                    <Style BasedOn="{StaticResource LinkButtonStyle}" TargetType="Button">
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="FontSize" Value="12" />
+                                                        <Setter Property="Cursor" Value="Hand" />
+                                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
                                                         <Setter Property="Content" Value="暂停" />
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <Border Background="Transparent">
+                                                                        <ContentPresenter
+                                                                            x:Name="LinkSite"
+                                                                            VerticalAlignment="Center"
+                                                                            TextElement.Foreground="{TemplateBinding Foreground}" />
+                                                                    </Border>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsEnabled}" Value="True">
                                                                 <Setter Property="Content" Value="启用" />
