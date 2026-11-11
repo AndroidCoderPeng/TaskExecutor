@@ -262,6 +262,9 @@
                 </Setter.Value>
             </Setter>
             <Style.Triggers>
+                <Trigger Property="Tag" Value="Run">
+                    <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                </Trigger>
                 <Trigger Property="Tag" Value="Mute">
                     <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
                 </Trigger>
@@ -521,7 +524,15 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTemplateColumn Width="176" Header="执行时间">
+                                <DataGridTemplateColumn Width="*" Header="动作链">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ItemsControl ItemsSource="{Binding Actions}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTemplateColumn Width="150" Header="执行时间">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
@@ -537,11 +548,11 @@
                                 </DataGridTemplateColumn>
 
                                 <DataGridTextColumn
-                                    Width="128"
+                                    Width="100"
                                     Binding="{Binding NotifyMethod}"
                                     Header="通知方式" />
 
-                                <DataGridTemplateColumn Width="128" Header="状态">
+                                <DataGridTemplateColumn Width="100" Header="状态">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ToggleButton
@@ -553,7 +564,7 @@
                                 </DataGridTemplateColumn>
 
                                 <DataGridTemplateColumn
-                                    Width="122"
+                                    Width="160"
                                     CellStyle="{StaticResource DataGridLastCellStyle}"
                                     Header="操作"
                                     HeaderStyle="{StaticResource DataGridLastColumnHeaderStyle}">
@@ -561,12 +572,20 @@
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
                                                 <Button
+                                                    Margin="0,0,12,0"
+                                                    Command="{Binding DataContext.OnceTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="运行"
+                                                    Style="{StaticResource LinkButtonStyle}"
+                                                    Tag="Run"
+                                                    ToolTip="按当前动作链试运行一次，不影响后续调度计划" />
+                                                <Button
                                                     Command="{Binding DataContext.EditTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                     CommandParameter="{Binding}"
                                                     Content="编辑"
                                                     Style="{StaticResource LinkButtonStyle}" />
                                                 <Button
-                                                    Margin="12,0,0,0"
+                                                    Margin="12,0"
                                                     Command="{Binding DataContext.ToggleTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                     CommandParameter="{Binding}"
                                                     Tag="Mute">
@@ -582,7 +601,6 @@
                                                     </Button.Style>
                                                 </Button>
                                                 <Button
-                                                    Margin="12,0,0,0"
                                                     Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                     CommandParameter="{Binding}"
                                                     Content="删除"
@@ -642,6 +660,7 @@
                         BorderThickness="0"
                         DockPanel.Dock="Bottom"
                         ItemsSource="{Binding RuntimeLogs}"
+                        ScrollViewer.CanContentScroll="False"
                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                         ScrollViewer.VerticalScrollBarVisibility="Auto">
                         <ListBox.ItemContainerStyle>
@@ -673,7 +692,7 @@
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="160" />
-                                        <ColumnDefinition Width="80" />
+                                        <ColumnDefinition Width="70" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
