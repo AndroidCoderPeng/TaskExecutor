@@ -523,17 +523,29 @@
   .chip.blue{color:var(--blue-bright);background:var(--blue-dim);}
   .chip.warn{color:var(--red);background:rgba(229,72,77,.10);}
 
-  /* 日志：任务列 + 动作标签 */
-  .log-row .task{
-    width:88px;flex:none;color:var(--text-2);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  /* 执行时间列：调度器计划出的实际触发时刻，无计划时显示 — */
+  .time-exec{font-family:Consolas,monospace;font-size:13px;font-weight:600;color:var(--green);}
+  .time-exec.none{color:var(--text-4);font-weight:400;}
+
+  /* 行右键菜单：运行 / 编辑 / 删除（对齐 DataGrid.ContextMenu） */
+  .ctx-menu{
+    position:absolute;z-index:80;display:none;min-width:138px;
+    background:#fff;border:1.5px solid var(--border);border-radius:8px;
+    padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.14);
   }
-  .log-row .task.sys{color:var(--text-4);}
+  .ctx-menu.show{display:block;}
+  .ctx-item{
+    display:flex;align-items:center;gap:8px;
+    padding:8px 10px;border-radius:8px;
+    font-size:13px;color:var(--text-1);cursor:pointer;user-select:none;
+  }
+  .ctx-item svg{width:15px;height:15px;flex:none;color:var(--text-2);}
+  .ctx-item:hover{background:var(--blue-dim);color:var(--blue-bright);}
+  .ctx-item:hover svg{color:var(--blue-bright);}
+  .ctx-item.run:hover{background:var(--green-dim);color:var(--green);}
+  .ctx-item.run:hover svg{color:var(--green);}
+  .ctx-item.danger:hover{background:rgba(229,72,77,.10);color:var(--red);}
+  .ctx-item.danger:hover svg{color:var(--red);}
+
+  /* 运行日志：时间 / 状态 / 内容 三列 */
   .log-row .lv{width:34px;}
-  .log-act{
-    display:inline-block;width:58px;text-align:center;
-    font-size:11px;color:var(--blue-bright);
-    background:var(--blue-dim);border-radius:3px;margin-right:8px;
-    vertical-align:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-  .log-act.none{background:transparent;}

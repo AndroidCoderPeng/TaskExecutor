@@ -6,10 +6,10 @@ namespace TaskExecutor.Utils;
 
 public sealed class ExecutionPlanStore(string? path = null)
 {
-    private readonly string _path = path ?? Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "TaskExecutor",
-        "execution-plan.json");
+    private static readonly string
+        DataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+    private readonly string _path = path ?? Path.Combine(DataFolder, "TaskExecutor", "execution-plan.json");
 
     public ExecutionPlanState Load()
     {

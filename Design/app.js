@@ -23,13 +23,13 @@
   const actColor=id=>(ACT_KIND[id]||{}).color||"#007AFF";
 
   let tasks=[
-    {name:"工作日打卡",sub:"钉钉 · com.alibaba.android.rimet",time:"07:30 ±5min",notify:"邮件 + 企微",on:true,
+    {name:"工作日打卡",sub:"钉钉 · com.alibaba.android.rimet",time:"07:30 ±5min",exec:"07:32",notify:"邮件",on:true,
       acts:["ScreenOn","OpenTarget","ScreenCapture"]},
-    {name:"会议提醒",sub:"飞书 · com.ss.android.lark",time:"08:50 ±3min",notify:"企业微信",on:true,
+    {name:"会议提醒",sub:"飞书 · com.ss.android.lark",time:"08:50 ±3min",exec:"08:51",notify:"企业微信",on:true,
       acts:["ScreenOn","OpenTarget"]},
-    {name:"日报截图",sub:"企业微信 · com.tencent.wework",time:"18:00",notify:"邮件",on:true,
+    {name:"日报截图",sub:"企业微信 · com.tencent.wework",time:"18:00",exec:"18:00",notify:"邮件",on:true,
       acts:["ScreenOn","OpenTarget","ScreenCapture","KillTarget"]},
-    {name:"周末巡检",sub:"企业微信 · com.tencent.wework",time:"09:00 ±10min",notify:"邮件",on:false,
+    {name:"周末巡检",sub:"企业微信 · com.tencent.wework",time:"09:00 ±10min",exec:"—",notify:"",on:false,
       acts:["ScreenOn","SendMessage","ScreenOff"],payload:"巡检完成，设备状态正常"},
   ];
   let apps=[
@@ -37,21 +37,17 @@
     {name:"飞书",pkg:"com.ss.android.lark"},
     {name:"企业微信",pkg:"com.tencent.wework"},
   ];
+  // 日志格式与 SchedulerService 一致：任务级一条汇总 + 心跳翻转，无动作级日志
   let logs=[
-    {t:"10-24 07:35:02",lv:"ok",l:"成功",task:"工作日打卡",act:"亮屏",m:"唤醒成功"},
-    {t:"10-24 07:35:05",lv:"ok",l:"成功",task:"工作日打卡",act:"打开应用",m:"已启动 钉钉 · com.alibaba.android.rimet"},
-    {t:"10-24 07:35:09",lv:"ok",l:"成功",task:"工作日打卡",act:"截屏",m:"已保存 Screenshots/screencap_20261024_073509.png"},
-    {t:"10-24 07:35:11",lv:"ok",l:"成功",task:"工作日打卡",m:"执行成功：完成 3/3 个动作，用时 9s"},
-    {t:"10-24 08:52:10",lv:"ok",l:"成功",task:"会议提醒",act:"打开应用",m:"已启动 飞书 · com.ss.android.lark"},
-    {t:"10-24 11:58:44",lv:"err",l:"失败",m:"ADB 心跳：设备连接已断开（192.168.1.23:5555）"},
-    {t:"10-24 11:59:16",lv:"ok",l:"成功",m:"ADB 心跳：设备已恢复连接（192.168.1.23:5555）"},
-    {t:"10-24 18:00:05",lv:"ok",l:"成功",task:"日报截图",act:"截屏",m:"已保存 Screenshots/screencap_20261024_180005.png"},
-    {t:"10-24 18:02:47",lv:"err",l:"失败",task:"周末巡检",act:"发送消息",m:"输入法未就绪，input text 未生效"},
-    {t:"10-24 18:02:47",lv:"err",l:"失败",task:"周末巡检",m:"第 2 步失败，已中止（完成 1/3），邮件通知已发送"},
+    {t:"11-12 07:32:41",lv:"ok",l:"成功",m:"任务「工作日打卡」执行成功：已启动 钉钉"},
+    {t:"11-12 08:51:26",lv:"ok",l:"成功",m:"任务「会议提醒」执行成功：已启动 飞书"},
+    {t:"11-12 11:58:44",lv:"err",l:"失败",m:"ADB 心跳：设备连接已断开（192.168.1.23:5555）"},
+    {t:"11-12 11:59:16",lv:"ok",l:"成功",m:"ADB 心跳：设备已恢复连接（192.168.1.23:5555）"},
+    {t:"11-12 18:00:05",lv:"err",l:"失败",m:"任务「日报截图」执行失败：截屏失败（退出码 1）"},
   ];
   let logsMore=[
-    {t:"10-23 07:35:11",lv:"ok",l:"成功",task:"工作日打卡",m:"执行成功：完成 3/3 个动作，用时 41s"},
-    {t:"10-23 09:00:14",lv:"err",l:"失败",task:"周末巡检",m:"触发时设备离线，已跳过本轮执行"},
+    {t:"11-11 07:33:11",lv:"ok",l:"成功",m:"任务「工作日打卡」执行成功：已启动 钉钉"},
+    {t:"11-11 09:00:14",lv:"err",l:"失败",m:"任务「周末巡检」执行失败：设备未授权 USB 调试，已跳过本轮"},
   ];
   let filter="all",editIndex=-1,logExpanded=false;
   let randCfg={min:0,max:5}; // 全局随机偏移范围，与「调度 → 随机时间范围」设置联动
@@ -101,15 +97,15 @@
     const d=new Date(),p=n=>String(n).padStart(2,"0");
     return p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds());
   }
-  function addLog(lv,l,m,task,act){
-    logs.push({t:nowStr(),lv,l,m,task:task||"",act:act||""});
+  function addLog(lv,l,m){
+    logs.push({t:nowStr(),lv,l,m});
     renderLogs();
     const list=$("logList");list.scrollTop=list.scrollHeight;
   }
   function renderLogs(){
     const list=logExpanded?logs.concat(logsMore):logs;
     $("logList").innerHTML=list.map(l=>`
-      <div class="log-row"><span class="t">${l.t}</span><span class="task${l.task?"":" sys"}">${l.task||"系统"}</span><span class="lv ${l.lv}">${l.l}</span><span class="m"><span class="log-act${l.act?"":" none"}">${l.act||""}</span>${l.m}</span></div>`).join("");
+      <div class="log-row"><span class="t">${l.t}</span><span class="lv ${l.lv}">${l.l}</span><span class="m">${l.m}</span></div>`).join("");
     $("logToggle").textContent=logExpanded?"收起":"查看全部";
   }
   $("logToggle").onclick=()=>{logExpanded=!logExpanded;renderLogs();};
@@ -149,70 +145,72 @@
       const i=tasks.indexOf(k);
       return `<tr data-i="${i}" class="${k.on?"":"disabled"}">
         <td><div class="task-name">${k.name}</div><div class="task-sub">${k.sub}</div></td>
-        <td>${chipsHtml(k)}</td>
         <td>${planHtml(k.time)}</td>
+        <td><span class="time-exec">${k.exec||"—"}</span></td>
+        <td>${chipsHtml(k)}</td>
         <td>${k.notify}</td>
         <td><button class="status-pill ${k.on?"on":"off"}" data-act="toggle"><span class="dot"></span>${k.on?"已启用":"已停用"}</button></td>
-        <td><div class="ops">
-          <a data-act="run" title="按当前动作链试运行一次，不影响调度计划">运行</a>
-          <a data-act="edit">编辑</a>
-          <a class="mute" data-act="toggle">${k.on?"暂停":"启用"}</a>
-          <a class="danger" data-act="del">删除</a>
-        </div></td>
+        <td><div class="ops"><a class="mute" data-act="toggle">${k.on?"暂停":"启用"}</a></div></td>
       </tr>`;}).join("")
-      :`<tr class="empty-row"><td colspan="6">暂无${filter==="off"?"已停用":"已启用"}任务，点击右上角「新建任务」添加</td></tr>`;
+      :`<tr class="empty-row"><td colspan="7">暂无任务，点击右上角「新建任务」添加</td></tr>`;
     $("countBadge").textContent=tasks.length+" 项";
   }
   $("taskBody").addEventListener("click",e=>{
-    const act=e.target.dataset.act;
-    if(!act)return;
-    const tr=e.target.closest("tr");
-    const i=+tr.dataset.i;
-    if(act==="run")return runTask(i);
-    if(act==="edit")return openDialog("edit",i);
-    if(act==="toggle"){
-      tasks[i].on=!tasks[i].on;
-      toast("任务「"+tasks[i].name+"」已"+(tasks[i].on?"启用":"暂停"));
-      return render();
-    }
-    if(act==="del"){
-      tr.classList.add("removing");
-      setTimeout(()=>{
-        const name=tasks[i].name;
-        tasks.splice(i,1);
-        render();
-        toast("任务「"+name+"」已删除");
-      },180);
+    if(e.target.dataset.act!=="toggle")return;
+    const i=+e.target.closest("tr").dataset.i;
+    tasks[i].on=!tasks[i].on;
+    toast("任务「"+tasks[i].name+"」已"+(tasks[i].on?"启用":"暂停"));
+    render();
+  });
+
+  // 行右键菜单：运行 / 编辑 / 删除（对齐 DataGrid.ContextMenu）
+  let ctxIndex=-1;
+  $("taskBody").addEventListener("contextmenu",e=>{
+    const tr=e.target.closest("tr[data-i]");
+    if(!tr)return;
+    e.preventDefault();
+    ctxIndex=+tr.dataset.i;
+    const menu=$("ctxMenu"),wr=document.querySelector(".win").getBoundingClientRect();
+    menu.style.left=Math.min(e.clientX-wr.left,wr.width-160)+"px";
+    menu.style.top=Math.min(e.clientY-wr.top,wr.height-140)+"px";
+    menu.classList.add("show");
+  });
+  document.addEventListener("click",e=>{
+    if(!e.target.closest("#ctxMenu"))$("ctxMenu").classList.remove("show");
+  });
+  $("ctxMenu").addEventListener("click",e=>{
+    const item=e.target.closest(".ctx-item");
+    if(!item)return;
+    $("ctxMenu").classList.remove("show");
+    const i=ctxIndex;
+    if(item.dataset.ctx==="run")return runTask(i);
+    if(item.dataset.ctx==="edit")return openDialog("edit",i);
+    if(item.dataset.ctx==="del"){
+      const name=tasks[i].name;
+      tasks.splice(i,1);render();
+      toast("任务「"+name+"」已删除");
     }
   });
 
-  // 试运行：按动作链逐步执行，动作级日志 + 末尾任务级汇总日志
+  // 试运行：按动作链逐步执行，结束写一条任务级汇总日志（与调度器日志格式一致）
   let runningTask=false;
   function runTask(i){
     const k=tasks[i];
     if(runningTask){toast("已有任务正在执行，请稍候");return;}
-    if(!k.acts||!k.acts.length){toast("该任务未配置动作，无法执行");return;}
+    if(!k.acts||!k.acts.length){toast("该任务未配置动作链，无法运行");return;}
     if(k.acts.includes("SendMessage")&&!k.payload){toast("动作链含「发送消息」但未填写内容");return;}
 
     runningTask=true;
-    toast("正在执行「"+k.name+"」");
+    toast("正在试运行「"+k.name+"」");
     const steps=k.acts.slice();
     let n=0;
     const next=()=>{
       if(n>=steps.length){
-        addLog("ok","成功",`执行成功：完成 ${steps.length}/${steps.length} 个动作`,k.name);
-        toast("「"+k.name+"」执行完成");
+        addLog("ok","成功","任务「"+k.name+"」试运行成功：完成 "+steps.length+" 个动作");
+        toast("「"+k.name+"」试运行完成");
         runningTask=false;return;
       }
-      const id=steps[n++],a=actMeta(id);
-      const appName=(k.sub||"").split(" · ")[0]||"APP";
-      const detail=id==="SendMessage"?`已发送「${k.payload}」`
-        :id==="OpenTarget"?`已启动 ${appName}`
-        :id==="KillTarget"?`已关闭 ${appName}`
-        :id==="ScreenCapture"?`已保存 Screenshots/screencap_${Date.now()}.png`
-        :a.desc;
-      addLog("ok","成功",detail,k.name,a.name);
-      setTimeout(next,1100);
+      n++;setTimeout(next,900);
     };
     next();
   }
@@ -408,6 +406,8 @@
     draftActs=mode==="edit"?(tasks[i].acts||[]).slice():["ScreenOn","OpenTarget"];
     draftPayload=mode==="edit"?(tasks[i].payload||""):"";
     saveTried=false;
+    // 通知方式单选回填
+    document.querySelectorAll(".tag-tg").forEach(c=>c.classList.toggle("on",mode==="edit"&&c.dataset.tag===tasks[i].notify));
     renderActs();
     refreshOffsetUI();
     overlay.classList.add("show");
@@ -440,16 +440,14 @@
     const label=time+offsetSuffix();
     const acts=draftActs.slice();
     const payload=draftActs.includes("SendMessage")?draftPayload.trim():"";
-    const chain=acts.map(id=>actMeta(id).name).join(" → ");
+    const notify=document.querySelector(".tag-tg.on")?.dataset.tag||"";
 
     if(editIndex>=0){
-      Object.assign(tasks[editIndex],{name,time:label,sub,on:true,acts,payload});
+      Object.assign(tasks[editIndex],{name,time:label,sub,on:true,notify,acts,payload});
       toast("任务「"+name+"」已保存");
-      addLog("info","信息","动作链已更新：" + chain,name);
     }else{
-      tasks.unshift({name,sub,time:label,notify:"邮件",on:true,acts,payload});
+      tasks.unshift({name,sub,time:label,exec:time,notify,on:true,acts,payload});
       toast("任务「"+name+"」已创建");
-      addLog("info","信息","已加入调度队列，动作链：" + chain,name);
     }
     closeDialog();render();
   };
@@ -515,7 +513,11 @@
     s.classList.toggle("on");
     toast("开关已"+(s.classList.contains("on")?"开启":"关闭"));
   }));
-  document.querySelectorAll("[data-tag]").forEach(t=>t.addEventListener("click",()=>t.classList.toggle("on")));
+  // 通知方式：单选（对齐 WPF RadioButton 组），点击已选中的保持不变
+  document.querySelectorAll("[data-tag]").forEach(t=>t.addEventListener("click",()=>{
+    document.querySelectorAll("[data-tag]").forEach(x=>x.classList.remove("on"));
+    t.classList.add("on");
+  }));
 
   // 节假日同步
   $("syncHoliday").onclick=()=>{

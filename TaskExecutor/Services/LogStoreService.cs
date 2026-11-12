@@ -14,8 +14,10 @@ public class LogStoreService : ILogStoreService
 {
     private const int RetentionDays = 7;
 
-    private static readonly string Dir =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TaskExecutor", "logs");
+    private static readonly string
+        DataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+    private static readonly string LogDir = Path.Combine(DataFolder, "TaskExecutor", "logs");
 
     private static readonly object Lock = new();
 
@@ -24,6 +26,7 @@ public class LogStoreService : ILogStoreService
         Formatting = Formatting.None,
         Converters = { new StringEnumConverter() }
     };
+
     public event Action<RuntimeLog>? Appended;
 
     public LogStoreService() => CleanupExpired();
@@ -34,7 +37,7 @@ public class LogStoreService : ILogStoreService
         {
             lock (Lock)
             {
-                Directory.CreateDirectory(Dir);
+                Directory.CreateDirectory(LogDir);
                 File.AppendAllText(GetPath(DateOnly.FromDateTime(DateTime.Now)),
                     JsonConvert.SerializeObject(log, JsonSettings) + Environment.NewLine);
             }
@@ -43,6 +46,7 @@ public class LogStoreService : ILogStoreService
         {
             Console.WriteLine($"写入运行日志失败：{e.Message}");
         }
+
         Appended?.Invoke(log);
     }
 
@@ -73,16 +77,16 @@ public class LogStoreService : ILogStoreService
         }
     }
 
-    private static string GetPath(DateOnly date) => Path.Combine(Dir, $"{date:yyyy-MM-dd}.jsonl");
+    private static string GetPath(DateOnly date) => Path.Combine(LogDir, $"{date:yyyy-MM-dd}.jsonl");
 
     private static void CleanupExpired()
     {
         try
         {
-            if (!Directory.Exists(Dir)) return;
+            if (!Directory.Exists(LogDir)) return;
 
             var deadline = DateOnly.FromDateTime(DateTime.Now).AddDays(-RetentionDays);
-            foreach (var file in Directory.EnumerateFiles(Dir, "*.jsonl"))
+            foreach (var file in Directory.EnumerateFiles(LogDir, "*.jsonl"))
             {
                 if (!DateOnly.TryParseExact(Path.GetFileNameWithoutExtension(file), "yyyy-MM-dd",
                         CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))

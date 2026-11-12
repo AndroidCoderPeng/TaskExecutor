@@ -6,9 +6,10 @@ namespace TaskExecutor.Utils
 {
     public class SettingsStore
     {
-        private static readonly string Dir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TaskExecutor"
-        );
+        private static readonly string
+            DataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+        private static readonly string Dir = Path.Combine(DataFolder, "TaskExecutor");
 
         private static readonly object Lock = new();
 
