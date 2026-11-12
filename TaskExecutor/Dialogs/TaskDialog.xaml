@@ -275,23 +275,32 @@
                     Margin="6,6,0,0"
                     Background="{StaticResource CardBackgroundAltBrush}"
                     Style="{StaticResource CommonBorderStyle}">
-                    <StackPanel Margin="12" Orientation="Horizontal">
+                    <StackPanel Margin="12" Orientation="Vertical">
                         <TextBlock
                             FontSize="14"
                             Foreground="{StaticResource TextSecondaryBrush}"
                             Text="通知方式" />
 
-                        <RadioButton
-                            Content="邮件通知"
-                            GroupName="NotifyMethod"
-                            IsChecked="{Binding IsNotifyByMail}"
-                            Style="{StaticResource RadioButtonSwitchStyle}" />
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
 
-                        <RadioButton
-                            Content="企业微信通知"
-                            GroupName="NotifyMethod"
-                            IsChecked="{Binding IsNotifyByWechat}"
-                            Style="{StaticResource RadioButtonSwitchStyle}" />
+                            <RadioButton
+                                Grid.Column="0"
+                                Content="邮件通知"
+                                GroupName="NotifyMethod"
+                                IsChecked="{Binding IsNotifyByMail}"
+                                Style="{StaticResource RadioButtonSwitchStyle}" />
+
+                            <RadioButton
+                                Grid.Column="1"
+                                Content="企业微信通知"
+                                GroupName="NotifyMethod"
+                                IsChecked="{Binding IsNotifyByWechat}"
+                                Style="{StaticResource RadioButtonSwitchStyle}" />
+                        </Grid>
                     </StackPanel>
                 </Border>
             </Grid>
