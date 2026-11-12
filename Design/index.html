@@ -600,66 +600,90 @@
 
     <!-- 新建/编辑任务弹窗 -->
     <div class="overlay" id="overlay">
-      <div class="dialog">
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+        <!-- 固定头部 -->
         <div class="dlg-head">
-          <b id="dlgTitle">新建任务</b>
-          <button class="dlg-close" id="btnClose">
+          <div class="dlg-head-text">
+            <b id="dlgTitle">新建任务</b>
+            <div class="device-strip">
+              <span class="dot sm"></span>执行设备：<b>Pixel 6</b> · Android 14
+            </div>
+          </div>
+          <button class="dlg-close" id="btnClose" aria-label="关闭对话框" title="关闭">
             <svg viewBox="0 0 16 16" fill="none">
               <path d="M3 3l10 10M13 3L3 13" stroke="#6E737D" stroke-width="1.6" stroke-linecap="round" />
             </svg>
           </button>
         </div>
-        <div class="device-strip">
-          <span class="dot sm"></span>执行设备：<b>Pixel 6</b> · Android 14
-        </div>
-        <div class="dlg-grid">
-          <div class="field">
-            <label>任务名称</label>
-            <div class="input" id="fName" contenteditable="true" data-ph="请输入任务名称"></div>
-          </div>
-          <div class="field">
-            <label class="inline">执行时间<span class="switch on" id="offsetSwitch" title="随机偏移开关"></span></label>
-            <div class="input" id="fTime" contenteditable="true" data-ph="HH:MM"></div>
-            <div class="offset-hint" id="offsetHint"></div>
-          </div>
-        </div>
 
-        <div class="dlg-grid">
-          <div class="field">
-            <label>目标 APP</label>
-            <select class="ui" id="fApp" style="width:100%;">
-              <option value="">请选择目标 APP</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>通知方式</label>
-            <div class="tag-toggles">
-              <span class="tag-tg on" data-tag="邮件">邮件</span>
-              <span class="tag-tg" data-tag="企业微信">企业微信</span>
+        <!-- 可滚动主体 -->
+        <div class="dlg-body">
+
+          <!-- 01 任务配置 -->
+          <section class="dlg-section">
+            <div class="section-head">
+              <span class="section-no">01</span>
+              <h2>任务配置</h2>
+              <span class="section-line"></span>
             </div>
-          </div>
-        </div>
-
-        <div class="dlg-divider"></div>
-
-        <div class="field">
-          <label>任务动作<span class="label-hint">拖入或点击添加 · 拖拽调整顺序</span></label>
-          <div class="builder">
-            <div class="palette">
-              <div class="panel-title">积木库</div>
-              <div class="pal-list" id="palList"></div>
-            </div>
-            <div class="chain-wrap">
-              <div class="chain-head">
-                <span>执行序列</span>
-                <span class="chain-count" id="chainCount">0 步</span>
-                <span class="link" id="chainClear">清空</span>
+            <div class="dlg-grid">
+              <div class="field">
+                <label>任务名称</label>
+                <div class="input" id="fName" contenteditable="true" role="textbox" aria-label="任务名称"
+                  data-ph="请输入任务名称"></div>
               </div>
-              <div class="chain" id="chain"></div>
+              <div class="field">
+                <label class="inline">执行时间<span class="sw-group"><span class="sw-label">随机偏移</span><button
+                      type="button" class="switch on" id="offsetSwitch" aria-label="随机偏移开关"
+                      title="随机偏移开关"></button></span></label>
+                <div class="input mono" id="fTime" contenteditable="true" role="textbox"
+                  aria-label="执行时间，格式 HH:MM" data-ph="HH:MM"></div>
+                <div class="offset-hint" id="offsetHint"></div>
+              </div>
+              <div class="field">
+                <label>目标 APP</label>
+                <select class="ui" id="fApp" aria-label="目标 APP" style="width:100%;">
+                  <option value="">请选择目标 APP</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>通知方式</label>
+                <div class="tag-toggles" role="group" aria-label="通知方式">
+                  <button type="button" class="tag-tg on" data-tag="邮件">邮件</button>
+                  <button type="button" class="tag-tg" data-tag="企业微信">企业微信</button>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="act-summary" id="actSummary"></div>
+          </section>
+
+          <!-- 02 任务动作 -->
+          <section class="dlg-section">
+            <div class="section-head">
+              <span class="section-no">02</span>
+              <h2>任务动作</h2>
+              <span class="section-line"></span>
+              <span class="section-tip">拖入或点击添加 · 拖拽调整顺序</span>
+            </div>
+            <div class="builder">
+              <div class="palette">
+                <div class="panel-title">积木库</div>
+                <div class="pal-list" id="palList"></div>
+              </div>
+              <div class="chain-wrap">
+                <div class="chain-head">
+                  <span>执行序列</span>
+                  <span class="chain-count" id="chainCount">0 步</span>
+                  <span class="link" id="chainClear">清空</span>
+                </div>
+                <div class="chain" id="chain"></div>
+              </div>
+            </div>
+            <div class="act-summary" id="actSummary"></div>
+          </section>
+
         </div>
+
+        <!-- 固定底部 -->
         <div class="dlg-foot">
           <span class="hint">保存后立即生效，节假日自动跳过</span>
           <div class="btns">
