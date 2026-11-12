@@ -110,8 +110,18 @@
             <TextBlock
                 Grid.Row="1"
                 Grid.Column="0"
-                Foreground="{StaticResource PrimaryBrush}"
-                Text="{Binding Tips}" />
+                Foreground="{StaticResource PrimaryBrush}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Text" Value="不做随机偏移，到点立即执行" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsRandomOffsetTime}" Value="True">
+                                <Setter Property="Text" Value="{Binding Tips}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
 
             <CheckBox
                 Grid.Row="0"
