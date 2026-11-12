@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace TaskExecutor.Controls;
 
@@ -10,6 +11,38 @@ public partial class TimePicker : UserControl
 
     private List<string> _minuteItems = [];
     private bool _isSyncing;
+
+    /// <summary>
+    /// 静态构造函数里重写元数据
+    /// </summary>
+    static TimePicker()
+    {
+        BackgroundProperty.OverrideMetadata(typeof(TimePicker), new FrameworkPropertyMetadata(OnBackgroundChanged));
+    }
+
+    private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var picker = (TimePicker)d;
+        ApplyBackground(picker.HourBox, e.NewValue as Brush);
+        ApplyBackground(picker.MinuteBox, e.NewValue as Brush);
+    }
+
+    private static void ApplyBackground(ComboBox? box, Brush? brush)
+    {
+        if (box is null)
+        {
+            return;
+        }
+
+        if (brush is null)
+        {
+            box.ClearValue(BackgroundProperty);
+        }
+        else
+        {
+            box.SetValue(BackgroundProperty, brush);
+        }
+    }
 
     public TimePicker()
     {
@@ -102,27 +135,27 @@ public partial class TimePicker : UserControl
         return TimeSpan.TryParseExact(text, @"hh\:mm", CultureInfo.InvariantCulture, out time) &&
                time < TimeSpan.FromDays(1);
     }
-    
+
     public static readonly DependencyProperty MinuteStepProperty = DependencyProperty.Register(
         nameof(MinuteStep),
         typeof(int),
         typeof(TimePicker),
         new FrameworkPropertyMetadata(1, OnMinuteStepChanged),
         value => value is int step and >= 1 and <= 30);
-    
+
     public int MinuteStep
     {
         get => (int)GetValue(MinuteStepProperty);
         set => SetValue(MinuteStepProperty, value);
     }
-    
+
     private static void OnMinuteStepChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var picker = (TimePicker)d;
         picker.RebuildMinuteItems();
         picker.ApplyTime(picker.SelectedTime);
     }
-    
+
     private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_isSyncing || HourBox.SelectedIndex < 0 || MinuteBox.SelectedIndex < 0)
@@ -135,7 +168,7 @@ public partial class TimePicker : UserControl
 
         SetCurrentValue(SelectedTimeProperty, new TimeSpan(hour, minute, 0));
     }
-    
+
     private void RebuildMinuteItems()
     {
         var step = Math.Clamp(MinuteStep, 1, 30);
@@ -176,7 +209,7 @@ public partial class TimePicker : UserControl
             SetCurrentValue(SelectedTimeProperty, snapped);
         }
     }
-    
+
     private int FindNearestMinuteIndex(int minute)
     {
         var bestIndex = 0;
@@ -194,7 +227,7 @@ public partial class TimePicker : UserControl
 
         return bestIndex;
     }
-    
+
     private void UpdateTimeText(TimeSpan time)
     {
         var text = $"{time.Hours:00}:{time.Minutes:00}";

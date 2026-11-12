@@ -5,6 +5,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
+
+    <UserControl.Template>
+        <ControlTemplate TargetType="UserControl">
+            <ContentPresenter Content="{TemplateBinding Content}" />
+        </ControlTemplate>
+    </UserControl.Template>
+
     <Grid VerticalAlignment="Center">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -16,7 +23,7 @@
             x:Name="HourBox"
             Grid.Column="0"
             Width="76"
-            Height="34"
+            Height="32"
             Padding="8,0"
             HorizontalContentAlignment="Center"
             SelectionChanged="OnSelectionChanged"
@@ -35,7 +42,7 @@
             x:Name="MinuteBox"
             Grid.Column="2"
             Width="76"
-            Height="34"
+            Height="32"
             Padding="8,0"
             HorizontalContentAlignment="Center"
             SelectionChanged="OnSelectionChanged"

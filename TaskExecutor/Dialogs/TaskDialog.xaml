@@ -7,16 +7,17 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
     Title="{Binding Title}"
-    Width="476"
-    Height="552"
+    Width="700"
+    Height="722"
     d:DataContext="{d:DesignInstance Type=vm:TaskDialogViewModel}"
-    Background="{StaticResource WindowBackgroundBrush}"
+    Background="White"
     ResizeMode="NoResize"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
-    <StackPanel Margin="24" Orientation="Vertical">
+    <StackPanel Orientation="Vertical">
         <Border
+            Margin="16"
             Padding="12,8"
             CornerRadius="4"
             Style="{StaticResource CommonBorderStyle}">
@@ -38,169 +39,262 @@
             </StackPanel>
         </Border>
 
-        <TextBlock
-            Margin="0,16,0,6"
-            FontSize="14"
-            Foreground="{StaticResource TextSecondaryBrush}"
-            Text="任务名称" />
+        <Separator Background="{StaticResource CardBorderBrush}" />
 
-        <TextBox Tag="请输入任务名称，名称创建后不可修改（可选）" Text="{Binding TaskName}">
-            <TextBox.Style>
-                <Style BasedOn="{StaticResource PlaceHolderTextBoxStyle}" TargetType="TextBox">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsEditing}" Value="True">
-                            <Setter Property="IsReadOnly" Value="True" />
-                            <Setter Property="Cursor" Value="No" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBox.Style>
-        </TextBox>
-
-
-        <TextBlock
-            Margin="0,12,0,6"
-            FontSize="14"
-            Foreground="{StaticResource TextSecondaryBrush}"
-            Text="计划时间" />
-
-        <ctrl:TimePicker
-            VerticalAlignment="Center"
-            MinuteStep="1"
-            TimeText="{Binding PlannedTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-        <TextBlock
-            Margin="0,12,0,6"
-            FontSize="14"
-            Foreground="{StaticResource TextSecondaryBrush}"
-            Text="目标 APP" />
-
-        <ComboBox
-            ItemsSource="{Binding TargetApps}"
-            SelectedItem="{Binding SelectedTargetApp}"
-            Style="{StaticResource CustomComboBoxStyle}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Name}" />
-                        <TextBlock Text="{Binding PackageName, StringFormat={} · {0}}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-
-        <Grid Margin="0,12,0,6">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-
-            <TextBlock
-                Grid.Row="0"
-                Grid.Column="0"
-                FontSize="14"
-                Foreground="{StaticResource TextSecondaryBrush}"
-                Text="随即偏移时间" />
-
-            <TextBlock
-                Grid.Row="1"
-                Grid.Column="0"
-                Foreground="{StaticResource PrimaryBrush}">
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Text" Value="不做随机偏移，到点立即执行" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsRandomOffsetTime}" Value="True">
-                                <Setter Property="Text" Value="{Binding Tips}" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
-
-            <CheckBox
-                Grid.Row="0"
-                Grid.Column="1"
-                Margin="0,0,-10,0"
-                FontSize="14"
-                IsChecked="{Binding IsRandomOffsetTime}"
-                Style="{StaticResource CheckBoxSwitchStyle}" />
-        </Grid>
-
-        <TextBlock
-            Margin="0,12,0,8"
-            FontSize="14"
-            Foreground="{StaticResource TextSecondaryBrush}"
-            Text="通知方式" />
-
-        <Grid>
-            <TextBlock
-                VerticalAlignment="Center"
-                FontSize="14"
-                Foreground="{StaticResource TextSecondaryBrush}"
-                Text="邮件通知" />
-
-            <RadioButton
-                Margin="0,0,-10,0"
-                HorizontalAlignment="Right"
-                FontSize="14"
-                GroupName="NotifyMethod"
-                IsChecked="{Binding IsNotifyByMail}"
-                Style="{StaticResource RadioButtonSwitchStyle}" />
-        </Grid>
-
-        <Grid Margin="0,8,0,16">
-            <TextBlock
-                VerticalAlignment="Center"
-                FontSize="14"
-                Foreground="{StaticResource TextSecondaryBrush}"
-                Text="企业微信通知" />
-
-            <RadioButton
-                Margin="0,0,-10,0"
-                HorizontalAlignment="Right"
-                FontSize="14"
-                GroupName="NotifyMethod"
-                IsChecked="{Binding IsNotifyByWechat}"
-                Style="{StaticResource RadioButtonSwitchStyle}" />
-        </Grid>
-
-        <Border
-            Background="Transparent"
-            BorderBrush="{StaticResource CardBorderBrush}"
-            BorderThickness="0,1,0,0">
-            <Grid Margin="0,16,0,0">
+        <StackPanel Margin="16">
+            <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <Border
+                    Grid.Column="0"
+                    Padding="4,2"
+                    VerticalAlignment="Center"
+                    Background="{StaticResource InfoDimBrush}"
+                    CornerRadius="2">
+                    <TextBlock
+                        FontSize="10"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource PrimaryBrush}"
+                        Text="01" />
+                </Border>
+
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="8,0"
+                    VerticalAlignment="Center"
+                    FontWeight="SemiBold"
+                    Foreground="{StaticResource TextPrimaryBrush}"
+                    Text="任务配置" />
+
+                <Separator Grid.Column="2" Background="{StaticResource CardBorderBrush}" />
+            </Grid>
+
+            <UniformGrid
+                Margin="0,12"
+                Columns="2"
+                Rows="2">
+                <Border
+                    Margin="0,0,6,6"
+                    Background="{StaticResource CardBackgroundAltBrush}"
+                    Style="{StaticResource CommonBorderStyle}">
+                    <StackPanel Margin="12">
+                        <TextBlock
+                            FontSize="14"
+                            Foreground="{StaticResource TextSecondaryBrush}"
+                            Text="任务名称" />
+
+                        <TextBox
+                            Margin="0,8,0,0"
+                            Tag="请输入任务名称，名称创建后不可修改（可选）"
+                            Text="{Binding TaskName}">
+                            <TextBox.Style>
+                                <Style BasedOn="{StaticResource PlaceHolderTextBoxStyle}" TargetType="TextBox">
+                                    <Setter Property="Background" Value="White" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                            <Setter Property="IsReadOnly" Value="True" />
+                                            <Setter Property="Cursor" Value="No" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    Margin="6,0,0,6"
+                    Background="{StaticResource CardBackgroundAltBrush}"
+                    Style="{StaticResource CommonBorderStyle}">
+                    <StackPanel Margin="12">
+                        <DockPanel LastChildFill="True">
+                            <TextBlock
+                                FontSize="14"
+                                Foreground="{StaticResource TextSecondaryBrush}"
+                                Text="计划时间" />
+
+                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontSize="12"
+                                    Foreground="{StaticResource TextTertiaryBrush}"
+                                    Text="随机偏移" />
+
+                                <CheckBox
+                                    Margin="8,0,-10,0"
+                                    IsChecked="{Binding IsRandomOffsetTime}"
+                                    Style="{StaticResource CheckBoxSwitchStyle}" />
+                            </StackPanel>
+                        </DockPanel>
+
+                        <ctrl:TimePicker
+                            Margin="0,2,0,0"
+                            VerticalAlignment="Center"
+                            Background="White"
+                            MinuteStep="1"
+                            TimeText="{Binding PlannedTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Margin="0,8,0,0" Foreground="{StaticResource PrimaryBrush}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="不做随机偏移，到点立即执行" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsRandomOffsetTime}" Value="True">
+                                            <Setter Property="Text" Value="{Binding Tips}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    Margin="0,6,6,0"
+                    Background="{StaticResource CardBackgroundAltBrush}"
+                    Style="{StaticResource CommonBorderStyle}">
+                    <StackPanel Margin="12">
+                        <TextBlock
+                            FontSize="14"
+                            Foreground="{StaticResource TextSecondaryBrush}"
+                            Text="目标 APP" />
+
+                        <ComboBox
+                            Margin="0,8,0,0"
+                            Background="White"
+                            ItemsSource="{Binding TargetApps}"
+                            SelectedItem="{Binding SelectedTargetApp}"
+                            Style="{StaticResource CustomComboBoxStyle}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Name}" />
+                                        <TextBlock Text="{Binding PackageName, StringFormat={} · {0}}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    Margin="6,6,0,0"
+                    Background="{StaticResource CardBackgroundAltBrush}"
+                    Style="{StaticResource CommonBorderStyle}">
+                    <StackPanel Margin="12">
+                        <TextBlock
+                            FontSize="14"
+                            Foreground="{StaticResource TextSecondaryBrush}"
+                            Text="通知方式" />
+
+                        <DockPanel LastChildFill="True">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="{StaticResource TextSecondaryBrush}"
+                                Text="邮件通知" />
+
+                            <RadioButton
+                                Margin="0,0,-10,8"
+                                HorizontalAlignment="Right"
+                                FontSize="14"
+                                GroupName="NotifyMethod"
+                                IsChecked="{Binding IsNotifyByMail}"
+                                Style="{StaticResource RadioButtonSwitchStyle}" />
+                        </DockPanel>
+
+                        <DockPanel LastChildFill="True">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="{StaticResource TextSecondaryBrush}"
+                                Text="企业微信通知" />
+
+                            <RadioButton
+                                Margin="0,0,-10,0"
+                                HorizontalAlignment="Right"
+                                FontSize="14"
+                                GroupName="NotifyMethod"
+                                IsChecked="{Binding IsNotifyByWechat}"
+                                Style="{StaticResource RadioButtonSwitchStyle}" />
+                        </DockPanel>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock
+                <Border
                     Grid.Column="0"
+                    Padding="4,2"
                     VerticalAlignment="Center"
-                    Foreground="{StaticResource TextTertiaryBrush}"
-                    Text="保存后立即生效，节假日自动跳过" />
+                    Background="{StaticResource InfoDimBrush}"
+                    CornerRadius="2">
+                    <TextBlock
+                        FontSize="10"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource PrimaryBrush}"
+                        Text="02" />
+                </Border>
 
-                <Button
+                <TextBlock
                     Grid.Column="1"
                     Margin="8,0"
-                    Command="{Binding CancelDialogCommand}"
-                    Content="取消"
-                    Style="{StaticResource CommonButtonStyle}" />
+                    VerticalAlignment="Center"
+                    FontWeight="SemiBold"
+                    Foreground="{StaticResource TextPrimaryBrush}"
+                    Text="任务动作链" />
 
-                <Button
-                    Grid.Column="2"
-                    Padding="14,0"
-                    Command="{Binding SaveTaskCommand}"
-                    Content="{Binding SaveButtonText}"
-                    Style="{StaticResource PrimaryButtonStyle}" />
+                <Separator Grid.Column="2" Background="{StaticResource CardBorderBrush}" />
+
+                <TextBlock
+                    Grid.Column="3"
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="11"
+                    Foreground="{StaticResource TextDisabledBrush}"
+                    Text="拖入或点击添加 · 拖拽调整命令执行顺序" />
             </Grid>
-        </Border>
+        </StackPanel>
+
+        <Separator Background="{StaticResource CardBorderBrush}" />
+
+        <Grid Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Foreground="{StaticResource TextTertiaryBrush}"
+                Text="保存后立即生效，节假日自动跳过" />
+
+            <Button
+                Grid.Column="1"
+                Margin="8,0"
+                Command="{Binding CancelDialogCommand}"
+                Content="取消"
+                Style="{StaticResource CommonButtonStyle}" />
+
+            <Button
+                Grid.Column="2"
+                Padding="14,0"
+                Command="{Binding SaveTaskCommand}"
+                Content="{Binding SaveButtonText}"
+                Style="{StaticResource PrimaryButtonStyle}" />
+        </Grid>
     </StackPanel>
 </Window>
