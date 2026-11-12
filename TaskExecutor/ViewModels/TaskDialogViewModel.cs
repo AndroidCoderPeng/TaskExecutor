@@ -2,9 +2,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskExecutor.Cache;
+using TaskExecutor.Enums;
+using TaskExecutor.Model;
 using TaskExecutor.Services;
 using TaskExecutor.Utils;
-using TaskExecutor.Enums;
 
 namespace TaskExecutor.ViewModels;
 
@@ -23,6 +24,16 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
     [ObservableProperty] private bool _isNotifyByMail;
     [ObservableProperty] private bool _isNotifyByWechat;
     [ObservableProperty] private TargetAppRow? _selectedTargetApp;
+
+    [ObservableProperty] private ObservableCollection<TaskAction> _defaultActions =
+    [
+        new() { Name = "亮屏", Color = "#FF1FA84F", DimColor = "#1F1FA84F" },
+        new() { Name = "打开应用", Color = "#FF8250C8", DimColor = "#1F8250C8" },
+        new() { Name = "截屏", Color = "#FF0F9688", DimColor = "#1F0F9688" },
+        new() { Name = "发送消息", Color = "#FFF5A500", DimColor = "#1FF5A500" },
+        new() { Name = "关闭应用", Color = "#FFE5484D", DimColor = "#1FE5484D" },
+        new() { Name = "息屏", Color = "#FF687386", DimColor = "#1F687386" }
+    ];
 
     public ObservableCollection<TargetAppRow> TargetApps { get; } = [];
 

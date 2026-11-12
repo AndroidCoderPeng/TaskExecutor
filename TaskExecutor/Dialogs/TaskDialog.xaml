@@ -15,6 +15,70 @@
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
+    <Window.Resources>
+        <Style x:Key="RadioButtonSwitchStyle" TargetType="RadioButton">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <StackPanel Orientation="Horizontal" TextElement.Foreground="{TemplateBinding Foreground}">
+                            <Border
+                                x:Name="SwitchTrack"
+                                Width="40"
+                                Height="24"
+                                Background="{StaticResource CardBorderBrush}"
+                                CornerRadius="12">
+                                <Ellipse
+                                    x:Name="SwitchThumb"
+                                    Width="18"
+                                    Height="18"
+                                    Margin="3,0,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Fill="White"
+                                    RenderTransformOrigin="0.5,0.5">
+                                    <Ellipse.RenderTransform>
+                                        <TranslateTransform X="0" />
+                                    </Ellipse.RenderTransform>
+                                </Ellipse>
+                            </Border>
+                            <ContentPresenter Margin="8,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="SwitchThumb" Property="Fill" Value="White" />
+                                <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource PrimaryBrush}" />
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="SwitchThumb"
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                To="16"
+                                                Duration="0:0:0.18" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="SwitchThumb"
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                To="0"
+                                                Duration="0:0:0.18" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <StackPanel Orientation="Vertical">
         <Border
             Margin="16"
@@ -39,10 +103,16 @@
             </StackPanel>
         </Border>
 
-        <Separator Background="{StaticResource CardBorderBrush}" />
+        <Grid Margin="16,0,16,9">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <StackPanel Margin="16">
-            <Grid>
+            <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -73,11 +143,20 @@
                 <Separator Grid.Column="2" Background="{StaticResource CardBorderBrush}" />
             </Grid>
 
-            <UniformGrid
-                Margin="0,12"
-                Columns="2"
-                Rows="2">
+            <Grid Grid.Row="1" Margin="0,12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
                 <Border
+                    Grid.Row="0"
+                    Grid.Column="0"
                     Margin="0,0,6,6"
                     Background="{StaticResource CardBackgroundAltBrush}"
                     Style="{StaticResource CommonBorderStyle}">
@@ -107,6 +186,8 @@
                 </Border>
 
                 <Border
+                    Grid.Row="0"
+                    Grid.Column="1"
                     Margin="6,0,0,6"
                     Background="{StaticResource CardBackgroundAltBrush}"
                     Style="{StaticResource CommonBorderStyle}">
@@ -116,6 +197,30 @@
                                 FontSize="14"
                                 Foreground="{StaticResource TextSecondaryBrush}"
                                 Text="计划时间" />
+
+                            <TextBlock
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource PrimaryBrush}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsRandomOffsetTime}" Value="True">
+                                                <Setter Property="Text" Value="{Binding Tips}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DockPanel>
+
+                        <DockPanel Margin="0,8,0,0" LastChildFill="True">
+                            <ctrl:TimePicker
+                                VerticalAlignment="Center"
+                                Background="White"
+                                MinuteStep="1"
+                                TimeText="{Binding PlannedTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                                 <TextBlock
@@ -130,30 +235,12 @@
                                     Style="{StaticResource CheckBoxSwitchStyle}" />
                             </StackPanel>
                         </DockPanel>
-
-                        <ctrl:TimePicker
-                            Margin="0,2,0,0"
-                            VerticalAlignment="Center"
-                            Background="White"
-                            MinuteStep="1"
-                            TimeText="{Binding PlannedTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <TextBlock Margin="0,8,0,0" Foreground="{StaticResource PrimaryBrush}">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Text" Value="不做随机偏移，到点立即执行" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsRandomOffsetTime}" Value="True">
-                                            <Setter Property="Text" Value="{Binding Tips}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
                     </StackPanel>
                 </Border>
 
                 <Border
+                    Grid.Row="1"
+                    Grid.Column="0"
                     Margin="0,6,6,0"
                     Background="{StaticResource CardBackgroundAltBrush}"
                     Style="{StaticResource CommonBorderStyle}">
@@ -181,50 +268,35 @@
                     </StackPanel>
                 </Border>
 
+                <!--  待调整 RadioButton 样式  -->
                 <Border
+                    Grid.Row="1"
+                    Grid.Column="1"
                     Margin="6,6,0,0"
                     Background="{StaticResource CardBackgroundAltBrush}"
                     Style="{StaticResource CommonBorderStyle}">
-                    <StackPanel Margin="12">
+                    <StackPanel Margin="12" Orientation="Horizontal">
                         <TextBlock
                             FontSize="14"
                             Foreground="{StaticResource TextSecondaryBrush}"
                             Text="通知方式" />
 
-                        <DockPanel LastChildFill="True">
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                FontSize="14"
-                                Foreground="{StaticResource TextSecondaryBrush}"
-                                Text="邮件通知" />
+                        <RadioButton
+                            Content="邮件通知"
+                            GroupName="NotifyMethod"
+                            IsChecked="{Binding IsNotifyByMail}"
+                            Style="{StaticResource RadioButtonSwitchStyle}" />
 
-                            <RadioButton
-                                Margin="0,0,-10,8"
-                                HorizontalAlignment="Right"
-                                GroupName="NotifyMethod"
-                                IsChecked="{Binding IsNotifyByMail}"
-                                Style="{StaticResource RadioButtonSwitchStyle}" />
-                        </DockPanel>
-
-                        <DockPanel LastChildFill="True">
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                FontSize="14"
-                                Foreground="{StaticResource TextSecondaryBrush}"
-                                Text="企业微信通知" />
-
-                            <RadioButton
-                                Margin="0,0,-10,0"
-                                HorizontalAlignment="Right"
-                                GroupName="NotifyMethod"
-                                IsChecked="{Binding IsNotifyByWechat}"
-                                Style="{StaticResource RadioButtonSwitchStyle}" />
-                        </DockPanel>
+                        <RadioButton
+                            Content="企业微信通知"
+                            GroupName="NotifyMethod"
+                            IsChecked="{Binding IsNotifyByWechat}"
+                            Style="{StaticResource RadioButtonSwitchStyle}" />
                     </StackPanel>
                 </Border>
-            </UniformGrid>
+            </Grid>
 
-            <Grid>
+            <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -264,7 +336,7 @@
                     Text="拖入或点击添加 · 拖拽调整命令执行顺序" />
             </Grid>
 
-            <Grid Margin="0,12">
+            <Grid Grid.Row="3" Margin="0,12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="2*" />
@@ -279,10 +351,61 @@
                         <TextBlock Foreground="{StaticResource TextTertiaryBrush}" Text="动作库" />
 
                         <ListBox
-                            Margin="0,8,0,0"
+                            Background="Transparent"
+                            BorderThickness="0"
                             ItemsSource="{Binding DefaultActions}"
                             ScrollViewer.CanContentScroll="False"
-                            ScrollViewer.VerticalScrollBarVisibility="Hidden" />
+                            ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                            ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Background="{Binding DimColor}"
+                                        CornerRadius="6"
+                                        Style="{StaticResource CommonBorderStyle}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border
+                                                Grid.Column="0"
+                                                BorderBrush="{Binding Color}"
+                                                BorderThickness="4,0,0,0"
+                                                CornerRadius="4" />
+
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                Margin="8,6"
+                                                Text="{Binding Name}" />
+
+                                            <Button
+                                                Grid.Column="2"
+                                                Margin="0,0,6,0"
+                                                Content="+"
+                                                Style="{StaticResource TextButtonStyle}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Margin" Value="0,6,0,0" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
                     </StackPanel>
                 </Border>
 
@@ -321,7 +444,6 @@
 
                             <Button
                                 Grid.Column="2"
-                                VerticalAlignment="Center"
                                 Command="{Binding ClearActionsCommand}"
                                 Content="清空"
                                 Style="{StaticResource TextButtonStyle}" />
@@ -338,6 +460,7 @@
             </Grid>
 
             <Border
+                Grid.Row="4"
                 Background="{StaticResource WindowBackgroundBrush}"
                 BorderThickness="0"
                 CornerRadius="6"
@@ -347,11 +470,11 @@
                     Foreground="{StaticResource TextTertiaryBrush}"
                     Text="从上到下依次执行，某一步失败会中止后续动作" />
             </Border>
-        </StackPanel>
+        </Grid>
 
         <Separator Background="{StaticResource CardBorderBrush}" />
 
-        <Grid Margin="16">
+        <Grid Margin="16,9,16,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
