@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Globalization;
+using System.Net.Http;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json.Linq;
@@ -13,7 +14,6 @@ public partial class TaskScheduleViewModel : ObservableObject
 {
     #region VM
 
-    [ObservableProperty] private bool _isNeedRandomTime = true;
     [ObservableProperty] private bool _isSkipHoliday = true;
     [ObservableProperty] private bool _isResetDailyTask = true;
     [ObservableProperty] private string _lastSyncTime = string.Empty;
@@ -37,7 +37,6 @@ public partial class TaskScheduleViewModel : ObservableObject
         _toastService = toastService;
 
         var config = SettingsStore.Load<TaskScheduleConfig>(ConfigSections.FileName, ConfigSections.TaskSchedule);
-        IsNeedRandomTime = config.IsNeedRandomTime;
         IsSkipHoliday = config.IsSkipHoliday;
         IsResetDailyTask = config.IsResetDailyTask;
         CurrentYear = DateTime.Now.Year.ToString();
@@ -45,9 +44,8 @@ public partial class TaskScheduleViewModel : ObservableObject
             .LastSyncTime;
         PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName is nameof(IsNeedRandomTime) or nameof(IsSkipHoliday) or nameof(IsResetDailyTask))
+            if (e.PropertyName is nameof(IsSkipHoliday) or nameof(IsResetDailyTask))
             {
-                config.IsNeedRandomTime = IsNeedRandomTime;
                 config.IsSkipHoliday = IsSkipHoliday;
                 config.IsResetDailyTask = IsResetDailyTask;
                 SettingsStore.Save(ConfigSections.FileName, ConfigSections.TaskSchedule, config);
@@ -69,7 +67,7 @@ public partial class TaskScheduleViewModel : ObservableObject
                 var json = await Http.GetStringAsync(url);
                 if (JToken.Parse(json) is not JObject { Count: > 0 }) continue;
 
-                var syncTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                var syncTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                 SettingsStore.Save(ConfigSections.FileName, ConfigSections.ChinaHoliday, new ChinaHolidayConfig
                 {
                     Year = year,

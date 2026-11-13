@@ -1,8 +1,7 @@
 using System.Globalization;
-using TaskExecutor.Cache;
 using TaskExecutor.Enums;
 
-namespace TaskExecutor.Utils;
+namespace TaskExecutor.Cache;
 
 public sealed class PlannedTask
 {
@@ -93,29 +92,37 @@ public sealed class ExecutionPlan
                 continue;
             }
 
-            var range = task.TimeRange ?? globalRange;
-            var min = schedule.IsNeedRandomTime ? Math.Max(0, range.MinLimitTime) : 0;
-            var max = schedule.IsNeedRandomTime ? Math.Max(min, range.MaxLimitTime) : 0;
+            var randomOn = task.TimeRange != null;
+            var min = 0;
+            var max = 0;
+            if (randomOn)
+            {
+                var range = task.TimeRange ?? globalRange;
+                min = Math.Max(0, range.MinLimitTime);
+                max = Math.Max(min, range.MaxLimitTime);
+            }
+
             foreach (var pending in State.Tasks.Where(p => p.TaskName == task.Name
                                                            && p.CycleDate.Date != today
                                                            && p.State == PlannedTaskState.Pending
                                                            && (p.PlannedAt != task.PlannedAt ||
-                                                               p.RandomEnabled != schedule.IsNeedRandomTime ||
-                                                               p.MinOffset != min || p.MaxOffset != max)))
+                                                               p.RandomEnabled != randomOn ||
+                                                               p.MinOffset != min ||
+                                                               p.MaxOffset != max)))
             {
                 pending.State = PlannedTaskState.Skipped;
                 changed = true;
             }
 
             var differs = entry != null && (entry.PlannedAt != task.PlannedAt ||
-                                            entry.RandomEnabled != schedule.IsNeedRandomTime ||
+                                            entry.RandomEnabled != randomOn ||
                                             entry.MinOffset != min || entry.MaxOffset != max);
             if (entry != null && !differs) continue;
 
             var previousState = entry?.State;
             var scheduledAt = previousState == PlannedTaskState.Triggered
                 ? entry!.ScheduledAt
-                : today.Add(time).AddMinutes(schedule.IsNeedRandomTime ? _random(min, max) : 0);
+                : today.Add(time).AddMinutes(randomOn ? _random(min, max) : 0);
             var state = previousState is PlannedTaskState.Triggered or PlannedTaskState.Skipped ? previousState.Value :
                 differs && scheduledAt <= now ? PlannedTaskState.Skipped : PlannedTaskState.Pending;
             var replacement = new PlannedTask
@@ -124,7 +131,7 @@ public sealed class ExecutionPlan
                 CycleDate = today,
                 ScheduledAt = scheduledAt,
                 PlannedAt = task.PlannedAt,
-                RandomEnabled = schedule.IsNeedRandomTime,
+                RandomEnabled = randomOn,
                 MinOffset = min,
                 MaxOffset = max,
                 State = state

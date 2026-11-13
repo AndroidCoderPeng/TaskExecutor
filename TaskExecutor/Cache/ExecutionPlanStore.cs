@@ -2,7 +2,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace TaskExecutor.Utils;
+namespace TaskExecutor.Cache;
 
 public sealed class ExecutionPlanStore(string? path = null)
 {

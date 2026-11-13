@@ -1,9 +1,8 @@
 ﻿using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using TaskExecutor.Cache;
 
-namespace TaskExecutor.Utils
+namespace TaskExecutor.Cache
 {
     public class SettingsStore
     {

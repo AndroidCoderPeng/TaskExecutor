@@ -21,11 +21,11 @@
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
                 Foreground="{StaticResource TextTertiaryBrush}"
-                Text="随机任务 / 节假日 / 重置" />
+                Text="节假日 / 重置" />
         </DockPanel>
 
         <Border
-            Height="168"
+            Height="128"
             Margin="20,16,20,12"
             Background="{StaticResource CardBackgroundBrush}"
             BorderBrush="{StaticResource CardBorderBrush}"
@@ -49,25 +49,7 @@
                     Grid.Row="1"
                     Margin="0,8,0,0"
                     Orientation="Vertical">
-                    <StackPanel Margin="64,0,0,0" Orientation="Horizontal">
-                        <Grid Width="80" VerticalAlignment="Center">
-                            <TextBlock
-                                HorizontalAlignment="Right"
-                                FontSize="14"
-                                Foreground="{StaticResource TextSecondaryBrush}"
-                                Text="随机任务" />
-                        </Grid>
-
-
-                        <CheckBox
-                            Margin="12,0,0,0"
-                            Content="启用后执行时间按随机范围偏移"
-                            Foreground="{StaticResource TextTertiaryBrush}"
-                            IsChecked="{Binding IsNeedRandomTime}"
-                            Style="{StaticResource CheckBoxSwitchStyle}" />
-                    </StackPanel>
-
-                    <StackPanel Margin="64,12,0,12" Orientation="Horizontal">
+                    <StackPanel Margin="64,0,0,12" Orientation="Horizontal">
                         <Grid Width="80" VerticalAlignment="Center">
                             <TextBlock
                                 HorizontalAlignment="Right"

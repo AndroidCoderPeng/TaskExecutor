@@ -101,7 +101,6 @@ public class TimeRangeConfig
 
 public class TaskScheduleConfig
 {
-    public bool IsNeedRandomTime { get; set; } = true;
     public bool IsSkipHoliday { get; set; } = true;
     public bool IsResetDailyTask { get; set; } = true;
 }
