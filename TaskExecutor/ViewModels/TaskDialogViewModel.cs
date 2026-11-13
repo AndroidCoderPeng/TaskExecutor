@@ -27,12 +27,12 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
 
     [ObservableProperty] private ObservableCollection<TaskAction> _defaultActions =
     [
-        new() { Name = "亮屏", IsEnabled = true, Color = "#FF3478F6", DimColor = "#1F3478F6" },
-        new() { Name = "打开应用", IsEnabled = true, Color = "#FF8250C8", DimColor = "#1F8250C8" },
-        new() { Name = "截屏", IsEnabled = true, Color = "#FF0F9688", DimColor = "#1F0F9688" },
-        new() { Name = "发送消息", Color = "#FFF5A500", DimColor = "#1FF5A500" }, // 选中渠道后解锁
-        new() { Name = "关闭应用", IsEnabled = true, Color = "#FFE5484D", DimColor = "#1FE5484D" },
-        new() { Name = "息屏", IsEnabled = true, Color = "#FF687386", DimColor = "#1F687386" }
+        new() { Name = TaskActionNames.ScreenOn, IsEnabled = true, Color = "#FF3478F6", DimColor = "#1F3478F6" },
+        new() { Name = TaskActionNames.OpenTarget, IsEnabled = true, Color = "#FF8250C8", DimColor = "#1F8250C8" },
+        new() { Name = TaskActionNames.ScreenCapture, IsEnabled = true, Color = "#FF0F9688", DimColor = "#1F0F9688" },
+        new() { Name = TaskActionNames.SendMessage, Color = "#FFF5A500", DimColor = "#1FF5A500" }, // 选中渠道后解锁
+        new() { Name = TaskActionNames.KillTarget, IsEnabled = true, Color = "#FFE5484D", DimColor = "#1FE5484D" },
+        new() { Name = TaskActionNames.ScreenOff, IsEnabled = true, Color = "#FF687386", DimColor = "#1F687386" }
     ];
 
     [ObservableProperty] private ObservableCollection<TaskAction> _selectedActions = [];

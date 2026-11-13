@@ -1,3 +1,4 @@
+using System.IO;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
@@ -14,6 +15,7 @@ public sealed class EmailMessage
     public string Recipient { get; init; } = "";
     public string Subject { get; init; } = "";
     public string Body { get; init; } = "";
+    public string AttachmentPath { get; init; } = "";
 }
 
 public class EmailSender
@@ -24,10 +26,32 @@ public class EmailSender
         message.From.Add(new MailboxAddress(msg.SenderEmail, msg.SenderEmail));
         message.To.Add(MailboxAddress.Parse(msg.Recipient));
         message.Subject = msg.Subject;
-        message.Body = new TextPart("plain")
+        if (string.IsNullOrEmpty(msg.AttachmentPath))
         {
-            Text = msg.Body
-        };
+            message.Body = new TextPart("plain")
+            {
+                Text = msg.Body
+            };
+        }
+        else
+        {
+            var bytes = await File.ReadAllBytesAsync(msg.AttachmentPath, ct);
+            var attachment = new MimePart("image", "png")
+            {
+                Content = new MimeContent(new MemoryStream(bytes)),
+                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                ContentTransferEncoding = ContentEncoding.Base64,
+                FileName = Path.GetFileName(msg.AttachmentPath)
+            };
+            message.Body = new Multipart("mixed")
+            {
+                new TextPart("plain")
+                {
+                    Text = msg.Body
+                },
+                attachment
+            };
+        }
 
         using var client = new SmtpClient();
         client.Timeout = 60_000;

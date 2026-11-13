@@ -17,16 +17,7 @@ public class SchedulerService : ISchedulerService
         ResetTimeConfig Reset,
         TaskScheduleConfig Schedule,
         TaskConfig Tasks,
-        TimeRangeConfig GlobalRange,
-        WaitTimeConfig Wait);
-
-    // 动作名常量，须与 TaskDialogViewModel.DefaultActions 的动作库名称保持一致
-    private const string ActionScreenOn = "亮屏";
-    private const string ActionOpenTarget = "打开应用";
-    private const string ActionScreenCapture = "截屏";
-    private const string ActionSendMessage = "发送消息";
-    private const string ActionKillTarget = "关闭应用";
-    private const string ActionScreenOff = "息屏";
+        TimeRangeConfig GlobalRange);
 
     // 30s 一次 tick，UI 线程回调，方便直接更新 VM
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(30) };
@@ -103,9 +94,7 @@ public class SchedulerService : ISchedulerService
         _isExecuting = true;
         try
         {
-            // TODO wait 是用来给目标应用操作时间的停留，与任务链节点间隔无关
-            var wait = SettingsStore.Load<WaitTimeConfig>(ConfigSections.FileName, ConfigSections.WaitTime);
-            await ExecuteChainAsync(task, wait.Time);
+            await ExecuteChainAsync(task);
         }
         finally
         {
@@ -157,7 +146,7 @@ public class SchedulerService : ISchedulerService
                 }
 
                 PublishStatus(snapshot);
-                await ExecuteTaskAsync(task, snapshot.Wait);
+                await ExecuteChainAsync(task);
             }
 
             RefreshPlan();
@@ -167,6 +156,12 @@ public class SchedulerService : ISchedulerService
             _isExecuting = false;
         }
     }
+
+    private static ConfigSnapshot LoadSnapshot() => new(
+        SettingsStore.Load<ResetTimeConfig>(ConfigSections.FileName, ConfigSections.ResetTime),
+        SettingsStore.Load<TaskScheduleConfig>(ConfigSections.FileName, ConfigSections.TaskSchedule),
+        SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task),
+        SettingsStore.Load<TimeRangeConfig>(ConfigSections.FileName, ConfigSections.TimeRange));
 
     public void RefreshPlan()
     {
@@ -235,10 +230,9 @@ public class SchedulerService : ISchedulerService
     }
 
     /// <summary>
-    /// 按 task.Actions 配置的顺序执行任务链；任一步骤失败立即中断。
-    /// 整条链只产生一条日志，与调度执行的统计口径一致。
+    /// 按 task.Actions 配置的顺序执行任务链；任一步骤失败立即中断，整条链只产生一条日志，与调度执行的统计口径一致。
     /// </summary>
-    private async Task ExecuteChainAsync(TaskRow task, int stepInterval)
+    private async Task ExecuteChainAsync(TaskRow task)
     {
         var serial = $"{_deviceState.DeviceIp}:5555";
         if (!_deviceState.IsConnected || !await _heartbeatService.ProbeAsync(serial))
@@ -257,30 +251,45 @@ public class SchedulerService : ISchedulerService
         var screenshotPath = ""; // 「截屏」动作的产出，供后续「发送消息」附带
         foreach (var action in task.Actions)
         {
-            bool ok;
-            switch (action.Name)
+            var step = TaskActionNames.FromName(action.Name);
+            if (step == null)
             {
-                case ActionScreenOn:
+                RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：未知动作「{action.Name}」");
+                return;
+            }
+
+            bool ok;
+            switch (step.Value)
+            {
+                case TaskChainAction.ScreenOn:
                     ok = await adb.ScreenOnAsync();
                     break;
-                case ActionOpenTarget:
+                case TaskChainAction.OpenTarget:
+                    var wait = SettingsStore.Load<WaitTimeConfig>(ConfigSections.FileName, ConfigSections.WaitTime);
+                    var dwellSeconds = wait.Time;
                     ok = await adb.OpenAppAsync(task.TargetApp.PackageName, task.TargetApp.Activity);
+                    if (ok && dwellSeconds > 0)
+                    {
+                        // 从打开目标应用开始计时，给应用留出操作停留时间，之后才继续后续动作
+                        await Task.Delay(TimeSpan.FromSeconds(dwellSeconds));
+                    }
+
                     break;
-                case ActionScreenCapture:
+                case TaskChainAction.ScreenCapture:
                     screenshotPath = await adb.ScreencapAsync(_screenshotDir) ?? "";
                     ok = screenshotPath != "";
                     break;
-                case ActionSendMessage:
+                case TaskChainAction.SendMessage:
                     ok = await SendChainMessageAsync(task, screenshotPath);
                     break;
-                case ActionKillTarget:
+                case TaskChainAction.KillTarget:
                     ok = await adb.KillAppAsync(task.TargetApp.PackageName);
                     break;
-                case ActionScreenOff:
+                case TaskChainAction.ScreenOff:
                     ok = await adb.ScreenOffAsync();
                     break;
                 default:
-                    ok = false; // 未知动作，fail-fast 并记日志
+                    ok = false; // 未知动作记日志
                     break;
             }
 
@@ -289,54 +298,29 @@ public class SchedulerService : ISchedulerService
                 RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：动作「{action.Name}」出错");
                 return;
             }
-            
-            if (stepInterval > 0) await Task.Delay(TimeSpan.FromSeconds(stepInterval));
         }
 
         RaiseLog(TaskState.Success, $"任务「{task.Name}」执行成功");
     }
 
     /// <summary>
-    /// 执行单个任务：探测设备 → adb 拉起目标 APP → 发送通知 → 等待任务间隔。
-    /// </summary>
-    private async Task ExecuteTaskAsync(TaskRow task, WaitTimeConfig wait)
-    {
-        var serial = $"{_deviceState.DeviceIp}:5555";
-
-        // 设备离线：记失败日志并跳过，不反复重试
-        if (!_deviceState.IsConnected || !await _heartbeatService.ProbeAsync(serial))
-        {
-            RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：设备离线");
-            return;
-        }
-
-        var adb = new AdbDevice(_adbPath, serial);
-        var failed = !await adb.OpenAppAsync(task.TargetApp.PackageName, task.TargetApp.Activity);
-        RaiseLog(failed ? TaskState.Failed : TaskState.Success, failed
-            ? $"任务「{task.Name}」执行失败：启动 {task.TargetApp.Name} 失败"
-            : $"任务「{task.Name}」执行成功：已启动 {task.TargetApp.Name}");
-
-        if (!failed)
-        {
-            await NotifyAsync(task, $"任务「{task.Name}」执行成功");
-        }
-
-        if (wait.Time > 0)
-        {
-            await Task.Delay(TimeSpan.FromSeconds(wait.Time));
-        }
-    }
-
-    /// <summary>
     /// 按 NotifyMethods 逐个发送通知，单渠道失败不影响其它渠道。
     /// </summary>
-    private async Task NotifyAsync(TaskRow task, string content)
+    private async Task<bool> SendChainMessageAsync(TaskRow task, string path)
     {
+        if (task.NotifyMethods.Count == 0)
+        {
+            _toastService.Show($"任务「{task.Name}」未配置通知渠道，「发送消息」动作失败", ToastType.Warning);
+            return false;
+        }
+
+        var content = $"任务「{task.Name}」执行通知";
+
         if (task.NotifyMethods.Any(m => m.Name == "QQ 邮箱"))
         {
             try
             {
-                await SendMailAsync(content);
+                await SendMailAsync(content, path);
             }
             catch (Exception e)
             {
@@ -348,16 +332,21 @@ public class SchedulerService : ISchedulerService
         {
             try
             {
-                await SendWechatAsync(content);
+                await SendWechatAsync(content, path);
             }
             catch (Exception e)
             {
                 RaiseLog(TaskState.Failed, $"任务「{task.Name}」企业微信通知发送失败：{e.Message}");
             }
         }
+
+        return true;
     }
 
-    private async Task SendMailAsync(string content)
+    /// <summary>
+    /// 发送带附件的邮件
+    /// </summary>
+    private async Task SendMailAsync(string content, string path)
     {
         var config = SettingsStore.Load<EmailConfig>(ConfigSections.FileName, ConfigSections.Email);
         if (string.IsNullOrWhiteSpace(config.SmtpServer) || string.IsNullOrWhiteSpace(config.RecipientEmail))
@@ -373,11 +362,15 @@ public class SchedulerService : ISchedulerService
             AuthCode = config.SenderAuthCode,
             Recipient = config.RecipientEmail,
             Subject = "TaskExecutor 任务执行通知",
-            Body = content
+            Body = content,
+            AttachmentPath = path
         });
     }
 
-    private async Task SendWechatAsync(string content)
+    /// <summary>
+    /// 发送图片消息
+    /// </summary>
+    private async Task SendWechatAsync(string content, string path)
     {
         var config = SettingsStore.Load<WechatConfig>(ConfigSections.FileName, ConfigSections.Wechat);
         if (string.IsNullOrWhiteSpace(config.WebhookKey))
@@ -385,13 +378,22 @@ public class SchedulerService : ISchedulerService
             return;
         }
 
+        // 先发文字
         await WechatSender.SendTextAsync(new WechatTextMessage
         {
             WebhookKey = config.WebhookKey,
-            Content = string.IsNullOrWhiteSpace(config.MessageTitle)
-                ? content
-                : $"{config.MessageTitle}\n{content}"
+            Content = string.IsNullOrWhiteSpace(config.MessageTitle) ? content : $"{config.MessageTitle}\n{content}"
         });
+
+        // 再发图片（如果有）
+        if (path != "" && config.AttachScreenshot)
+        {
+            await WechatSender.SendImageAsync(new WechatImageMessage
+            {
+                WebhookKey = config.WebhookKey,
+                ImagePath = path
+            });
+        }
     }
 
     /// <summary>
@@ -408,13 +410,6 @@ public class SchedulerService : ISchedulerService
         _todayTotal = logs.Count;
         _todaySuccess = logs.Count(l => l.State == TaskState.Success);
     }
-
-    private static ConfigSnapshot LoadSnapshot() => new(
-        SettingsStore.Load<ResetTimeConfig>(ConfigSections.FileName, ConfigSections.ResetTime),
-        SettingsStore.Load<TaskScheduleConfig>(ConfigSections.FileName, ConfigSections.TaskSchedule),
-        SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task),
-        SettingsStore.Load<TimeRangeConfig>(ConfigSections.FileName, ConfigSections.TimeRange),
-        SettingsStore.Load<WaitTimeConfig>(ConfigSections.FileName, ConfigSections.WaitTime));
 
     private void RaiseLog(TaskState state, string content)
     {
