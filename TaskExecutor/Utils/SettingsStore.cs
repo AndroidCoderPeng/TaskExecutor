@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using TaskExecutor.Cache;
 
 namespace TaskExecutor.Utils
 {
@@ -29,6 +30,22 @@ namespace TaskExecutor.Utils
                 return new JObject();
             }
         }
+        
+        // 写入整个文件根对象（临时文件 + 原子替换）
+        private static void WriteRoot(string file, JObject root)
+        {
+            try
+            {
+                Directory.CreateDirectory(Dir);
+                var temporaryPath = file + ".tmp";
+                File.WriteAllText(temporaryPath, root.ToString(Formatting.Indented));
+                File.Move(temporaryPath, file, true);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"保存配置文件失败：{e.Message}，请检查文件是否可写。");
+            }
+        }
 
         // 按分组加载
         public static T Load<T>(string fileName, string section) where T : class, new()
@@ -54,8 +71,36 @@ namespace TaskExecutor.Utils
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($@"保存配置文件失败：{e.Message}，请检查文件是否可写。");
+                    Console.WriteLine($"保存配置文件失败：{e.Message}，请检查文件是否可写。");
                 }
+            }
+        }
+        
+        /// <summary>
+        /// 读取 app-config.json 全部 section。
+        /// </summary>
+        public static JObject ExportAll()
+        {
+            lock (Lock)
+            {
+                return ReadRoot(GetFilePath(ConfigSections.FileName));
+            }
+        }
+        
+        /// <summary>
+        /// 把备份里的 section 逐个写回，文件中其余 section 保留不动。
+        /// </summary>
+        public static void ImportAll(JObject data)
+        {
+            var file = GetFilePath(ConfigSections.FileName);
+            lock (Lock)
+            {
+                var root = ReadRoot(file);
+                foreach (var section in data.Properties())
+                {
+                    root[section.Name] = section.Value.DeepClone();
+                }
+                WriteRoot(file, root);
             }
         }
     }
