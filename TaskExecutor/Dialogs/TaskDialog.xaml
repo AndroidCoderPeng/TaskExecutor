@@ -5,6 +5,7 @@
     xmlns:ctrl="clr-namespace:TaskExecutor.Controls"
     xmlns:cvt="clr-namespace:TaskExecutor.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dragDrop="urn:gong-wpf-dragdrop"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
     Title="{Binding Title}"
@@ -407,7 +408,10 @@
                     <StackPanel Orientation="Vertical">
                         <TextBlock Foreground="{StaticResource TextTertiaryBrush}" Text="动作库" />
 
+                        <!--  拖出源 + 点击添加  -->
                         <ListBox
+                            dragDrop:DragDrop.DragHandler="{Binding DragSourceHandler}"
+                            dragDrop:DragDrop.IsDragSource="True"
                             Background="Transparent"
                             BorderThickness="0"
                             ItemsSource="{Binding DefaultActions}"
@@ -416,10 +420,7 @@
                             ScrollViewer.VerticalScrollBarVisibility="Hidden">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Border
-                                        Background="{Binding DimColor}"
-                                        CornerRadius="6"
-                                        IsEnabled="{Binding IsEnabled}">
+                                    <Border Background="{Binding DimColor}" CornerRadius="6">
                                         <Border.Style>
                                             <Style BasedOn="{StaticResource CommonBorderStyle}" TargetType="Border">
                                                 <Style.Triggers>
@@ -528,7 +529,12 @@
 
                         <!--  动作列表 + 空态  -->
                         <Grid DockPanel.Dock="Bottom">
+
+                            <!--  拖动重排 + 接收拖入  -->
                             <ListBox
+                                dragDrop:DragDrop.DropHandler="{Binding DropSourceHandler}"
+                                dragDrop:DragDrop.IsDragSource="True"
+                                dragDrop:DragDrop.IsDropTarget="True"
                                 AlternationCount="999"
                                 Background="Transparent"
                                 BorderThickness="0"
@@ -630,7 +636,7 @@
                                         HorizontalAlignment="Center"
                                         FontSize="11"
                                         Foreground="{StaticResource TextDisabledBrush}"
-                                        Text="点击左侧指令库「+」添加任务动作" />
+                                        Text="点击左侧动作库「+」添加任务动作" />
                                 </StackPanel>
                             </Grid>
                         </Grid>

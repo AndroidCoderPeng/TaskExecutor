@@ -47,9 +47,13 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
     private readonly TaskConfig _config;
     private int _editingIndex = -1;
 
+    public SequenceDragHandler DragSourceHandler { get; } = new();
+    public SequenceDropHandler DropSourceHandler { get; }
+
     public TaskDialogViewModel(IToastService toastService)
     {
         _toastService = toastService;
+        DropSourceHandler = new SequenceDropHandler(toastService);
 
         _config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
 
@@ -237,6 +241,13 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         if (IsNotifyByWechat) notifyMethods.Add("企业微信");
         var timeRange = SettingsStore.Load<TimeRangeConfig>(ConfigSections.FileName, ConfigSections.TimeRange);
 
+        // 先加「发送消息」又把渠道关掉的兜底（放在写回配置之前，避免校验失败时污染配置）
+        if (SelectedActions.Any(a => a.Name == "发送消息") && notifyMethods.Count == 0)
+        {
+            _toastService.Show("执行序列含「发送消息」，请至少选择一个通知方式", ToastType.Warning);
+            return;
+        }
+
         var task = isEditing ? _config.Tasks[_editingIndex] : new TaskRow { Name = TaskName, IsEnabled = true };
 
         task.TargetApp = new TargetAppRow
@@ -252,13 +263,6 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
 
         if (!isEditing) _config.Tasks.Add(task);
 
-        // 先加「发送消息」又把渠道关掉的兜底
-        if (SelectedActions.Any(a => a.Name == "发送消息") && notifyMethods.Count == 0)
-        {
-            _toastService.Show("执行序列含「发送消息」，请至少选择一个通知方式", ToastType.Warning);
-            return;
-        }
-        
         SettingsStore.Save(ConfigSections.FileName, ConfigSections.Task, _config);
 
         _toastService.Show(isEditing ? $"任务「{task.Name}」已更新" : "任务创建成功", ToastType.Success);
