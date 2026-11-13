@@ -9,7 +9,7 @@
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
     Title="{Binding Title}"
     Width="690"
-    Height="672"
+    Height="662"
     d:DataContext="{d:DesignInstance Type=vm:TaskDialogViewModel}"
     Background="White"
     ResizeMode="NoResize"
@@ -86,8 +86,16 @@
         <cvt:StepIndexConverter x:Key="StepIndexConverterKey" />
     </Window.Resources>
 
-    <StackPanel Orientation="Vertical">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
         <Border
+            Grid.Row="0"
             Margin="16,12"
             Padding="12,8"
             CornerRadius="4"
@@ -110,13 +118,10 @@
             </StackPanel>
         </Border>
 
-        <Grid Margin="16,0,16,9">
+        <Grid Grid.Row="1" Margin="16,0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0">
@@ -340,8 +345,15 @@
                     </StackPanel>
                 </Border>
             </Grid>
+        </Grid>
 
-            <Grid Grid.Row="2">
+        <Grid Grid.Row="2" Margin="16,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -381,7 +393,7 @@
                     Text="拖入或点击添加 · 拖拽调整命令执行顺序" />
             </Grid>
 
-            <Grid Grid.Row="3" Margin="0,12">
+            <Grid Grid.Row="1" Margin="0,12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="2*" />
@@ -480,8 +492,8 @@
                     Padding="12,8"
                     Background="{StaticResource WindowBackgroundBrush}"
                     Style="{StaticResource CommonBorderStyle}">
-                    <StackPanel Orientation="Vertical">
-                        <Grid>
+                    <DockPanel LastChildFill="True">
+                        <Grid DockPanel.Dock="Top">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="Auto" />
@@ -515,7 +527,7 @@
                         </Grid>
 
                         <!--  动作列表 + 空态  -->
-                        <Grid Margin="0,8,0,0">
+                        <Grid DockPanel.Dock="Bottom">
                             <ListBox
                                 AlternationCount="999"
                                 Background="Transparent"
@@ -588,7 +600,7 @@
                             </ListBox>
 
                             <!--  空态：无动作时覆盖显示  -->
-                            <Grid>
+                            <Grid Margin="0,8,0,4">
                                 <Grid.Style>
                                     <Style TargetType="Grid">
                                         <Setter Property="Visibility" Value="Collapsed" />
@@ -622,43 +634,43 @@
                                 </StackPanel>
                             </Grid>
                         </Grid>
-                    </StackPanel>
+                    </DockPanel>
                 </Border>
-            </Grid>
-
-            <Grid Grid.Row="4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <Border
-                    Grid.Column="0"
-                    Background="{StaticResource WindowBackgroundBrush}"
-                    BorderThickness="0"
-                    CornerRadius="6"
-                    Style="{StaticResource CommonBorderStyle}">
-                    <TextBlock
-                        Margin="8"
-                        Foreground="{StaticResource TextTertiaryBrush}"
-                        Text="保存后立即生效，从上到下依次执行，某一步失败会中止后续动作" />
-                </Border>
-
-                <Button
-                    Grid.Column="1"
-                    Margin="8,0"
-                    Command="{Binding CancelDialogCommand}"
-                    Content="取消"
-                    Style="{StaticResource CommonButtonStyle}" />
-
-                <Button
-                    Grid.Column="2"
-                    Padding="14,0"
-                    Command="{Binding SaveTaskCommand}"
-                    Content="{Binding SaveButtonText}"
-                    Style="{StaticResource PrimaryButtonStyle}" />
             </Grid>
         </Grid>
-    </StackPanel>
+
+        <Grid Grid.Row="3" Margin="16,0,16,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Border
+                Grid.Column="0"
+                Background="{StaticResource WindowBackgroundBrush}"
+                BorderThickness="0"
+                CornerRadius="6"
+                Style="{StaticResource CommonBorderStyle}">
+                <TextBlock
+                    Margin="8"
+                    Foreground="{StaticResource TextTertiaryBrush}"
+                    Text="保存后立即生效，从上到下依次执行，某一步失败会中止后续动作" />
+            </Border>
+
+            <Button
+                Grid.Column="1"
+                Margin="8,0"
+                Command="{Binding CancelDialogCommand}"
+                Content="取消"
+                Style="{StaticResource CommonButtonStyle}" />
+
+            <Button
+                Grid.Column="2"
+                Padding="14,0"
+                Command="{Binding SaveTaskCommand}"
+                Content="{Binding SaveButtonText}"
+                Style="{StaticResource PrimaryButtonStyle}" />
+        </Grid>
+    </Grid>
 </Window>
