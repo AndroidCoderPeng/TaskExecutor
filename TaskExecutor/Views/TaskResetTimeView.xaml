@@ -69,6 +69,7 @@
                     <ctrl:TimePicker
                         Margin="12,0"
                         VerticalAlignment="Center"
+                        Background="{StaticResource WindowBackgroundBrush}"
                         MinuteStep="1"
                         TimeText="{Binding ResetTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>

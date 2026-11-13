@@ -545,50 +545,43 @@
                             VerticalScrollBarVisibility="Hidden">
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn
-                                    Width="2*"
+                                    Width="1.75*"
                                     CellStyle="{StaticResource DataGridFirstCellStyle}"
                                     Header="任务名称"
                                     HeaderStyle="{StaticResource DataGridFirstColumnHeaderStyle}">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <StackPanel VerticalAlignment="Center">
+                                            <StackPanel>
                                                 <TextBlock
                                                     FontSize="14"
-                                                    FontWeight="Medium"
                                                     Foreground="{StaticResource TextPrimaryBrush}"
-                                                    Text="{Binding Name}"
+                                                    Text="{Binding TargetApp.Name, StringFormat={}任务名称 - {0}}"
                                                     TextTrimming="CharacterEllipsis" />
+
                                                 <TextBlock
                                                     Margin="0,4,0,0"
                                                     FontSize="12"
                                                     Foreground="{StaticResource TextTertiaryBrush}"
-                                                    TextTrimming="CharacterEllipsis">
-                                                    <Run Text="{Binding TargetApp.Name}" />
-                                                    <Run Text=" · " />
-                                                    <Run Text="{Binding TargetApp.PackageName}" />
-                                                </TextBlock>
+                                                    Text="{Binding TargetApp.PackageName}"
+                                                    TextTrimming="CharacterEllipsis" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTemplateColumn Width="100" Header="计划时间">
+                                <DataGridTemplateColumn Width="120" Header="计划时间">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Vertical">
                                                 <TextBlock
-                                                    FontFamily="Consle"
-                                                    FontSize="15"
-                                                    FontWeight="SemiBold"
+                                                    FontFamily="Consolas"
+                                                    FontSize="16"
                                                     Foreground="{StaticResource TextPrimaryBrush}"
                                                     Text="{Binding PlannedAt}"
                                                     TextTrimming="CharacterEllipsis" />
 
                                                 <TextBlock
-                                                    Margin="0,4,0,0"
-                                                    FontFamily="Consle"
-                                                    FontSize="11"
-                                                    FontWeight="SemiBold"
+                                                    FontFamily="Consolas"
                                                     Foreground="{StaticResource PrimaryBrush}"
                                                     TextTrimming="CharacterEllipsis">
                                                     <TextBlock.Text>
@@ -615,9 +608,8 @@
                                 <DataGridTextColumn
                                     Width="80"
                                     Binding="{Binding TimeDisplay}"
-                                    FontFamily="Consle"
-                                    FontSize="15"
-                                    FontWeight="SemiBold"
+                                    FontFamily="Consolas"
+                                    FontSize="16"
                                     Foreground="{StaticResource SuccessBrush}"
                                     Header="执行时间" />
 
@@ -663,7 +655,7 @@
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
                                                         <Border
-                                                            Margin="0,0,4,0"
+                                                            Margin="0,0,6,0"
                                                             BorderBrush="{Binding Color}"
                                                             BorderThickness="1"
                                                             CornerRadius="3">
