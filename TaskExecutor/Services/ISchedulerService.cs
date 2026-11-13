@@ -11,6 +11,11 @@ public interface ISchedulerService
     event Action<SchedulerStatus>? StatusChanged;
 
     /// <summary>
+    /// 任务链执行进度变化（taskName, actionName）；actionName 为空串表示链已开始/结束，无当前节点。
+    /// </summary>
+    public event Action<string, string>? ChainProgressChanged;
+    
+    /// <summary>
     /// 当前状态快照，供界面首次进入时初始化。
     /// </summary>
     SchedulerStatus CurrentStatus { get; }

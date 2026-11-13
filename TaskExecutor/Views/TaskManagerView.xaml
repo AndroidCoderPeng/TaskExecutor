@@ -434,6 +434,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
@@ -460,6 +461,36 @@
 
                         <Border
                             Grid.Column="2"
+                            Margin="8,0,0,0"
+                            Padding="8,3"
+                            VerticalAlignment="Center"
+                            CornerRadius="4">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="{StaticResource ControlFillBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ChainProgress}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+
+                            <TextBlock
+                                MaxWidth="340"
+                                FontSize="11"
+                                Text="{Binding ChainProgress}"
+                                TextTrimming="CharacterEllipsis">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Border>
+
+                        <Border
+                            Grid.Column="3"
                             Padding="8,4"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
@@ -507,7 +538,7 @@
                         </Border>
 
                         <StackPanel
-                            Grid.Column="3"
+                            Grid.Column="4"
                             Margin="16,0"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"

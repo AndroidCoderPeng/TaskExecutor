@@ -25,6 +25,7 @@ public partial class TaskManagerViewModel : ObservableObject
     [ObservableProperty] private string _nextTaskTime = "-";
     [ObservableProperty] private ObservableCollection<TaskRow> _tasks = [];
     [ObservableProperty] private bool _isTaskScheduled;
+    [ObservableProperty] private string _chainProgress = "";
     [ObservableProperty] private ObservableCollection<RuntimeLog> _runtimeLogs = [];
 
     #endregion
@@ -49,7 +50,7 @@ public partial class TaskManagerViewModel : ObservableObject
             (_, msg) => { DeviceName = string.IsNullOrEmpty(msg.Value.DeviceName) ? "-" : msg.Value.DeviceName; });
 
         WeakReferenceMessenger.Default.Register<MessengerMessage.TasksChangedMessage>(this, (_, _) => ReloadTasks());
-        
+
         var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
         Tasks = [.. config.Tasks];
 
@@ -65,6 +66,10 @@ public partial class TaskManagerViewModel : ObservableObject
             RuntimeLogs.Insert(0, log);
         };
         schedulerService.StatusChanged += ApplyStatus;
+        schedulerService.ChainProgressChanged += delegate(string actionName, string taskName)
+        {
+            ChainProgress = actionName == "" ? "" : $"任务：{actionName} - 正在执行「{taskName}」";
+        };
 
         // 进入页面时从唯一事实源拉取当前状态
         ApplyStatus(schedulerService.CurrentStatus);

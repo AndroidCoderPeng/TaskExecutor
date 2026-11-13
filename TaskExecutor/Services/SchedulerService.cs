@@ -43,6 +43,8 @@ public class SchedulerService : ISchedulerService
     private SchedulerStatus _currentStatus = new();
 
     public event Action<SchedulerStatus>? StatusChanged;
+    
+    public event Action<string, string>? ChainProgressChanged;
 
     public SchedulerStatus CurrentStatus => _currentStatus;
 
@@ -247,6 +249,8 @@ public class SchedulerService : ISchedulerService
             return;
         }
 
+        ChainProgressChanged?.Invoke(task.Name, ""); // 链开始：清空旧进度
+        
         var adb = new AdbDevice(_adbPath, serial);
         var screenshotPath = ""; // 「截屏」动作的产出，供后续「发送消息」附带
         foreach (var action in task.Actions)
@@ -258,6 +262,8 @@ public class SchedulerService : ISchedulerService
                 return;
             }
 
+            ChainProgressChanged?.Invoke(task.Name, action.Name); // 进入节点前播报
+            
             bool ok;
             switch (step.Value)
             {
@@ -301,6 +307,7 @@ public class SchedulerService : ISchedulerService
         }
 
         RaiseLog(TaskState.Success, $"任务「{task.Name}」执行成功");
+        ChainProgressChanged?.Invoke(task.Name, ""); // 链结束：清空进度
     }
 
     /// <summary>
