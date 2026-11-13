@@ -90,12 +90,12 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         PlannedTime = task.PlannedAt;
         IsRandomOffsetTime = task.TimeRange != null;
         SelectedActions = [.. task.Actions];
-        IsNotifyByMail = task.NotifyMethods.Contains("QQ 邮箱");
-        IsNotifyByWechat = task.NotifyMethods.Contains("企业微信");
+        IsNotifyByMail = task.NotifyMethods.Any(m => m.Name == "QQ 邮箱");
+        IsNotifyByWechat = task.NotifyMethods.Any(m => m.Name == "企业微信");
         SelectedTargetApp = MatchTargetApp(task.TargetApp);
 
         RefreshMessageAction();
-        
+
         foreach (var action in DefaultActions)
         {
             action.InSequence = SelectedActions.Any(a => a.Name == action.Name);
@@ -172,9 +172,9 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
     [RelayCommand]
     private void SelectAction(TaskAction action)
     {
-        if (!action.IsEnabled) return;   // 渠道未配置，Border 已禁用，兜底
-        if (action.InSequence) return;   // 已选过，Border 已禁用，兜底
-        
+        if (!action.IsEnabled) return; // 渠道未配置，Border 已禁用，兜底
+        if (action.InSequence) return; // 已选过，Border 已禁用，兜底
+
         SelectedActions.Add(new TaskAction
         {
             Name = action.Name,
@@ -182,7 +182,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
             DimColor = action.DimColor,
             IsEnabled = true
         });
-        
+
         action.InSequence = true; // 置灰动作库里的原条目
     }
 
@@ -199,7 +199,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         SelectedActions.Clear();
         foreach (var action in DefaultActions) action.InSequence = false;
     }
-    
+
     [RelayCommand]
     private void CancelDialog()
     {
@@ -236,9 +236,17 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
             }
         }
 
-        var notifyMethods = new List<string>();
-        if (IsNotifyByMail) notifyMethods.Add("QQ 邮箱");
-        if (IsNotifyByWechat) notifyMethods.Add("企业微信");
+        var notifyMethods = new List<NotifyMethod>();
+        if (IsNotifyByMail)
+        {
+            notifyMethods.Add(new NotifyMethod { Name = "QQ 邮箱", Color = "#FFF5A500"});
+        }
+
+        if (IsNotifyByWechat)
+        {
+            notifyMethods.Add(new NotifyMethod { Name = "企业微信", Color = "#FF1FA84F" });
+        }
+
         var timeRange = SettingsStore.Load<TimeRangeConfig>(ConfigSections.FileName, ConfigSections.TimeRange);
 
         // 先加「发送消息」又把渠道关掉的兜底（放在写回配置之前，避免校验失败时污染配置）

@@ -247,7 +247,7 @@ public class SchedulerService : ISchedulerService
     /// </summary>
     private async Task NotifyAsync(TaskRow task, string content)
     {
-        if (task.NotifyMethods.Contains("邮件"))
+        if (task.NotifyMethods.Any(m => m.Name == "QQ 邮箱"))
         {
             try
             {
@@ -259,7 +259,7 @@ public class SchedulerService : ISchedulerService
             }
         }
         
-        if (task.NotifyMethods.Contains("企业微信"))
+        if (task.NotifyMethods.Any(m => m.Name == "企业微信"))
         {
             try
             {

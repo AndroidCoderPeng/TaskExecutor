@@ -36,8 +36,7 @@ public class TaskRow
     public string PlannedAt { get; set; } = "";
     public TimeRangeConfig? TimeRange { get; set; }
     public List<TaskAction> Actions { get; set; } = [];
-    public List<string> NotifyMethods { get; set; } = [];
-    [JsonIgnore] public string NotifyMethodDisplay => string.Join("、", NotifyMethods);
+    public List<NotifyMethod> NotifyMethods { get; set; } = [];
 
     public bool IsEnabled { get; set; }
 

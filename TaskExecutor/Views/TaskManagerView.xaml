@@ -650,10 +650,35 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTextColumn
-                                    Width="150"
-                                    Binding="{Binding NotifyMethodDisplay}"
-                                    Header="通知方式" />
+                                <DataGridTemplateColumn Width="150" Header="通知方式">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ItemsControl ItemsSource="{Binding NotifyMethods}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Horizontal" />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border
+                                                            Margin="0,0,4,0"
+                                                            BorderBrush="{Binding Color}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="3">
+                                                            <TextBlock
+                                                                Margin="6,3"
+                                                                FontSize="11"
+                                                                Foreground="{Binding Color}"
+                                                                Text="{Binding Name}" />
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
                                 <DataGridTemplateColumn
                                     Width="90"
