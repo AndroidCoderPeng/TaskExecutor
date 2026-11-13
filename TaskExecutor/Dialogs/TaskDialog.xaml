@@ -411,9 +411,17 @@
                                         <Border.Style>
                                             <Style BasedOn="{StaticResource CommonBorderStyle}" TargetType="Border">
                                                 <Style.Triggers>
-                                                    <Trigger Property="IsEnabled" Value="False">
+                                                    <!--  渠道未解锁（发送消息）  -->
+                                                    <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                                        <Setter Property="IsEnabled" Value="False" />
                                                         <Setter Property="Opacity" Value="0.45" />
-                                                    </Trigger>
+                                                    </DataTrigger>
+                                                    
+                                                    <!--  已加入执行序列  -->
+                                                    <DataTrigger Binding="{Binding InSequence}" Value="True">
+                                                        <Setter Property="IsEnabled" Value="False" />
+                                                        <Setter Property="Opacity" Value="0.45" />
+                                                    </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>

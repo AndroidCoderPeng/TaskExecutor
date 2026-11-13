@@ -91,6 +91,11 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         SelectedTargetApp = MatchTargetApp(task.TargetApp);
 
         RefreshMessageAction();
+        
+        foreach (var action in DefaultActions)
+        {
+            action.InSequence = SelectedActions.Any(a => a.Name == action.Name);
+        }
     }
 
     private TargetAppRow MatchTargetApp(TargetAppRow target)
@@ -163,17 +168,8 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
     [RelayCommand]
     private void SelectAction(TaskAction action)
     {
-        if (!action.IsEnabled)
-        {
-            _toastService.Show("请先选择通知方式，再添加「发送消息」", ToastType.Warning);
-            return;
-        }
-        
-        if (SelectedActions.Any(a => a.Name == action.Name))
-        {
-            _toastService.Show($"动作「{action.Name}」已在执行序列中", ToastType.Warning);
-            return;
-        }
+        if (!action.IsEnabled) return;   // 渠道未配置，Border 已禁用，兜底
+        if (action.InSequence) return;   // 已选过，Border 已禁用，兜底
         
         SelectedActions.Add(new TaskAction
         {
@@ -182,18 +178,22 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
             DimColor = action.DimColor,
             IsEnabled = true
         });
+        
+        action.InSequence = true; // 置灰动作库里的原条目
     }
 
     [RelayCommand]
     private void RemoveAction(TaskAction action)
     {
         SelectedActions.Remove(action);
+        DefaultActions.First(a => a.Name == action.Name).InSequence = false;
     }
 
     [RelayCommand]
     private void ClearActions()
     {
         SelectedActions.Clear();
+        foreach (var action in DefaultActions) action.InSequence = false;
     }
     
     [RelayCommand]
