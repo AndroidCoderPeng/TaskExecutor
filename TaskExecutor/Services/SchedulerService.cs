@@ -43,7 +43,7 @@ public class SchedulerService : ISchedulerService
     private SchedulerStatus _currentStatus = new();
 
     public event Action<SchedulerStatus>? StatusChanged;
-    
+
     public event Action<string, string>? ChainProgressChanged;
 
     public SchedulerStatus CurrentStatus => _currentStatus;
@@ -111,7 +111,12 @@ public class SchedulerService : ISchedulerService
         PublishStatus();
     }
 
-    private async void OnTick(object? s, EventArgs e)
+    private void OnTick(object? s, EventArgs e)
+    {
+        _ = OnTickAsync();
+    }
+
+    private async Task OnTickAsync()
     {
         if (_isExecuting) return;
 
@@ -152,6 +157,10 @@ public class SchedulerService : ISchedulerService
             }
 
             RefreshPlan();
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine($"调度执行异常：{exception}");
         }
         finally
         {
@@ -236,78 +245,87 @@ public class SchedulerService : ISchedulerService
     /// </summary>
     private async Task ExecuteChainAsync(TaskRow task)
     {
-        var serial = $"{_deviceState.DeviceIp}:5555";
-        if (!_deviceState.IsConnected || !await _heartbeatService.ProbeAsync(serial))
+        try
         {
-            RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：设备离线");
-            return;
-        }
-
-        if (task.Actions.Count == 0)
-        {
-            RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：未配置动作链");
-            return;
-        }
-
-        ChainProgressChanged?.Invoke(task.Name, ""); // 链开始：清空旧进度
-        
-        var adb = new AdbDevice(_adbPath, serial);
-        var screenshotPath = ""; // 「截屏」动作的产出，供后续「发送消息」附带
-        foreach (var action in task.Actions)
-        {
-            var step = TaskActionNames.FromName(action.Name);
-            if (step == null)
+            var serial = $"{_deviceState.DeviceIp}:5555";
+            if (!_deviceState.IsConnected || !await _heartbeatService.ProbeAsync(serial))
             {
-                RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：未知动作「{action.Name}」");
+                RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：设备离线");
                 return;
             }
 
-            ChainProgressChanged?.Invoke(task.Name, action.Name); // 进入节点前播报
-            
-            bool ok;
-            switch (step.Value)
+            if (task.Actions.Count == 0)
             {
-                case TaskChainAction.ScreenOn:
-                    ok = await adb.ScreenOnAsync();
-                    break;
-                case TaskChainAction.OpenTarget:
-                    var wait = SettingsStore.Load<WaitTimeConfig>(ConfigSections.FileName, ConfigSections.WaitTime);
-                    var dwellSeconds = wait.Time;
-                    ok = await adb.OpenAppAsync(task.TargetApp.PackageName, task.TargetApp.Activity);
-                    if (ok && dwellSeconds > 0)
-                    {
-                        // 从打开目标应用开始计时，给应用留出操作停留时间，之后才继续后续动作
-                        await Task.Delay(TimeSpan.FromSeconds(dwellSeconds));
-                    }
-
-                    break;
-                case TaskChainAction.ScreenCapture:
-                    screenshotPath = await adb.ScreencapAsync(_screenshotDir) ?? "";
-                    ok = screenshotPath != "";
-                    break;
-                case TaskChainAction.SendMessage:
-                    ok = await SendChainMessageAsync(task, screenshotPath);
-                    break;
-                case TaskChainAction.KillTarget:
-                    ok = await adb.KillAppAsync(task.TargetApp.PackageName);
-                    break;
-                case TaskChainAction.ScreenOff:
-                    ok = await adb.ScreenOffAsync();
-                    break;
-                default:
-                    ok = false; // 未知动作记日志
-                    break;
-            }
-
-            if (!ok)
-            {
-                RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：动作「{action.Name}」出错");
+                RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：未配置动作链");
                 return;
             }
-        }
 
-        RaiseLog(TaskState.Success, $"任务「{task.Name}」执行成功");
-        ChainProgressChanged?.Invoke(task.Name, ""); // 链结束：清空进度
+            // 目标应用操作停留时长：从「打开应用」开始计时，与任务链节点间隔无关
+            var dwellSeconds = SettingsStore.Load<WaitTimeConfig>(ConfigSections.FileName, ConfigSections.WaitTime)
+                .Time;
+
+            ChainProgressChanged?.Invoke(task.Name, ""); // 链开始：清空旧进度
+
+            var adb = new AdbDevice(_adbPath, serial);
+            var screenshotPath = ""; // 「截屏」动作的产出，供后续「发送消息」附带
+            foreach (var action in task.Actions)
+            {
+                var step = TaskActionNames.FromName(action.Name);
+                if (step == null)
+                {
+                    RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：未知动作「{action.Name}」");
+                    return;
+                }
+
+                ChainProgressChanged?.Invoke(task.Name, action.Name); // 进入节点前播报
+
+                bool ok;
+                switch (step.Value)
+                {
+                    case TaskChainAction.ScreenOn:
+                        ok = await adb.ScreenOnAsync();
+                        break;
+                    case TaskChainAction.OpenTarget:
+                        ok = await adb.OpenAppAsync(task.TargetApp.PackageName, task.TargetApp.Activity);
+                        if (ok && dwellSeconds > 0)
+                        {
+                            // 从打开目标应用开始计时，给应用留出操作停留时间，之后才继续后续动作
+                            await Task.Delay(TimeSpan.FromSeconds(dwellSeconds));
+                        }
+
+                        break;
+                    case TaskChainAction.ScreenCapture:
+                        screenshotPath = await adb.ScreencapAsync(_screenshotDir) ?? "";
+                        ok = screenshotPath != "";
+                        break;
+                    case TaskChainAction.SendMessage:
+                        ok = await SendChainMessageAsync(task, screenshotPath);
+                        break;
+                    case TaskChainAction.KillTarget:
+                        ok = await adb.KillAppAsync(task.TargetApp.PackageName);
+                        break;
+                    case TaskChainAction.ScreenOff:
+                        ok = await adb.ScreenOffAsync();
+                        break;
+                    default:
+                        ok = false; // 未知动作记日志
+                        break;
+                }
+
+                if (!ok)
+                {
+                    RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：动作「{action.Name}」出错");
+                    return;
+                }
+            }
+
+            RaiseLog(TaskState.Success, $"任务「{task.Name}」执行成功");
+        }
+        finally
+        {
+            // 链结束（含设备离线、动作失败、未知动作等提前返回）：清空进度，chip 不残留
+            ChainProgressChanged?.Invoke(task.Name, "");
+        }
     }
 
     /// <summary>

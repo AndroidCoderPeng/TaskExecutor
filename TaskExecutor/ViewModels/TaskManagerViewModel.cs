@@ -66,9 +66,9 @@ public partial class TaskManagerViewModel : ObservableObject
             RuntimeLogs.Insert(0, log);
         };
         schedulerService.StatusChanged += ApplyStatus;
-        schedulerService.ChainProgressChanged += delegate(string actionName, string taskName)
+        schedulerService.ChainProgressChanged += delegate(string taskName, string actionName)
         {
-            ChainProgress = actionName == "" ? "" : $"任务：{actionName} - 正在执行「{taskName}」";
+            ChainProgress = actionName == "" ? "" : $"任务：{taskName} - 正在执行「{actionName}」";
         };
 
         // 进入页面时从唯一事实源拉取当前状态

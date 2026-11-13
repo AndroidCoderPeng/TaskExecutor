@@ -462,7 +462,7 @@
                         <Border
                             Grid.Column="2"
                             Margin="8,0,0,0"
-                            Padding="8,3"
+                            Padding="8,3,2,3"
                             VerticalAlignment="Center"
                             CornerRadius="4">
                             <Border.Style>
