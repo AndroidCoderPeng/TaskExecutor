@@ -18,7 +18,7 @@ public partial class ImportExportViewModel : ObservableObject
     #region VM
 
     [ObservableProperty] private string _exportFileName = string.Empty;
-    [ObservableProperty] private string _selectedFilePath = "点击选择或拖入备份文件";
+    [ObservableProperty] private string _selectedFilePath = "点击右侧按钮选择备份文件";
 
     #endregion
 

@@ -7,7 +7,7 @@
 body {
     font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
     background: transparent;
-    padding: 8px 16px 16px;
+    padding: 10px 10px 16px;
     color: #4E535C;
     -webkit-font-smoothing: antialiased;
 }
@@ -142,7 +142,7 @@ strong {
 
 @media (max-width: 480px) {
     body {
-        padding: 6px 10px 12px;
+        padding: 6px 8px 12px;
     }
 
     summary {
