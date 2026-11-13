@@ -36,14 +36,8 @@ public partial class ToastService : ObservableObject, IToastService
 
     private async Task HideAfterAsync(int ms, CancellationToken token)
     {
-        try
-        {
-            await Task.Delay(ms, token);
-        }
-        catch (OperationCanceledException)
-        {
-            return;
-        }
+        await Task.Delay(ms, CancellationToken.None);
+        if (token.IsCancellationRequested) return;
 
         _dispatcher.Invoke(() => IsVisible = false);
     }
