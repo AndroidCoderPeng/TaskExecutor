@@ -243,24 +243,34 @@
 
           <!-- ============ 视图：数据导入导出 ============ -->
           <section class="view" data-view="sync">
-            <p class="page-note">任务配置、目标 APP 映射与通知配置可导出为 CSV 备份，也可从 CSV 恢复。导入时同名任务将被覆盖。</p>
+            <p class="page-note">全部数据打包为一个 JSON 备份文件：定时任务、包名映射、通知与调度配置。恢复时自动识别内容，同名任务将被覆盖。</p>
             <div class="io-grid">
-              <div class="card io-card">
-                <b>导出配置</b>
-                <p>将当前全部任务（名称、执行时间、动作链、通知方式）导出为 CSV 文件，可用于备份或迁移到其他电脑。</p>
-                <div class="file-hint">tasks_2026-10-24.csv</div>
-                <div style="display:flex;gap:8px;margin-top:2px;">
-                  <button class="btn btn-primary" data-io="export-tasks">导出任务配置</button>
-                  <button class="btn btn-ghost" data-io="export-all">导出全部配置</button>
+              <div class="io-tile">
+                <div class="io-head">
+                  <span class="io-ico"><svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 3v10M8 9l4 4 4-4M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg></span>
+                  <b>导出备份</b>
+                </div>
+                <p>将任务、包名映射、通知与调度配置打包为一个 JSON 文件，用于备份或迁移到其他电脑。授权码、Webhook Key 等敏感信息不会导出。</p>
+                <div class="io-foot">
+                  <div class="io-file">TaskExecutor_备份_2026-11-13.json</div>
+                  <button class="btn btn-primary" data-io="export-backup">导出备份</button>
                 </div>
               </div>
-              <div class="card io-card">
-                <b>导入配置</b>
-                <p>从 CSV 文件导入任务与包名映射。支持 TaskExecutor 导出格式，也支持自定义「应用名,包名」两列格式。</p>
-                <div class="file-hint">选择 CSV 文件…</div>
-                <div style="display:flex;gap:8px;margin-top:2px;">
-                  <button class="btn btn-primary" data-io="import-tasks">导入任务</button>
-                  <button class="btn btn-ghost" data-io="import-apps">导入包名映射</button>
+              <div class="io-tile">
+                <div class="io-head">
+                  <span class="io-ico"><svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 13V3M8 7l4-4 4 4M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg></span>
+                  <b>导入备份</b>
+                </div>
+                <p>选择或拖入备份文件，自动识别内容并恢复，无需区分类型。兼容旧版「应用名,包名」两列 CSV，识别到该格式时按包名映射导入。</p>
+                <div class="io-foot">
+                  <div class="io-file drop" id="ioDrop" title="点击选择或拖入备份文件">点击选择或拖入备份文件…</div>
+                  <button class="btn btn-primary" data-io="import-backup">导入备份</button>
                 </div>
               </div>
             </div>

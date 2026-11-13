@@ -102,12 +102,15 @@
 
                     <StackPanel Grid.Row="3" Orientation="Horizontal">
                         <Button
-                            Margin="0,0,8,0"
                             Padding="14,0"
-                            Content="导出任务配置"
+                            Command="{Binding ExportTaskCommand}"
+                            Content="导出任务"
                             FontSize="14"
                             Style="{StaticResource PrimaryButtonStyle}" />
+
                         <Button
+                            Margin="8,0"
+                            Command="{Binding ExportConfigCommand}"
                             Content="导出全部配置"
                             FontSize="14"
                             Style="{StaticResource CommonButtonStyle}" />

@@ -273,14 +273,29 @@
 
   /* 数据导入导出 */
   .io-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .io-card{padding:16px;display:flex;flex-direction:column;gap:8px;}
-  .io-card b{font-size:14px;color:var(--text-1);font-weight:600;}
-  .io-card p{font-size:12px;color:var(--text-3);line-height:1.7;}
-  .io-card .file-hint{
-    background:var(--bg);border:1px dashed var(--border);border-radius:var(--radius);
-    padding:14px;font-size:12px;color:var(--text-4);text-align:center;
-    font-family:Consolas,monospace;
+  .io-tile{
+    background:var(--card);border:1px solid var(--border);border-radius:6px;
+    padding:18px;display:flex;flex-direction:column;gap:10px;
+    transition:border-color .15s,box-shadow .15s;
   }
+  .io-tile:hover{border-color:var(--primary);box-shadow:0 2px 12px rgba(0,122,255,.08);}
+  .io-head{display:flex;align-items:center;gap:10px;}
+  .io-ico{
+    width:36px;height:36px;flex:none;border-radius:9px;
+    background:var(--blue-dim);color:var(--primary);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .io-ico svg{width:20px;height:20px;}
+  .io-head b{font-size:14px;color:var(--text-1);font-weight:600;}
+  .io-tile p{font-size:12px;color:var(--text-3);line-height:1.7;}
+  .io-foot{margin-top:auto;display:flex;gap:8px;align-items:center;padding-top:4px;}
+  .io-file{
+    flex:1;min-width:0;border:1px dashed var(--border);border-radius:var(--radius);
+    background:var(--bg);padding:8px 10px;font-size:12px;color:var(--text-4);
+    font-family:Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .io-file.drop{cursor:pointer;transition:border-color .15s,color .15s;}
+  .io-file.drop:hover{border-color:var(--primary);color:var(--primary);}
 
   /* 指令测试 */
   .cmd-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;padding:14px 16px;}

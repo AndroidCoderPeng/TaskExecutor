@@ -485,11 +485,10 @@
   // ===== 数据导入导出 =====
   document.querySelectorAll("[data-io]").forEach(b=>b.addEventListener("click",()=>{
     const io=b.dataset.io;
-    if(io==="export-tasks"){toast("任务配置已导出：tasks_2026-10-24.csv");addLog("ok","成功","任务配置已导出为 tasks_2026-10-24.csv");}
-    if(io==="export-all"){toast("全部配置已导出：config_2026-10-24.csv");addLog("ok","成功","全部配置（任务/映射/通知）已导出");}
-    if(io==="import-tasks"){toast("已从 CSV 导入 4 条任务（演示）");addLog("ok","成功","从 CSV 导入 4 条任务配置");}
-    if(io==="import-apps"){toast("已从 CSV 导入 3 条包名映射（演示）");}
+    if(io==="export-backup"){toast("备份已导出：TaskExecutor_备份_2026-11-13.json");addLog("ok","成功","完整备份已导出（任务/映射/通知/调度配置）");}
+    if(io==="import-backup"){toast("已从备份恢复 4 条任务与 3 条包名映射（演示）");addLog("ok","成功","从备份文件恢复全部配置");}
   }));
+  $("ioDrop").onclick=()=>{toast("已从备份恢复 4 条任务与 3 条包名映射（演示）");addLog("ok","成功","从备份文件恢复全部配置");};
 
   // ===== 保存 / 测试按钮 =====
   document.querySelectorAll("[data-save]").forEach(b=>b.addEventListener("click",()=>{
