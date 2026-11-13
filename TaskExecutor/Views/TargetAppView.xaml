@@ -152,7 +152,7 @@
         <Style x:Key="LinkButtonStyle" TargetType="Button">
             <Setter Property="FontSize" Value="12" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -162,6 +162,12 @@
                                 VerticalAlignment="Center"
                                 TextElement.Foreground="{TemplateBinding Foreground}" />
                         </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Tag" Value="Danger">
+                                <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -238,32 +244,42 @@
                     Style="{StaticResource CardDataGridStyle}">
                     <DataGrid.Columns>
                         <DataGridTextColumn
-                            Width="20*"
+                            Width="2*"
                             Binding="{Binding Name}"
                             Header="应用名称" />
 
                         <DataGridTextColumn
-                            Width="30*"
+                            Width="3*"
                             Binding="{Binding PackageName}"
                             Header="包名" />
 
                         <DataGridTextColumn
-                            Width="44*"
+                            Width="5*"
                             Binding="{Binding Activity}"
                             Header="启动页" />
 
                         <DataGridTemplateColumn
-                            Width="6*"
+                            Width="86"
                             CellStyle="{StaticResource DataGridLastCellStyle}"
                             Header="操作"
                             HeaderStyle="{StaticResource DataGridLastColumnHeaderStyle}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button
-                                        Command="{Binding DataContext.DeleteTargetAppCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                        CommandParameter="{Binding}"
-                                        Content="删除"
-                                        Style="{StaticResource LinkButtonStyle}" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button
+                                            Command="{Binding DataContext.EditTargetAppCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}"
+                                            Content="编辑"
+                                            Style="{StaticResource LinkButtonStyle}" />
+
+                                        <Button
+                                            Margin="12,0,0,0"
+                                            Command="{Binding DataContext.DeleteTargetAppCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}"
+                                            Content="删除"
+                                            Style="{StaticResource LinkButtonStyle}"
+                                            Tag="Danger" />
+                                    </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -276,8 +292,8 @@
                     BorderThickness="0,1,0,0">
                     <Grid Margin="12">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="4*" />
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="9*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
@@ -289,17 +305,34 @@
 
                         <TextBox
                             Grid.Column="1"
-                            Margin="8,0"
+                            Margin="12,0"
                             Style="{StaticResource PlaceHolderTextBoxStyle}"
                             Tag="com.example.package"
                             Text="{Binding PackageName, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <Button
-                            Grid.Column="2"
-                            Padding="14,0"
-                            Command="{Binding AddTargetAppCommand}"
-                            Content="添加"
-                            Style="{StaticResource PrimaryButtonStyle}" />
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button
+                                Padding="14,0"
+                                Command="{Binding AddTargetAppCommand}"
+                                Content="{Binding SaveButtonText}"
+                                Style="{StaticResource PrimaryButtonStyle}" />
+
+                            <Button
+                                Margin="8,0,0,0"
+                                Command="{Binding CancelEditCommand}"
+                                Content="取消">
+                                <Button.Style>
+                                    <Style BasedOn="{StaticResource TextButtonStyle}" TargetType="Button">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </StackPanel>
                     </Grid>
                 </Border>
             </Grid>

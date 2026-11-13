@@ -48,6 +48,8 @@ public partial class TaskManagerViewModel : ObservableObject
         WeakReferenceMessenger.Default.Register<MessengerMessage.UpdateNavigationStateMessage>(this,
             (_, msg) => { DeviceName = string.IsNullOrEmpty(msg.Value.DeviceName) ? "-" : msg.Value.DeviceName; });
 
+        WeakReferenceMessenger.Default.Register<MessengerMessage.TasksChangedMessage>(this, (_, _) => ReloadTasks());
+        
         var config = SettingsStore.Load<TaskConfig>(ConfigSections.FileName, ConfigSections.Task);
         Tasks = [.. config.Tasks];
 
