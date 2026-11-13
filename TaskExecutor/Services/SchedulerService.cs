@@ -20,9 +20,18 @@ public class SchedulerService : ISchedulerService
         TimeRangeConfig GlobalRange,
         WaitTimeConfig Wait);
 
+    // 动作名常量，须与 TaskDialogViewModel.DefaultActions 的动作库名称保持一致
+    private const string ActionScreenOn = "亮屏";
+    private const string ActionOpenTarget = "打开应用";
+    private const string ActionScreenCapture = "截屏";
+    private const string ActionSendMessage = "发送消息";
+    private const string ActionKillTarget = "关闭应用";
+    private const string ActionScreenOff = "息屏";
+
     // 30s 一次 tick，UI 线程回调，方便直接更新 VM
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(30) };
     private readonly string _adbPath = Path.Combine(AppContext.BaseDirectory, "ADB", "adb.exe");
+    private readonly string _screenshotDir = Path.Combine(AppContext.BaseDirectory, "Screenshots");
     private readonly IDeviceStateProvider _deviceState;
     private readonly ILogStoreService _logStore;
     private readonly IAdbHeartbeatService _heartbeatService;
@@ -78,6 +87,30 @@ public class SchedulerService : ISchedulerService
         _isScheduled = true;
         RefreshPlan();
         _timer.Start();
+    }
+
+    /// <summary>
+    /// 手动执行一次完整任务链（不走调度计划）。调度 tick 与手动执行共用 _isExecuting 防重入。
+    /// </summary>
+    public async Task RunOnceAsync(TaskRow task)
+    {
+        if (_isExecuting)
+        {
+            _toastService.Show("有任务正在执行，请稍后再试", ToastType.Warning);
+            return;
+        }
+
+        _isExecuting = true;
+        try
+        {
+            // TODO wait 是用来给目标应用操作时间的停留，与任务链节点间隔无关
+            var wait = SettingsStore.Load<WaitTimeConfig>(ConfigSections.FileName, ConfigSections.WaitTime);
+            await ExecuteChainAsync(task, wait.Time);
+        }
+        finally
+        {
+            _isExecuting = false;
+        }
     }
 
     public void Stop()
@@ -202,6 +235,68 @@ public class SchedulerService : ISchedulerService
     }
 
     /// <summary>
+    /// 按 task.Actions 配置的顺序执行任务链；任一步骤失败立即中断。
+    /// 整条链只产生一条日志，与调度执行的统计口径一致。
+    /// </summary>
+    private async Task ExecuteChainAsync(TaskRow task, int stepInterval)
+    {
+        var serial = $"{_deviceState.DeviceIp}:5555";
+        if (!_deviceState.IsConnected || !await _heartbeatService.ProbeAsync(serial))
+        {
+            RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：设备离线");
+            return;
+        }
+
+        if (task.Actions.Count == 0)
+        {
+            RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：未配置动作链");
+            return;
+        }
+
+        var adb = new AdbDevice(_adbPath, serial);
+        var screenshotPath = ""; // 「截屏」动作的产出，供后续「发送消息」附带
+        foreach (var action in task.Actions)
+        {
+            bool ok;
+            switch (action.Name)
+            {
+                case ActionScreenOn:
+                    ok = await adb.ScreenOnAsync();
+                    break;
+                case ActionOpenTarget:
+                    ok = await adb.OpenAppAsync(task.TargetApp.PackageName, task.TargetApp.Activity);
+                    break;
+                case ActionScreenCapture:
+                    screenshotPath = await adb.ScreencapAsync(_screenshotDir) ?? "";
+                    ok = screenshotPath != "";
+                    break;
+                case ActionSendMessage:
+                    ok = await SendChainMessageAsync(task, screenshotPath);
+                    break;
+                case ActionKillTarget:
+                    ok = await adb.KillAppAsync(task.TargetApp.PackageName);
+                    break;
+                case ActionScreenOff:
+                    ok = await adb.ScreenOffAsync();
+                    break;
+                default:
+                    ok = false; // 未知动作，fail-fast 并记日志
+                    break;
+            }
+
+            if (!ok)
+            {
+                RaiseLog(TaskState.Failed, $"任务「{task.Name}」执行失败：动作「{action.Name}」出错");
+                return;
+            }
+            
+            if (stepInterval > 0) await Task.Delay(TimeSpan.FromSeconds(stepInterval));
+        }
+
+        RaiseLog(TaskState.Success, $"任务「{task.Name}」执行成功");
+    }
+
+    /// <summary>
     /// 执行单个任务：探测设备 → adb 拉起目标 APP → 发送通知 → 等待任务间隔。
     /// </summary>
     private async Task ExecuteTaskAsync(TaskRow task, WaitTimeConfig wait)
@@ -215,18 +310,8 @@ public class SchedulerService : ISchedulerService
             return;
         }
 
-        var commandLine = new ArgumentCreator()
-            .Append("-s")
-            .Append(serial)
-            .Append("shell")
-            .Append("am")
-            .Append("start")
-            .Append("-n")
-            .Append($"{task.TargetApp.PackageName}/{task.TargetApp.Activity}")
-            .ToCommandLine();
-        var (code, output) = await new CommandExecutor(commandLine).ExecuteWithOutputAsync(_adbPath);
-
-        var failed = code != 0 || output.Any(line => line.Contains("Error", StringComparison.OrdinalIgnoreCase));
+        var adb = new AdbDevice(_adbPath, serial);
+        var failed = !await adb.OpenAppAsync(task.TargetApp.PackageName, task.TargetApp.Activity);
         RaiseLog(failed ? TaskState.Failed : TaskState.Success, failed
             ? $"任务「{task.Name}」执行失败：启动 {task.TargetApp.Name} 失败"
             : $"任务「{task.Name}」执行成功：已启动 {task.TargetApp.Name}");
@@ -258,7 +343,7 @@ public class SchedulerService : ISchedulerService
                 RaiseLog(TaskState.Failed, $"任务「{task.Name}」邮件通知发送失败：{e.Message}");
             }
         }
-        
+
         if (task.NotifyMethods.Any(m => m.Name == "企业微信"))
         {
             try
@@ -366,18 +451,18 @@ public class SchedulerService : ISchedulerService
             .Where(t => t.IsEnabled)
             .Select(t => t.Name)
             .ToHashSet(StringComparer.Ordinal);
-        
+
         var planned = _plan.State.Tasks
             .Where(p => enabled.Contains(p.TaskName))
             .OrderBy(p => p.ScheduledAt)
             .Select(p => new ScheduledTaskInfo(p.TaskName, p.ScheduledAt, p.State))
             .ToArray();
-        
+
         _nextTaskTime = planned
             .Where(p => p.State == PlannedTaskState.Pending)
             .Select(p => (DateTime?)p.ScheduledAt)
             .FirstOrDefault();
-        
+
         _currentStatus = new SchedulerStatus
         {
             IsScheduled = _isScheduled,

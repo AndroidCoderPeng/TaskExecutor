@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using System.IO;
-using System.Text.RegularExpressions;
+﻿using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskExecutor.Cache;
@@ -23,9 +21,6 @@ public partial class CommandTestViewModel : ObservableObject
     private readonly ConnectDeviceViewModel _deviceViewModel;
     private readonly IToastService _toastService;
 
-    [GeneratedRegex(@"^\s*(?:Override|Physical) size:\s*(\d+)\s*x\s*(\d+)\s*$")]
-    private static partial Regex ScreenSizeRegex();
-
     public CommandTestViewModel(ConnectDeviceViewModel deviceViewModel, IToastService toastService)
     {
         _deviceViewModel = deviceViewModel;
@@ -36,51 +31,15 @@ public partial class CommandTestViewModel : ObservableObject
 
     private string DeviceSerial => $"{_deviceViewModel.DeviceIp}:5555";
 
+    private AdbDevice CreateDevice() => new(_adbPath, DeviceSerial);
+
     [RelayCommand]
     private async Task WakeupPhoneAsync()
     {
         if (!CheckConnected()) return;
 
-        var (wakeCode, _) = await RunAdbAsync("shell", "input", "keyevent", "KEYCODE_WAKEUP");
-        if (wakeCode != 0)
-        {
-            _toastService.Show("亮屏指令执行失败", ToastType.Error);
-            return;
-        }
-
-        var (sizeCode, output) = await RunAdbAsync("shell", "wm", "size");
-        if (sizeCode != 0)
-        {
-            Console.WriteLine($"获取屏幕尺寸失败，退出码: {sizeCode}, 输出: {string.Join("\n", output)}");
-            return;
-        }
-
-        // 设置过覆盖尺寸时，应使用覆盖尺寸而不是物理尺寸。
-        var sizeLine = output.FirstOrDefault(line =>
-                           line.TrimStart().StartsWith("Override size:", StringComparison.OrdinalIgnoreCase))
-                       ?? output.FirstOrDefault(line =>
-                           line.TrimStart().StartsWith("Physical size:", StringComparison.OrdinalIgnoreCase));
-        Console.WriteLine($"屏幕尺寸信息: {sizeLine}");
-
-        var match = ScreenSizeRegex().Match(sizeLine ?? "");
-        if (!match.Success
-            || !int.TryParse(match.Groups[1].Value, out var width)
-            || !int.TryParse(match.Groups[2].Value, out var height)
-            || width < 2 || height < 2)
-        {
-            Console.WriteLine("无法解析屏幕尺寸");
-            return;
-        }
-
-        await Task.Delay(500);
-        var x = (width / 2).ToString(CultureInfo.InvariantCulture);
-        var startY = ((int)(height * 0.8)).ToString(CultureInfo.InvariantCulture);
-        var endY = ((int)(height * 0.2)).ToString(CultureInfo.InvariantCulture);
-
-        var (swipeCode, _) = await RunAdbAsync("shell", "input", "swipe", x, startY, x, endY, "300");
-        _toastService.Show(
-            swipeCode == 0 ? "亮屏指令执行成功" : "亮屏指令执行失败",
-            swipeCode == 0 ? ToastType.Success : ToastType.Error);
+        var ok = await CreateDevice().ScreenOnAsync();
+        _toastService.Show(ok ? "亮屏指令执行成功" : "亮屏指令执行失败", ok ? ToastType.Success : ToastType.Error);
     }
 
     [RelayCommand]
@@ -88,8 +47,8 @@ public partial class CommandTestViewModel : ObservableObject
     {
         if (!CheckConnected()) return;
 
-        var (code, _) = await RunAdbAsync("shell", "input", "keyevent", "KEYCODE_SLEEP");
-        _toastService.Show(code == 0 ? "已发送息屏指令" : "息屏指令执行失败", code == 0 ? ToastType.Success : ToastType.Error);
+        var ok = await CreateDevice().ScreenOffAsync();
+        _toastService.Show(ok ? "已发送息屏指令" : "息屏指令执行失败", ok ? ToastType.Success : ToastType.Error);
     }
 
     [RelayCommand]
@@ -97,22 +56,9 @@ public partial class CommandTestViewModel : ObservableObject
     {
         if (!CheckConnected()) return;
 
-        Directory.CreateDirectory(_screenshotDir);
-        var localPath = Path.Combine(_screenshotDir, $"screencap_{DateTime.Now:yyyyMMdd_HHmmss}.png");
-        var remotePath = "/sdcard/screencap_tmp.png";
-
-        var (capCode, _) = await RunAdbAsync("shell", "screencap", "-p", remotePath);
-        if (capCode != 0)
-        {
-            _toastService.Show("设备端截屏失败", ToastType.Error);
-            return;
-        }
-
-        var (pullCode, _) = await RunAdbAsync("pull", remotePath, localPath);
-        await RunAdbAsync("shell", "rm", remotePath); // 清理设备端临时文件
-
-        _toastService.Show(pullCode == 0 ? $"截屏已保存到 {localPath}" : "截屏文件传输失败",
-            pullCode == 0 ? ToastType.Success : ToastType.Error);
+        var localPath = await CreateDevice().ScreencapAsync(_screenshotDir);
+        _toastService.Show(localPath == null ? "截屏失败" : $"截屏已保存到 {localPath}",
+            localPath == null ? ToastType.Error : ToastType.Success);
     }
 
     [RelayCommand]
@@ -121,9 +67,8 @@ public partial class CommandTestViewModel : ObservableObject
         if (!CheckConnected()) return;
         if (!TryGetTargetApp(out var app)) return;
 
-        var (code, output) = await RunAdbAsync("shell", "am", "start", "-n", $"{app.PackageName}/{app.Activity}");
-        var failed = code != 0 || output.Any(line => line.Contains("Error", StringComparison.OrdinalIgnoreCase));
-        _toastService.Show(failed ? "启动目标应用失败" : $"已启动 {app.Name}", failed ? ToastType.Error : ToastType.Success);
+        var ok = await CreateDevice().OpenAppAsync(app.PackageName, app.Activity);
+        _toastService.Show(ok ? $"已启动 {app.Name}" : "启动目标应用失败", ok ? ToastType.Success : ToastType.Error);
     }
 
     [RelayCommand]
@@ -132,8 +77,8 @@ public partial class CommandTestViewModel : ObservableObject
         if (!CheckConnected()) return;
         if (!TryGetTargetApp(out var app)) return;
 
-        var (code, _) = await RunAdbAsync("shell", "am", "force-stop", app.PackageName);
-        _toastService.Show(code == 0 ? $"已关闭 {app.Name}" : "关闭目标应用失败", code == 0 ? ToastType.Success : ToastType.Error);
+        var ok = await CreateDevice().KillAppAsync(app.PackageName);
+        _toastService.Show(ok ? $"已关闭 {app.Name}" : "关闭目标应用失败", ok ? ToastType.Success : ToastType.Error);
     }
 
     private bool CheckConnected()
@@ -145,20 +90,6 @@ public partial class CommandTestViewModel : ObservableObject
 
         _toastService.Show("设备未连接，请先连接设备", ToastType.Warning);
         return false;
-    }
-
-    /// <summary>
-    /// 执行 adb 子命令（自动附带 -s 指定目标设备），返回 (退出码, 输出行)。
-    /// </summary>
-    private async Task<(int Code, IReadOnlyList<string> Output)> RunAdbAsync(params string[] arguments)
-    {
-        var commandLine = new ArgumentCreator().Append("-s").Append(DeviceSerial);
-        foreach (var argument in arguments)
-        {
-            commandLine.Append(argument);
-        }
-
-        return await new CommandExecutor(commandLine.ToCommandLine()).ExecuteWithOutputAsync(_adbPath);
     }
 
     private bool TryGetTargetApp(out TargetAppRow app)

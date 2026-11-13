@@ -116,9 +116,22 @@ public partial class TaskManagerViewModel : ObservableObject
     [RelayCommand]
     private async Task RunTaskOnce(TaskRow task)
     {
-        
+        if (!_deviceViewModel.IsConnected)
+        {
+            _toastService.Show("设备未连接，请先连接设备", ToastType.Warning);
+            return;
+        }
+
+        if (!task.IsEnabled)
+        {
+            _toastService.Show($"任务「{task.Name}」已暂停，请先启用后再执行", ToastType.Warning);
+            return;
+        }
+
+        _toastService.Show($"任务「{task.Name}」开始执行");
+        await _schedulerService.RunOnceAsync(task);
     }
-    
+
     [RelayCommand]
     private async Task EditTask(TaskRow task)
     {
@@ -149,7 +162,7 @@ public partial class TaskManagerViewModel : ObservableObject
         _schedulerService.RefreshPlan();
         ApplyTaskFilter();
     }
-    
+
     [RelayCommand]
     private void DeleteTask(TaskRow task)
     {

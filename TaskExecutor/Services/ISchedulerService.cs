@@ -1,4 +1,5 @@
-﻿using TaskExecutor.Utils;
+﻿using TaskExecutor.Cache;
+using TaskExecutor.Utils;
 
 namespace TaskExecutor.Services;
 
@@ -15,6 +16,11 @@ public interface ISchedulerService
     SchedulerStatus CurrentStatus { get; }
 
     void Start();
+
+    /// <summary>
+    /// 手动触发一次完整的任务链执行（不占用调度计划，与调度 tick 互斥）。
+    /// </summary>
+    Task RunOnceAsync(TaskRow task);
 
     void Stop();
 
