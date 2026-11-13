@@ -48,7 +48,9 @@ namespace TaskExecutor.Utils
                 try
                 {
                     Directory.CreateDirectory(Dir);
-                    File.WriteAllText(file, root.ToString(Formatting.Indented));
+                    var temporaryPath = file + ".tmp";
+                    File.WriteAllText(temporaryPath, root.ToString(Formatting.Indented));
+                    File.Move(temporaryPath, file, true);
                 }
                 catch (Exception e)
                 {
