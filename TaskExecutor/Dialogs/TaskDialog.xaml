@@ -3,12 +3,13 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ctrl="clr-namespace:TaskExecutor.Controls"
+    xmlns:cvt="clr-namespace:TaskExecutor.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
     Title="{Binding Title}"
     Width="690"
-    Height="734"
+    Height="672"
     d:DataContext="{d:DesignInstance Type=vm:TaskDialogViewModel}"
     Background="White"
     ResizeMode="NoResize"
@@ -81,6 +82,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <cvt:StepIndexConverter x:Key="StepIndexConverterKey" />
     </Window.Resources>
 
     <StackPanel Orientation="Vertical">
@@ -466,7 +469,7 @@
                 <Border
                     Grid.Column="1"
                     Margin="12,0,0,0"
-                    Padding="12"
+                    Padding="12,8"
                     Background="{StaticResource WindowBackgroundBrush}"
                     Style="{StaticResource CommonBorderStyle}">
                     <StackPanel Orientation="Vertical">
@@ -503,14 +506,16 @@
                                 Style="{StaticResource TextButtonStyle}" />
                         </Grid>
 
-                        <Separator Margin="0,8" Background="{StaticResource CardBorderBrush}" />
+                        <Separator Margin="0,8,0,4" Background="{StaticResource CardBorderBrush}" />
 
                         <ListBox
+                            AlternationCount="999"
                             Background="Transparent"
                             BorderThickness="0"
                             ItemsSource="{Binding SelectedActions}"
                             ScrollViewer.CanContentScroll="False"
-                            ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            VirtualizingPanel.VirtualizationMode="Standard">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Border
@@ -530,10 +535,19 @@
                                                 BorderThickness="4,0,0,0"
                                                 CornerRadius="4" />
 
-                                            <TextBlock
+                                            <StackPanel
                                                 Grid.Column="1"
                                                 Margin="8,6"
-                                                Text="{Binding Name}" />
+                                                VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                                <TextBlock Foreground="{StaticResource TextTertiaryBrush}" Text="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource AncestorType=ListBoxItem}, Converter={StaticResource StepIndexConverterKey}}" />
+
+                                                <TextBlock
+                                                    Margin="8,0,0,0"
+                                                    FontWeight="Medium"
+                                                    Foreground="{StaticResource TextPrimaryBrush}"
+                                                    Text="{Binding Name}" />
+                                            </StackPanel>
 
                                             <Button
                                                 Grid.Column="2"
@@ -568,47 +582,39 @@
                 </Border>
             </Grid>
 
-            <Border
-                Grid.Row="4"
-                Background="{StaticResource WindowBackgroundBrush}"
-                BorderThickness="0"
-                CornerRadius="6"
-                Style="{StaticResource CommonBorderStyle}">
-                <TextBlock
-                    Margin="8"
-                    Foreground="{StaticResource TextTertiaryBrush}"
-                    Text="从上到下依次执行，某一步失败会中止后续动作" />
-            </Border>
-        </Grid>
+            <Grid Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-        <Separator Background="{StaticResource CardBorderBrush}" />
+                <Border
+                    Grid.Column="0"
+                    Background="{StaticResource WindowBackgroundBrush}"
+                    BorderThickness="0"
+                    CornerRadius="6"
+                    Style="{StaticResource CommonBorderStyle}">
+                    <TextBlock
+                        Margin="8"
+                        Foreground="{StaticResource TextTertiaryBrush}"
+                        Text="保存后立即生效，从上到下依次执行，某一步失败会中止后续动作" />
+                </Border>
 
-        <Grid Margin="16,9,16,16">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+                <Button
+                    Grid.Column="1"
+                    Margin="8,0"
+                    Command="{Binding CancelDialogCommand}"
+                    Content="取消"
+                    Style="{StaticResource CommonButtonStyle}" />
 
-            <TextBlock
-                Grid.Column="0"
-                VerticalAlignment="Center"
-                Foreground="{StaticResource TextTertiaryBrush}"
-                Text="保存后立即生效，节假日自动跳过" />
-
-            <Button
-                Grid.Column="1"
-                Margin="8,0"
-                Command="{Binding CancelDialogCommand}"
-                Content="取消"
-                Style="{StaticResource CommonButtonStyle}" />
-
-            <Button
-                Grid.Column="2"
-                Padding="14,0"
-                Command="{Binding SaveTaskCommand}"
-                Content="{Binding SaveButtonText}"
-                Style="{StaticResource PrimaryButtonStyle}" />
+                <Button
+                    Grid.Column="2"
+                    Padding="14,0"
+                    Command="{Binding SaveTaskCommand}"
+                    Content="{Binding SaveButtonText}"
+                    Style="{StaticResource PrimaryButtonStyle}" />
+            </Grid>
         </Grid>
     </StackPanel>
 </Window>

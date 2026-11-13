@@ -169,7 +169,12 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
             return;
         }
         
-        // 动作库实例还承担展示状态（IsEnabled 联动），执行序列必须放独立副本
+        if (SelectedActions.Any(a => a.Name == action.Name))
+        {
+            _toastService.Show($"动作「{action.Name}」已在执行序列中", ToastType.Warning);
+            return;
+        }
+        
         SelectedActions.Add(new TaskAction
         {
             Name = action.Name,
