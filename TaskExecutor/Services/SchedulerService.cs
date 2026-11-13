@@ -41,6 +41,8 @@ public class SchedulerService : ISchedulerService
     private int _todayTotal;
     private int _todaySuccess;
     private SchedulerStatus _currentStatus = new();
+    private CancellationTokenSource? _chainCts;
+    private string? _runningTaskName;
 
     public event Action<SchedulerStatus>? StatusChanged;
 
@@ -240,11 +242,21 @@ public class SchedulerService : ISchedulerService
         _toastService.Show($"执行计划异常，调度已暂停：{e.Message}", ToastType.Error);
     }
 
+    public void CancelChain(string taskName)
+    {
+        if (_runningTaskName != taskName) return;
+        _chainCts?.Cancel();
+    }
+
     /// <summary>
     /// 按 task.Actions 配置的顺序执行任务链；任一步骤失败立即中断，整条链只产生一条日志，与调度执行的统计口径一致。
     /// </summary>
     private async Task ExecuteChainAsync(TaskRow task)
     {
+        using var cts = new CancellationTokenSource();
+        _chainCts = cts;
+        _runningTaskName = task.Name;
+        
         try
         {
             var serial = $"{_deviceState.DeviceIp}:5555";
@@ -278,6 +290,7 @@ public class SchedulerService : ISchedulerService
                     return;
                 }
 
+                cts.Token.ThrowIfCancellationRequested(); // 每个节点前检查删除
                 ChainProgressChanged?.Invoke(task.Name, action.Name); // 进入节点前播报
 
                 bool ok;
@@ -294,7 +307,7 @@ public class SchedulerService : ISchedulerService
                             for (var remaining = dwellSeconds; remaining > 0; remaining--)
                             {
                                 ChainProgressChanged?.Invoke(task.Name, $"打开应用（剩余 {remaining}s）");
-                                await Task.Delay(TimeSpan.FromSeconds(1));
+                                await Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
                             }
                         }
 
@@ -325,6 +338,10 @@ public class SchedulerService : ISchedulerService
             }
 
             RaiseLog(TaskState.Success, $"任务「{task.Name}」执行成功");
+        }
+        catch (OperationCanceledException)
+        {
+            // 任务已删除，剩余动作中止
         }
         finally
         {

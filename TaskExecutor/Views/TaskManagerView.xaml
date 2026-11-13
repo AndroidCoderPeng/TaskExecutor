@@ -583,11 +583,36 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel>
-                                                <TextBlock
-                                                    FontSize="14"
-                                                    Foreground="{StaticResource TextPrimaryBrush}"
-                                                    Text="{Binding TargetApp.Name, StringFormat={}任务名称 - {0}}"
-                                                    TextTrimming="CharacterEllipsis" />
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock
+                                                        FontSize="14"
+                                                        Foreground="{StaticResource TextPrimaryBrush}"
+                                                        Text="{Binding TargetApp.Name, StringFormat={}任务名称 - {0}}"
+                                                        TextTrimming="CharacterEllipsis" />
+
+                                                    <!--  执行中徽标  -->
+                                                    <Border
+                                                        Margin="6,0"
+                                                        Padding="6,2"
+                                                        VerticalAlignment="Center"
+                                                        CornerRadius="3">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                <Setter Property="Background" Value="{StaticResource SuccessDimBrush}" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsExecuting}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <TextBlock
+                                                            FontSize="10"
+                                                            Foreground="{StaticResource SuccessBrush}"
+                                                            Text="执行中" />
+                                                    </Border>
+                                                </StackPanel>
 
                                                 <TextBlock
                                                     Margin="0,4,0,0"

@@ -30,4 +30,9 @@ public interface ISchedulerService
     void Stop();
 
     void RefreshPlan();
+    
+    /// <summary>
+    /// 若指定任务正在执行链，则中止其剩余动作（任务删除场景）。
+    /// </summary>
+    void CancelChain(string taskName);
 }

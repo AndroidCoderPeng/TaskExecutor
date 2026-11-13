@@ -68,6 +68,9 @@ public partial class TaskManagerViewModel : ObservableObject
         schedulerService.StatusChanged += ApplyStatus;
         schedulerService.ChainProgressChanged += delegate(string taskName, string actionName)
         {
+            var task = Tasks.FirstOrDefault(t => t.Name == taskName);
+            if (task != null) task.IsExecuting = actionName != "";
+            
             ChainProgress = actionName == "" ? "" : $"任务：{taskName} - 正在执行「{actionName}」";
         };
 
@@ -175,6 +178,8 @@ public partial class TaskManagerViewModel : ObservableObject
     {
         if (!Tasks.Remove(task)) return;
 
+        _schedulerService.CancelChain(task.Name);
+        
         SaveTasks();
         _toastService.Show($"任务「{task.Name}」已删除", ToastType.Success);
         _schedulerService.RefreshPlan();

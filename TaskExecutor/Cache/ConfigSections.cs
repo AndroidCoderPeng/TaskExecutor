@@ -1,4 +1,5 @@
 using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Newtonsoft.Json;
 using TaskExecutor.Model;
 
@@ -29,7 +30,7 @@ public class TaskConfig
     public List<TaskRow> Tasks { get; set; } = [];
 }
 
-public class TaskRow
+public partial class TaskRow : ObservableObject
 {
     public string Name { get; set; } = "";
     public TargetAppRow TargetApp { get; set; } = new();
@@ -47,6 +48,11 @@ public class TaskRow
     public string TimeDisplay => ExecuteTime is { } time
         ? time.ToString("HH:mm", CultureInfo.InvariantCulture)
         : "—";
+
+    /// <summary>
+    /// 运行态标记：任务链是否正在执行（不落盘）。
+    /// </summary>
+    [ObservableProperty] [JsonIgnore] private bool _isExecuting;
 }
 
 public class TargetAppConfig
