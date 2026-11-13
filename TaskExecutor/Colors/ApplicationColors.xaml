@@ -58,8 +58,8 @@
     <Color x:Key="ProcessingDimColor">#1A3478F6</Color>
 
     <!-- 提示/特殊：紫 -->
-    <Color x:Key="AccentColor">#FF8250C8</Color>
-    <Color x:Key="AccentDimColor">#1F8250C8</Color>
+    <Color x:Key="AccentColor">#FF7B5CFA</Color>
+    <Color x:Key="AccentDimColor">#1F7B5CFA</Color>
 
     <!-- 同步/辅助状态：青绿 -->
     <Color x:Key="SyncColor">#FF0F9688</Color>

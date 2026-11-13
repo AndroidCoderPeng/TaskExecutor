@@ -636,7 +636,7 @@
                                         HorizontalAlignment="Center"
                                         FontSize="11"
                                         Foreground="{StaticResource TextDisabledBrush}"
-                                        Text="点击左侧动作库「+」添加任务动作" />
+                                        Text="点击左侧动作库「+」或者拖拽任务动作项" />
                                 </StackPanel>
                             </Grid>
                         </Grid>
