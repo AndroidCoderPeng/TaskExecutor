@@ -27,12 +27,12 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
 
     [ObservableProperty] private ObservableCollection<TaskAction> _defaultActions =
     [
-        new() { Name = "亮屏", Color = "#FF1FA84F", DimColor = "#1F1FA84F" },
-        new() { Name = "打开应用", Color = "#FF8250C8", DimColor = "#1F8250C8" },
-        new() { Name = "截屏", Color = "#FF0F9688", DimColor = "#1F0F9688" },
-        new() { Name = "发送消息", Color = "#FFF5A500", DimColor = "#1FF5A500" },
-        new() { Name = "关闭应用", Color = "#FFE5484D", DimColor = "#1FE5484D" },
-        new() { Name = "息屏", Color = "#FF687386", DimColor = "#1F687386" }
+        new() { Name = "亮屏", IsEnabled = true, Color = "#FF1FA84F", DimColor = "#1F1FA84F" },
+        new() { Name = "打开应用", IsEnabled = true, Color = "#FF8250C8", DimColor = "#1F8250C8" },
+        new() { Name = "截屏", IsEnabled = true, Color = "#FF0F9688", DimColor = "#1F0F9688" },
+        new() { Name = "发送消息", Color = "#FFF5A500", DimColor = "#1FF5A500" }, // 选中渠道后解锁
+        new() { Name = "关闭应用", IsEnabled = true, Color = "#FFE5484D", DimColor = "#1FFE5484D" },
+        new() { Name = "息屏", IsEnabled = true, Color = "#FF687386", DimColor = "#1F687386" }
     ];
 
     public ObservableCollection<TargetAppRow> TargetApps { get; } = [];
@@ -83,9 +83,11 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         TaskName = task.Name;
         PlannedTime = task.PlannedAt;
         IsRandomOffsetTime = task.TimeRange != null;
-        IsNotifyByMail = task.NotifyMethods.Contains("邮件");
+        IsNotifyByMail = task.NotifyMethods.Contains("QQ 邮箱");
         IsNotifyByWechat = task.NotifyMethods.Contains("企业微信");
         SelectedTargetApp = MatchTargetApp(task.TargetApp);
+
+        RefreshMessageAction();
     }
 
     private TargetAppRow MatchTargetApp(TargetAppRow target)
@@ -108,6 +110,53 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         return orphan;
     }
 
+    [RelayCommand]
+    private void ToggleNotifyChannel(string channel)
+    {
+        var enabled = channel == "QQ 邮箱" ? IsNotifyByMail : IsNotifyByWechat;
+
+        if (enabled && !IsChannelConfigured(channel))
+        {
+            // 回弹：IsChecked 绑定已经把属性改成 true 了，翻回去
+            if (channel == "QQ 邮箱") IsNotifyByMail = false;
+            else IsNotifyByWechat = false;
+
+            _toastService.Show(
+                channel == "QQ 邮箱" ? "邮件渠道未配置，请先完成「邮件配置」" : "企业微信渠道未配置，请先填写 Webhook Key",
+                ToastType.Warning);
+        }
+
+        RefreshMessageAction();
+    }
+    
+    private void RefreshMessageAction()
+    {
+        var send = DefaultActions.First(a => a.Name == "发送消息");
+        send.IsEnabled = IsNotifyByMail || IsNotifyByWechat;
+    }
+    
+    private static bool IsChannelConfigured(string channel) => channel switch
+    {
+        "企业微信" => IsWechatConfigured(),
+        "QQ 邮箱" => IsEmailConfigured(),
+        _ => false
+    };
+    
+    private static bool IsEmailConfigured()
+    {
+        var c = SettingsStore.Load<EmailConfig>(ConfigSections.FileName, ConfigSections.Email);
+        return !string.IsNullOrWhiteSpace(c.SmtpServer)
+               && c.SmtpPort > 0
+               && !string.IsNullOrWhiteSpace(c.SenderAuthCode)
+               && !string.IsNullOrWhiteSpace(c.RecipientEmail);
+    }
+    
+    private static bool IsWechatConfigured()
+    {
+        var c = SettingsStore.Load<WechatConfig>(ConfigSections.FileName, ConfigSections.Wechat);
+        return !string.IsNullOrWhiteSpace(c.WebhookKey);
+    }
+    
     [RelayCommand]
     private void CancelDialog()
     {
@@ -145,7 +194,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         }
 
         var notifyMethods = new List<string>();
-        if (IsNotifyByMail) notifyMethods.Add("邮件");
+        if (IsNotifyByMail) notifyMethods.Add("QQ 邮箱");
         if (IsNotifyByWechat) notifyMethods.Add("企业微信");
         var timeRange = SettingsStore.Load<TimeRangeConfig>(ConfigSections.FileName, ConfigSections.TimeRange);
 

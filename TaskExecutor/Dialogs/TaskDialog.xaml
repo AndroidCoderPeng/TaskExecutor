@@ -293,6 +293,8 @@
                             <ToggleButton
                                 Grid.Column="0"
                                 Margin="0,0,6,0"
+                                Command="{Binding ToggleNotifyChannelCommand}"
+                                CommandParameter="企业微信"
                                 IsChecked="{Binding IsNotifyByWechat}"
                                 Style="{StaticResource ToggleButtonStyle}">
                                 <StackPanel Orientation="Horizontal">
@@ -313,6 +315,8 @@
                             <ToggleButton
                                 Grid.Column="1"
                                 Margin="6,0,0,0"
+                                Command="{Binding ToggleNotifyChannelCommand}"
+                                CommandParameter="QQ 邮箱"
                                 IsChecked="{Binding IsNotifyByMail}"
                                 Style="{StaticResource ToggleButtonStyle}">
                                 <StackPanel Orientation="Horizontal">
@@ -400,7 +404,17 @@
                                     <Border
                                         Background="{Binding DimColor}"
                                         CornerRadius="6"
-                                        Style="{StaticResource CommonBorderStyle}">
+                                        IsEnabled="{Binding IsEnabled}">
+                                        <Border.Style>
+                                            <Style BasedOn="{StaticResource CommonBorderStyle}" TargetType="Border">
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsEnabled" Value="False">
+                                                        <Setter Property="Opacity" Value="0.45" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
