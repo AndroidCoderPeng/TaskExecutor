@@ -44,6 +44,7 @@ public sealed class AdbDevice
         }
 
         var (code, output) = await new CommandExecutor(creator.ToCommandLine()).ExecuteWithOutputAsync(_adbPath);
+        Console.WriteLine(string.Join(Environment.NewLine, output));
         return new AdbResult(code, output);
     }
 
@@ -53,6 +54,26 @@ public sealed class AdbDevice
     /// <param name="arguments"></param>
     /// <returns></returns>
     public async Task<bool> TryRunAsync(params string[] arguments) => (await RunAsync(arguments)).IsSuccess;
+
+    /// <summary>
+    /// 获取应用的启动 Activity（Launcher Activity）
+    /// </summary>
+    /// <returns></returns>
+    public async Task<string> GetLauncherActivityAsync(string packageName)
+    {
+        var result = await RunAsync("shell", "cmd", "package", "resolve-activity", "--brief", packageName);
+        if (!result.IsSuccess) return string.Empty;
+
+        var activityLine = result.Output.FirstOrDefault(line => line.Contains('/'));
+        if (activityLine is null) return string.Empty;
+
+        // com.pengxh.daily.app/.ui.MainActivity
+        var separator = activityLine.IndexOf('/');
+        var componentPackage = activityLine[..separator];
+        var activity = activityLine[(separator + 1)..];
+
+        return activity.StartsWith('.') ? componentPackage + activity : activity;
+    }
 
     /// <summary>
     /// 唤醒后按屏幕尺寸上滑解锁

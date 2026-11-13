@@ -238,22 +238,22 @@
                     Style="{StaticResource CardDataGridStyle}">
                     <DataGrid.Columns>
                         <DataGridTextColumn
-                            Width="23*"
+                            Width="20*"
                             Binding="{Binding Name}"
                             Header="应用名称" />
 
                         <DataGridTextColumn
-                            Width="25*"
+                            Width="30*"
                             Binding="{Binding PackageName}"
                             Header="包名" />
 
                         <DataGridTextColumn
-                            Width="45*"
+                            Width="44*"
                             Binding="{Binding Activity}"
                             Header="启动页" />
 
                         <DataGridTemplateColumn
-                            Width="7*"
+                            Width="6*"
                             CellStyle="{StaticResource DataGridLastCellStyle}"
                             Header="操作"
                             HeaderStyle="{StaticResource DataGridLastColumnHeaderStyle}">
@@ -276,9 +276,8 @@
                     BorderThickness="0,1,0,0">
                     <Grid Margin="12">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*" />
-                            <ColumnDefinition Width="3*" />
-                            <ColumnDefinition Width="5*" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="4*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
@@ -295,15 +294,8 @@
                             Tag="com.example.package"
                             Text="{Binding PackageName, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <TextBox
-                            Grid.Column="2"
-                            Margin="0,0,8,0"
-                            Style="{StaticResource PlaceHolderTextBoxStyle}"
-                            Tag="com.alibaba.android.rimet.biz.LaunchHomeActivity"
-                            Text="{Binding LauncherActivity, UpdateSourceTrigger=PropertyChanged}" />
-
                         <Button
-                            Grid.Column="3"
+                            Grid.Column="2"
                             Padding="14,0"
                             Command="{Binding AddTargetAppCommand}"
                             Content="添加"
