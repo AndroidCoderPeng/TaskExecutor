@@ -261,8 +261,9 @@ public class SchedulerService : ISchedulerService
             }
 
             // 目标应用操作停留时长：从「打开应用」开始计时，与任务链节点间隔无关
-            var dwellSeconds = SettingsStore.Load<WaitTimeConfig>(ConfigSections.FileName, ConfigSections.WaitTime)
-                .Time;
+            var dwellSeconds = SettingsStore.Load<WaitTimeConfig>(
+                ConfigSections.FileName, ConfigSections.WaitTime
+            ).Time;
 
             ChainProgressChanged?.Invoke(task.Name, ""); // 链开始：清空旧进度
 
@@ -289,8 +290,12 @@ public class SchedulerService : ISchedulerService
                         ok = await adb.OpenAppAsync(task.TargetApp.PackageName, task.TargetApp.Activity);
                         if (ok && dwellSeconds > 0)
                         {
-                            // 从打开目标应用开始计时，给应用留出操作停留时间，之后才继续后续动作
-                            await Task.Delay(TimeSpan.FromSeconds(dwellSeconds));
+                            // 从打开目标应用开始计时，给应用留出操作停留时间；逐秒播报倒计时
+                            for (var remaining = dwellSeconds; remaining > 0; remaining--)
+                            {
+                                ChainProgressChanged?.Invoke(task.Name, $"打开应用（剩余 {remaining}s）");
+                                await Task.Delay(TimeSpan.FromSeconds(1));
+                            }
                         }
 
                         break;
