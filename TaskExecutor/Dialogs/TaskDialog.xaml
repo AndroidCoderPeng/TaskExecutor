@@ -416,7 +416,7 @@
                                                         <Setter Property="IsEnabled" Value="False" />
                                                         <Setter Property="Opacity" Value="0.45" />
                                                     </DataTrigger>
-                                                    
+
                                                     <!--  已加入执行序列  -->
                                                     <DataTrigger Binding="{Binding InSequence}" Value="True">
                                                         <Setter Property="IsEnabled" Value="False" />
@@ -514,78 +514,114 @@
                                 Style="{StaticResource TextButtonStyle}" />
                         </Grid>
 
-                        <Separator Margin="0,8,0,4" Background="{StaticResource CardBorderBrush}" />
+                        <!--  动作列表 + 空态  -->
+                        <Grid Margin="0,8,0,0">
+                            <ListBox
+                                AlternationCount="999"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                ItemsSource="{Binding SelectedActions}"
+                                ScrollViewer.CanContentScroll="False"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                VirtualizingPanel.VirtualizationMode="Standard">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border
+                                            Background="{Binding DimColor}"
+                                            CornerRadius="6"
+                                            Style="{StaticResource CommonBorderStyle}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
 
-                        <ListBox
-                            AlternationCount="999"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            ItemsSource="{Binding SelectedActions}"
-                            ScrollViewer.CanContentScroll="False"
-                            ScrollViewer.VerticalScrollBarVisibility="Auto"
-                            VirtualizingPanel.VirtualizationMode="Standard">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Border
-                                        Background="{Binding DimColor}"
-                                        CornerRadius="6"
-                                        Style="{StaticResource CommonBorderStyle}">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
+                                                <Border
+                                                    Grid.Column="0"
+                                                    BorderBrush="{Binding Color}"
+                                                    BorderThickness="4,0,0,0"
+                                                    CornerRadius="4" />
 
-                                            <Border
-                                                Grid.Column="0"
-                                                BorderBrush="{Binding Color}"
-                                                BorderThickness="4,0,0,0"
-                                                CornerRadius="4" />
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    Margin="8,6"
+                                                    VerticalAlignment="Center"
+                                                    Orientation="Horizontal">
+                                                    <TextBlock Foreground="{StaticResource TextTertiaryBrush}" Text="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource AncestorType=ListBoxItem}, Converter={StaticResource StepIndexConverterKey}}" />
 
-                                            <StackPanel
-                                                Grid.Column="1"
-                                                Margin="8,6"
-                                                VerticalAlignment="Center"
-                                                Orientation="Horizontal">
-                                                <TextBlock Foreground="{StaticResource TextTertiaryBrush}" Text="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource AncestorType=ListBoxItem}, Converter={StaticResource StepIndexConverterKey}}" />
+                                                    <TextBlock
+                                                        Margin="8,0,0,0"
+                                                        FontWeight="Medium"
+                                                        Foreground="{StaticResource TextPrimaryBrush}"
+                                                        Text="{Binding Name}" />
+                                                </StackPanel>
 
-                                                <TextBlock
-                                                    Margin="8,0,0,0"
-                                                    FontWeight="Medium"
-                                                    Foreground="{StaticResource TextPrimaryBrush}"
-                                                    Text="{Binding Name}" />
-                                            </StackPanel>
+                                                <Button
+                                                    Grid.Column="2"
+                                                    Margin="0,0,6,0"
+                                                    Command="{Binding DataContext.RemoveActionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="×"
+                                                    Foreground="{StaticResource DangerBrush}"
+                                                    Style="{StaticResource TextButtonStyle}" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
 
-                                            <Button
-                                                Grid.Column="2"
-                                                Margin="0,0,6,0"
-                                                Command="{Binding DataContext.RemoveActionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding}"
-                                                Content="×"
-                                                Foreground="{StaticResource DangerBrush}"
-                                                Style="{StaticResource TextButtonStyle}" />
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Margin" Value="0,6,0,0" />
+                                        <Setter Property="Cursor" Value="Hand" />
+                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListBoxItem">
+                                                    <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>
 
-                            <ListBox.ItemContainerStyle>
-                                <Style TargetType="ListBoxItem">
-                                    <Setter Property="Margin" Value="0,6,0,0" />
-                                    <Setter Property="Cursor" Value="Hand" />
-                                    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
-                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="ListBoxItem">
-                                                <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </ListBox.ItemContainerStyle>
-                        </ListBox>
+                            <!--  空态：无动作时覆盖显示  -->
+                            <Grid>
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedActions.Count}" Value="0">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+
+                                <Rectangle
+                                    RadiusX="4"
+                                    RadiusY="4"
+                                    Stroke="{StaticResource CardBorderBrush}"
+                                    StrokeDashArray="3 3" />
+
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        FontSize="11"
+                                        Foreground="{StaticResource TextDisabledBrush}"
+                                        Text="暂无任务动作" />
+
+                                    <TextBlock
+                                        Margin="0,8,0,0"
+                                        HorizontalAlignment="Center"
+                                        FontSize="11"
+                                        Foreground="{StaticResource TextDisabledBrush}"
+                                        Text="点击左侧指令库「+」添加任务动作" />
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
                     </StackPanel>
                 </Border>
             </Grid>
