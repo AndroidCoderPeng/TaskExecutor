@@ -204,15 +204,8 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
                     <TextBlock
-                        Grid.Column="0"
                         Margin="16,12,10,12"
                         FontSize="15"
                         FontWeight="SemiBold"
@@ -220,7 +213,6 @@
                         Text="包名映射" />
 
                     <Border
-                        Grid.Column="1"
                         Padding="8,3"
                         VerticalAlignment="Center"
                         Background="{StaticResource ControlFillBrush}"
@@ -230,13 +222,7 @@
                             Foreground="{StaticResource TextTertiaryBrush}"
                             Text="{Binding TargetApps.Count, StringFormat={}{0} 项, FallbackValue=0 项}" />
                     </Border>
-
-                    <Button
-                        Grid.Column="2"
-                        Margin="16,0"
-                        Content="从 CSV 导入"
-                        Style="{StaticResource TextButtonStyle}" />
-                </Grid>
+                </StackPanel>
 
                 <DataGrid
                     Grid.Row="1"
