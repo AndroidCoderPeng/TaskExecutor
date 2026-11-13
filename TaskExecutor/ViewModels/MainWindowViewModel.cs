@@ -53,17 +53,16 @@ public partial class MainWindowViewModel : ObservableObject
         _heartbeatTimer.Start();
 
         var taskManager = new MenuItem { Group = "管理", Icon = "\ue63f", Title = "任务管理" };
-        var importExport = new MenuItem { Group = "配置", Icon = "\ue629", Title = "导入导出" };
         var commandTest = new MenuItem { Group = "帮助", Icon = "\ue640", Title = "指令测试" };
 
-        _deviceRequiredItems = [taskManager, importExport, commandTest];
+        _deviceRequiredItems = [taskManager, commandTest];
 
         MenuItems =
         [
             new MenuItem { Group = "管理", Icon = "\ue74f", Title = "连接设备" },
             taskManager,
             new MenuItem { Group = "配置", Icon = "\ue622", Title = "目标APP" },
-            importExport,
+            new MenuItem { Group = "配置", Icon = "\ue629", Title = "导入导出" },
             new MenuItem { Group = "配置", Icon = "\ue690", Title = "邮箱配置" },
             new MenuItem { Group = "配置", Icon = "\ue621", Title = "企业微信配置" },
             new MenuItem { Group = "调度", Icon = "\ue736", Title = "任务等待时间" },

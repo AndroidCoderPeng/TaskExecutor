@@ -9,8 +9,19 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
+        <Style
+            x:Key="DataFileBorderStyle"
+            BasedOn="{StaticResource CommonBorderStyle}"
+            TargetType="Border">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <Style x:Key="FileHintStyle" TargetType="ContentControl">
-            <Setter Property="Padding" Value="14" />
+            <Setter Property="Padding" Value="10" />
             <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -64,14 +75,14 @@
         <TextBlock
             Margin="20,16"
             Foreground="{StaticResource TextTertiaryBrush}"
-            Text="任务配置、目标 APP 映射与通知配置可导出为 CSV 备份，也可以从 CSV 备份恢复，导入时同名任务将被覆盖" />
+            Text="全部数据打包为一个 JSON 备份文件：定时任务、包名映射、通知与调度配置。恢复时自动识别内容，同名任务将被覆盖。" />
 
         <UniformGrid
-            Height="196"
+            Height="168"
             Margin="20,0"
             Columns="2"
             Rows="1">
-            <Border Margin="0,0,6,0" Style="{StaticResource CommonBorderStyle}">
+            <Border Margin="0,0,6,0" Style="{StaticResource DataFileBorderStyle}">
                 <Grid Margin="16">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -80,45 +91,60 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock
-                        Grid.Row="0"
-                        FontSize="15"
-                        FontWeight="SemiBold"
-                        Foreground="{StaticResource TextPrimaryBrush}"
-                        Text="导出配置" />
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <Border
+                            Padding="8"
+                            Background="{StaticResource InfoDimBrush}"
+                            CornerRadius="8">
+                            <TextBlock
+                                FontFamily="/TaskExecutor;component/Fonts/#iconfont"
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Foreground="{StaticResource PrimaryBrush}"
+                                Text="&#xe626;" />
+                        </Border>
+
+                        <TextBlock
+                            Margin="12,0"
+                            VerticalAlignment="Center"
+                            FontSize="15"
+                            FontWeight="SemiBold"
+                            Foreground="{StaticResource TextPrimaryBrush}"
+                            Text="导出备份" />
+                    </StackPanel>
 
                     <TextBlock
                         Grid.Row="1"
                         Margin="0,12"
                         Foreground="{StaticResource TextTertiaryBrush}"
-                        Text="将当前全部任务（名称、执行时间、动作链、通知方式）导出为 CSV 文件，可用于备份或迁移到其他电脑"
+                        Text="将任务、包名映射、通知与调度配置打包为一个 JSON 文件，用于备份或迁移到其他电脑。授权码、Webhook Key 等敏感信息不会导出。"
                         TextWrapping="Wrap" />
 
-                    <ContentControl
-                        Grid.Row="2"
-                        VerticalAlignment="Top"
-                        Content="{Binding ExportFileName, FallbackValue=tasks_2026-10-24.csv}"
-                        Style="{StaticResource FileHintStyle}" />
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Row="3" Orientation="Horizontal">
+                        <ContentControl
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Content="{Binding ExportFileName}"
+                            Style="{StaticResource FileHintStyle}" />
+
                         <Button
+                            Grid.Column="1"
+                            Margin="12,0,0,0"
                             Padding="14,0"
-                            Command="{Binding ExportTaskCommand}"
-                            Content="导出任务"
+                            Command="{Binding ExportConfigCommand}"
+                            Content="导出备份"
                             FontSize="14"
                             Style="{StaticResource PrimaryButtonStyle}" />
-
-                        <Button
-                            Margin="8,0"
-                            Command="{Binding ExportConfigCommand}"
-                            Content="导出全部配置"
-                            FontSize="14"
-                            Style="{StaticResource CommonButtonStyle}" />
-                    </StackPanel>
+                    </Grid>
                 </Grid>
             </Border>
 
-            <Border Margin="6,0,0,0" Style="{StaticResource CommonBorderStyle}">
+            <Border Margin="6,0,0,0" Style="{StaticResource DataFileBorderStyle}">
                 <Grid Margin="16">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -127,38 +153,55 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock
-                        Grid.Row="0"
-                        FontSize="15"
-                        FontWeight="SemiBold"
-                        Foreground="{StaticResource TextPrimaryBrush}"
-                        Text="导入配置" />
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <Border
+                            Padding="8"
+                            Background="{StaticResource InfoDimBrush}"
+                            CornerRadius="8">
+                            <TextBlock
+                                FontFamily="/TaskExecutor;component/Fonts/#iconfont"
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Foreground="{StaticResource PrimaryBrush}"
+                                Text="&#xe627;" />
+                        </Border>
+
+                        <TextBlock
+                            Margin="12,0"
+                            VerticalAlignment="Center"
+                            FontSize="15"
+                            FontWeight="SemiBold"
+                            Foreground="{StaticResource TextPrimaryBrush}"
+                            Text="导入备份" />
+                    </StackPanel>
 
                     <TextBlock
                         Grid.Row="1"
                         Margin="0,12"
                         Foreground="{StaticResource TextTertiaryBrush}"
-                        Text="从 CSV 文件导入任务与包名映射。支持 TaskExecutor 导出格式，也支持自定义「应用名，包名」两列格式"
+                        Text="选择或拖入备份文件，自动识别内容并恢复，无需区分类型，识别到该格式时按包名映射导入。"
                         TextWrapping="Wrap" />
 
-                    <ContentControl
-                        Grid.Row="2"
-                        VerticalAlignment="Top"
-                        Content="{Binding SelectedFilePath, TargetNullValue=选择 CSV 文件…, FallbackValue=选择 CSV 文件…}"
-                        Style="{StaticResource FileHintStyle}" />
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Row="3" Orientation="Horizontal">
+                        <ContentControl
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Content="{Binding SelectedFilePath, FallbackValue=点击选择或拖入备份文件}"
+                            Style="{StaticResource FileHintStyle}" />
+
                         <Button
-                            Margin="0,0,8,0"
+                            Grid.Column="1"
+                            Margin="12,0,0,0"
                             Padding="14,0"
                             Content="导入任务"
                             FontSize="14"
                             Style="{StaticResource PrimaryButtonStyle}" />
-                        <Button
-                            Content="导入包名映射"
-                            FontSize="14"
-                            Style="{StaticResource CommonButtonStyle}" />
-                    </StackPanel>
+                    </Grid>
                 </Grid>
             </Border>
         </UniformGrid>
