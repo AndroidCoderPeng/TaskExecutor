@@ -8,7 +8,7 @@
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
     Title="{Binding Title}"
     Width="690"
-    Height="718"
+    Height="734"
     d:DataContext="{d:DesignInstance Type=vm:TaskDialogViewModel}"
     Background="White"
     ResizeMode="NoResize"
@@ -435,6 +435,8 @@
                                             <Button
                                                 Grid.Column="2"
                                                 Margin="0,0,6,0"
+                                                Command="{Binding DataContext.SelectActionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
                                                 Content="+"
                                                 Style="{StaticResource TextButtonStyle}" />
                                         </Grid>
@@ -504,9 +506,64 @@
                         <Separator Margin="0,8" Background="{StaticResource CardBorderBrush}" />
 
                         <ListBox
+                            Background="Transparent"
+                            BorderThickness="0"
                             ItemsSource="{Binding SelectedActions}"
                             ScrollViewer.CanContentScroll="False"
-                            ScrollViewer.VerticalScrollBarVisibility="Hidden" />
+                            ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Background="{Binding DimColor}"
+                                        CornerRadius="6"
+                                        Style="{StaticResource CommonBorderStyle}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border
+                                                Grid.Column="0"
+                                                BorderBrush="{Binding Color}"
+                                                BorderThickness="4,0,0,0"
+                                                CornerRadius="4" />
+
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                Margin="8,6"
+                                                Text="{Binding Name}" />
+
+                                            <Button
+                                                Grid.Column="2"
+                                                Margin="0,0,6,0"
+                                                Command="{Binding DataContext.RemoveActionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Content="×"
+                                                Foreground="{StaticResource DangerBrush}"
+                                                Style="{StaticResource TextButtonStyle}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Margin" Value="0,6,0,0" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
                     </StackPanel>
                 </Border>
             </Grid>

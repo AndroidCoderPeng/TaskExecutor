@@ -1,5 +1,6 @@
 using System.Globalization;
 using Newtonsoft.Json;
+using TaskExecutor.Model;
 
 namespace TaskExecutor.Cache;
 
@@ -34,6 +35,7 @@ public class TaskRow
     public TargetAppRow TargetApp { get; set; } = new();
     public string PlannedAt { get; set; } = "";
     public TimeRangeConfig? TimeRange { get; set; }
+    public List<TaskAction> Actions { get; set; } = [];
     public List<string> NotifyMethods { get; set; } = [];
     [JsonIgnore] public string NotifyMethodDisplay => string.Join("、", NotifyMethods);
 

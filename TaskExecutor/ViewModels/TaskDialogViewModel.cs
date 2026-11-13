@@ -35,6 +35,8 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         new() { Name = "息屏", IsEnabled = true, Color = "#FF687386", DimColor = "#1F687386" }
     ];
 
+    [ObservableProperty] private ObservableCollection<TaskAction> _selectedActions = [];
+
     public ObservableCollection<TargetAppRow> TargetApps { get; } = [];
 
     #endregion
@@ -83,6 +85,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         TaskName = task.Name;
         PlannedTime = task.PlannedAt;
         IsRandomOffsetTime = task.TimeRange != null;
+        SelectedActions = [.. task.Actions];
         IsNotifyByMail = task.NotifyMethods.Contains("QQ 邮箱");
         IsNotifyByWechat = task.NotifyMethods.Contains("企业微信");
         SelectedTargetApp = MatchTargetApp(task.TargetApp);
@@ -128,20 +131,20 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
 
         RefreshMessageAction();
     }
-    
+
     private void RefreshMessageAction()
     {
         var send = DefaultActions.First(a => a.Name == "发送消息");
         send.IsEnabled = IsNotifyByMail || IsNotifyByWechat;
     }
-    
+
     private static bool IsChannelConfigured(string channel) => channel switch
     {
         "企业微信" => IsWechatConfigured(),
         "QQ 邮箱" => IsEmailConfigured(),
         _ => false
     };
-    
+
     private static bool IsEmailConfigured()
     {
         var c = SettingsStore.Load<EmailConfig>(ConfigSections.FileName, ConfigSections.Email);
@@ -150,11 +153,42 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
                && !string.IsNullOrWhiteSpace(c.SenderAuthCode)
                && !string.IsNullOrWhiteSpace(c.RecipientEmail);
     }
-    
+
     private static bool IsWechatConfigured()
     {
         var c = SettingsStore.Load<WechatConfig>(ConfigSections.FileName, ConfigSections.Wechat);
         return !string.IsNullOrWhiteSpace(c.WebhookKey);
+    }
+
+    [RelayCommand]
+    private void SelectAction(TaskAction action)
+    {
+        if (!action.IsEnabled)
+        {
+            _toastService.Show("请先选择通知方式，再添加「发送消息」", ToastType.Warning);
+            return;
+        }
+        
+        // 动作库实例还承担展示状态（IsEnabled 联动），执行序列必须放独立副本
+        SelectedActions.Add(new TaskAction
+        {
+            Name = action.Name,
+            Color = action.Color,
+            DimColor = action.DimColor,
+            IsEnabled = true
+        });
+    }
+
+    [RelayCommand]
+    private void RemoveAction(TaskAction action)
+    {
+        SelectedActions.Remove(action);
+    }
+
+    [RelayCommand]
+    private void ClearActions()
+    {
+        SelectedActions.Clear();
     }
     
     [RelayCommand]
@@ -208,10 +242,18 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         };
         task.PlannedAt = PlannedTime;
         task.TimeRange = IsRandomOffsetTime ? timeRange : null;
+        task.Actions = [.. SelectedActions];
         task.NotifyMethods = notifyMethods;
 
         if (!isEditing) _config.Tasks.Add(task);
 
+        // 先加「发送消息」又把渠道关掉的兜底
+        if (SelectedActions.Any(a => a.Name == "发送消息") && notifyMethods.Count == 0)
+        {
+            _toastService.Show("执行序列含「发送消息」，请至少选择一个通知方式", ToastType.Warning);
+            return;
+        }
+        
         SettingsStore.Save(ConfigSections.FileName, ConfigSections.Task, _config);
 
         _toastService.Show(isEditing ? $"任务「{task.Name}」已更新" : "任务创建成功", ToastType.Success);
