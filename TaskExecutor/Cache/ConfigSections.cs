@@ -34,9 +34,11 @@ public class TaskRow
     public TargetAppRow TargetApp { get; set; } = new();
     public string PlannedAt { get; set; } = "";
     public TimeRangeConfig? TimeRange { get; set; }
-    public string NotifyMethod { get; set; } = "";
+    public List<string> NotifyMethods { get; set; } = [];
+    [JsonIgnore] public string NotifyMethodDisplay => string.Join("、", NotifyMethods);
+
     public bool IsEnabled { get; set; }
-    
+
     // 表示序列化或反序列化时忽略这个属性
     [JsonIgnore] public DateTime? ExecuteTime { get; set; }
 

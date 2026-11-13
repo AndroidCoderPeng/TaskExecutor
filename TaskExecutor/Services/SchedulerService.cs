@@ -247,21 +247,28 @@ public class SchedulerService : ISchedulerService
     /// </summary>
     private async Task NotifyAsync(TaskRow task, string content)
     {
-        try
+        if (task.NotifyMethods.Contains("邮件"))
         {
-            switch (task.NotifyMethod)
+            try
             {
-                case "邮件":
-                    await SendMailAsync(content);
-                    break;
-                case "企业微信":
-                    await SendWechatAsync(content);
-                    break;
+                await SendMailAsync(content);
+            }
+            catch (Exception e)
+            {
+                RaiseLog(TaskState.Failed, $"任务「{task.Name}」邮件通知发送失败：{e.Message}");
             }
         }
-        catch (Exception e)
+        
+        if (task.NotifyMethods.Contains("企业微信"))
         {
-            RaiseLog(TaskState.Failed, $"任务「{task.Name}」{task.NotifyMethod}通知发送失败：{e.Message}");
+            try
+            {
+                await SendWechatAsync(content);
+            }
+            catch (Exception e)
+            {
+                RaiseLog(TaskState.Failed, $"任务「{task.Name}」企业微信通知发送失败：{e.Message}");
+            }
         }
     }
 

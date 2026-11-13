@@ -83,8 +83,8 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         TaskName = task.Name;
         PlannedTime = task.PlannedAt;
         IsRandomOffsetTime = task.TimeRange != null;
-        IsNotifyByMail = task.NotifyMethod.Contains("邮件");
-        IsNotifyByWechat = task.NotifyMethod.Contains("企业微信");
+        IsNotifyByMail = task.NotifyMethods.Contains("邮件");
+        IsNotifyByWechat = task.NotifyMethods.Contains("企业微信");
         SelectedTargetApp = MatchTargetApp(task.TargetApp);
     }
 
@@ -144,7 +144,9 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
             }
         }
 
-        var notifyMethod = IsNotifyByWechat ? "企业微信" : IsNotifyByMail ? "邮件" : "";
+        var notifyMethods = new List<string>();
+        if (IsNotifyByMail) notifyMethods.Add("邮件");
+        if (IsNotifyByWechat) notifyMethods.Add("企业微信");
         var timeRange = SettingsStore.Load<TimeRangeConfig>(ConfigSections.FileName, ConfigSections.TimeRange);
 
         var task = isEditing ? _config.Tasks[_editingIndex] : new TaskRow { Name = TaskName, IsEnabled = true };
@@ -157,7 +159,7 @@ public partial class TaskDialogViewModel : ObservableObject, IDialogParameterRec
         };
         task.PlannedAt = PlannedTime;
         task.TimeRange = IsRandomOffsetTime ? timeRange : null;
-        task.NotifyMethod = notifyMethod;
+        task.NotifyMethods = notifyMethods;
 
         if (!isEditing) _config.Tasks.Add(task);
 
