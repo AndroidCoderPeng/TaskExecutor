@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using System.Windows.Threading;
 using Newtonsoft.Json;
@@ -16,7 +17,7 @@ public class SchedulerService : ISchedulerService
     private sealed record ConfigSnapshot(
         ResetTimeConfig Reset,
         TaskScheduleConfig Schedule,
-        TaskConfig Tasks,
+        TaskConfig Config,
         TimeRangeConfig GlobalRange);
 
     // 30s 一次 tick，UI 线程回调，方便直接更新 VM
@@ -139,9 +140,9 @@ public class SchedulerService : ISchedulerService
                 if (!TrySyncPlan(snapshot, now)) break;
                 if (snapshot.Schedule.IsSkipHoliday && HolidayHelper.IsRestDay(DateOnly.FromDateTime(now))) break;
 
-                var enabled = snapshot.Tasks.Tasks
-                    .Where(t => t.IsEnabled)
-                    .ToDictionary(t => t.Name, StringComparer.Ordinal);
+                var enabled = snapshot.Config.Tasks
+                    .Where(task => task.IsEnabled)
+                    .ToDictionary(task => task.Name, StringComparer.Ordinal);
                 var entry = _plan.FindNextDue(now, enabled.Keys.ToHashSet(StringComparer.Ordinal));
                 if (entry == null) break;
                 var task = enabled[entry.TaskName];
@@ -185,8 +186,8 @@ public class SchedulerService : ISchedulerService
 
     private bool TrySyncPlan(ConfigSnapshot snapshot, DateTime now)
     {
-        var duplicate = snapshot.Tasks.Tasks
-            .GroupBy(t => t.Name, StringComparer.Ordinal)
+        var duplicate = snapshot.Config.Tasks
+            .GroupBy(task => task.Name, StringComparer.Ordinal)
             .FirstOrDefault(group => group.Count() > 1);
         if (duplicate != null)
         {
@@ -202,7 +203,7 @@ public class SchedulerService : ISchedulerService
             _todaySuccess = 0;
         }
 
-        _planDirty |= _plan.Reconcile(now, snapshot.Tasks, snapshot.Schedule, snapshot.GlobalRange, snapshot.Reset);
+        _planDirty |= _plan.Reconcile(now, snapshot.Config, snapshot.Schedule, snapshot.GlobalRange, snapshot.Reset);
         if (!TrySavePlan()) return false;
         _planErrorReported = false;
         return true;
@@ -256,7 +257,7 @@ public class SchedulerService : ISchedulerService
         using var cts = new CancellationTokenSource();
         _chainCts = cts;
         _runningTaskName = task.Name;
-        
+
         try
         {
             var serial = $"{_deviceState.DeviceIp}:5555";
@@ -450,19 +451,19 @@ public class SchedulerService : ISchedulerService
     {
         // 心跳日志只用于排障，不计入今日任务执行统计
         var logs = _logStore.LoadByDate(today)
-            .Where(l => !l.Content.StartsWith(IAdbHeartbeatService.LogPrefix, StringComparison.Ordinal))
+            .Where(log => !log.Content.StartsWith(IAdbHeartbeatService.LogPrefix, StringComparison.Ordinal))
             .ToList();
 
         _statDate = today;
         _todayTotal = logs.Count;
-        _todaySuccess = logs.Count(l => l.State == TaskState.Success);
+        _todaySuccess = logs.Count(log => log.State == TaskState.Success);
     }
 
     private void RaiseLog(TaskState state, string content)
     {
         var log = new RuntimeLog
         {
-            Time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            Time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
             State = state,
             Content = content
         };
@@ -489,21 +490,24 @@ public class SchedulerService : ISchedulerService
     private void PublishStatus(ConfigSnapshot? snapshot = null)
     {
         snapshot ??= LoadSnapshot();
-        var enabled = snapshot.Tasks.Tasks
-            .Where(t => t.IsEnabled)
-            .Select(t => t.Name)
+        var enabled = snapshot.Config.Tasks
+            .Where(task => task.IsEnabled)
+            .Select(task => task.Name)
             .ToHashSet(StringComparer.Ordinal);
 
         var planned = _plan.State.Tasks
-            .Where(p => enabled.Contains(p.TaskName))
-            .OrderBy(p => p.ScheduledAt)
-            .Select(p => new ScheduledTaskInfo(p.TaskName, p.ScheduledAt, p.State))
+            .Where(plan => enabled.Contains(plan.TaskName))
+            .OrderBy(plan => plan.ScheduledAt)
+            .Select(plan => new ScheduledTaskInfo(plan.TaskName, plan.ScheduledAt, plan.State))
             .ToArray();
 
-        _nextTaskTime = planned
-            .Where(p => p.State == PlannedTaskState.Pending)
-            .Select(p => (DateTime?)p.ScheduledAt)
-            .FirstOrDefault();
+        var isRestDay = snapshot.Schedule.IsSkipHoliday && HolidayHelper.IsRestDay(DateOnly.FromDateTime(DateTime.Now));
+
+        _nextTaskTime = isRestDay
+            ? null
+            : planned
+                .Where(plan => plan.State == PlannedTaskState.Pending)
+                .Select(plan => (DateTime?)plan.ScheduledAt).FirstOrDefault();
 
         _currentStatus = new SchedulerStatus
         {
