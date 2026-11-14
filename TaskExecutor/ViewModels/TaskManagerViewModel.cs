@@ -27,6 +27,10 @@ public partial class TaskManagerViewModel : ObservableObject
     [ObservableProperty] private bool _isTaskScheduled;
     [ObservableProperty] private string _chainProgress = "";
     [ObservableProperty] private ObservableCollection<RuntimeLog> _runtimeLogs = [];
+    [ObservableProperty] private bool _isRestBadgeVisible;
+    [ObservableProperty] private bool _isRestBadgeWarning;
+    [ObservableProperty] private string _restBadgeText = "";
+    [ObservableProperty] private string _restBadgeTip = "";
 
     #endregion
 
@@ -69,8 +73,11 @@ public partial class TaskManagerViewModel : ObservableObject
         schedulerService.ChainProgressChanged += delegate(string taskName, string actionName)
         {
             var task = Tasks.FirstOrDefault(t => t.Name == taskName);
-            if (task != null) task.IsExecuting = actionName != "";
-            
+            if (task != null)
+            {
+                task.IsExecuting = actionName != "";
+            }
+
             ChainProgress = actionName == "" ? "" : $"任务：{taskName} - 正在执行「{actionName}」";
         };
 
@@ -90,6 +97,7 @@ public partial class TaskManagerViewModel : ObservableObject
         NextTaskTime = status.NextTaskTime is { } next
             ? next.ToString(next.Date == DateTime.Today ? "HH:mm" : "MM-dd HH:mm", CultureInfo.InvariantCulture)
             : "-";
+        RefreshRestBadge();
         ApplyTaskFilter();
     }
 
@@ -179,7 +187,7 @@ public partial class TaskManagerViewModel : ObservableObject
         if (!Tasks.Remove(task)) return;
 
         _schedulerService.CancelChain(task.Name);
-        
+
         SaveTasks();
         _toastService.Show($"任务「{task.Name}」已删除", ToastType.Success);
         _schedulerService.RefreshPlan();
@@ -202,6 +210,30 @@ public partial class TaskManagerViewModel : ObservableObject
     {
         _taskFilterOption = int.Parse(parameter);
         ApplyTaskFilter();
+    }
+
+    /// <summary>
+    /// 工作日胶囊（与设计稿 restBadge 三态对齐）：
+    /// 工作日 → 隐藏；休息日 +「跳过节假日」开启 → 橙色「休息日 · 任务暂停」；
+    /// 休息日 + 未开启 → 灰色「今日休息日（跳过节假日未开启）」。
+    /// </summary>
+    private void RefreshRestBadge()
+    {
+        if (!HolidayHelper.IsRestDay(DateOnly.FromDateTime(DateTime.Now)))
+        {
+            IsRestBadgeVisible = false;
+            return;
+        }
+
+        var skip = SettingsStore.Load<TaskScheduleConfig>(
+            ConfigSections.FileName, ConfigSections.TaskSchedule
+        ).IsSkipHoliday;
+        IsRestBadgeVisible = true;
+        IsRestBadgeWarning = skip;
+        RestBadgeText = skip ? "休息日 · 任务暂停" : "今日休息日（跳过节假日未开启）";
+        RestBadgeTip = skip
+            ? "今日为休息日，「跳过节假日」已开启，到点任务不会触发"
+            : "今日为休息日，「跳过节假日」未开启，任务正常执行";
     }
 
     private void ApplyTaskFilter()

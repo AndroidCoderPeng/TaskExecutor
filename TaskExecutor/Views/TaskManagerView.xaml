@@ -437,6 +437,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <TextBlock
@@ -491,8 +492,42 @@
 
                         <Border
                             Grid.Column="3"
+                            Margin="8,0"
                             Padding="8,4"
                             HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            CornerRadius="4"
+                            ToolTip="{Binding RestBadgeTip}">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="{StaticResource ControlFillBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsRestBadgeVisible}" Value="False">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsRestBadgeWarning}" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource WarningDimBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock FontSize="11" Text="{Binding RestBadgeText}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsRestBadgeWarning}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Border>
+
+                        <Border
+                            Grid.Column="4"
+                            Padding="8,4"
                             VerticalAlignment="Center"
                             CornerRadius="4">
                             <Border.Style>
@@ -538,7 +573,7 @@
                         </Border>
 
                         <StackPanel
-                            Grid.Column="4"
+                            Grid.Column="5"
                             Margin="16,0"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
