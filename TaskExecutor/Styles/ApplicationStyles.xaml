@@ -355,8 +355,8 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    
-        <!--  ========== 下拉框：与输入框同风格 ==========  -->
+
+    <!--  ========== 下拉框：与输入框同风格 ==========  -->
     <Style x:Key="ComboBoxItemStyle" TargetType="ComboBoxItem">
         <Setter Property="Padding" Value="8" />
         <Setter Property="Margin" Value="2" />
@@ -496,6 +496,72 @@
                             <Setter Property="Opacity" Value="0.5" />
                             <Setter Property="Cursor" Value="Arrow" />
                         </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ToggleButtonStyle" TargetType="ToggleButton">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Padding" Value="0,8" />
+        <Setter Property="Background" Value="White" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid>
+                        <Border
+                            x:Name="ToggleButtonBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{StaticResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6">
+                            <ContentPresenter
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                RecognizesAccessKey="True" />
+                        </Border>
+
+                        <!--  右上角选中角标（20×20）  -->
+                        <Grid
+                            x:Name="CheckBadge"
+                            Width="20"
+                            Height="20"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Visibility="Collapsed">
+                            <Path Data="M0,0 L12,0 A8,8 0 0 1 20,8 L20,20 A20,20 0 0 1 0,0 Z" Fill="{StaticResource PrimaryBrush}" />
+                            <Path
+                                Data="M9,8.5 L12,11 L16.5,5.5"
+                                Stroke="White"
+                                StrokeEndLineCap="Round"
+                                StrokeLineJoin="Round"
+                                StrokeStartLineCap="Round"
+                                StrokeThickness="2" />
+                        </Grid>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <!--  选中：蓝边 + 浅蓝底 + 蓝字 + 显示角标  -->
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="ToggleButtonBorder" Property="Background" Value="{StaticResource InfoDimBrush}" />
+                            <Setter TargetName="ToggleButtonBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                            <Setter TargetName="CheckBadge" Property="Visibility" Value="Visible" />
+                        </Trigger>
+
+                        <!--  未选中时 hover：边框提前亮一下，暗示可点  -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsChecked" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="ToggleButtonBorder" Property="BorderBrush" Value="{StaticResource PrimaryHoverBrush}" />
+                        </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

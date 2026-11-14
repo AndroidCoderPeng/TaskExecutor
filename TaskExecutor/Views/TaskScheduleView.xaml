@@ -87,6 +87,99 @@
         </Border>
 
         <Border
+            Margin="20,0,20,12"
+            Background="{StaticResource CardBackgroundBrush}"
+            BorderBrush="{StaticResource CardBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="16,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        FontSize="15"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource TextPrimaryBrush}"
+                        Text="自定义工作日" />
+
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="12,0"
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource TextTertiaryBrush}"
+                        Text="按星期循环生效，如勾选周六，则每周六都会执行任务" />
+
+                    <Button
+                        Grid.Column="2"
+                        Command="{Binding ResetWorkdayCommand}"
+                        Content="恢复默认"
+                        Style="{StaticResource TextButtonStyle}" />
+                </Grid>
+
+                <ListBox
+                    Grid.Row="1"
+                    Margin="16,0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ItemsSource="{Binding Weekdays}"
+                    ScrollViewer.CanContentScroll="False">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="7" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <ToggleButton
+                                Padding="12"
+                                Content="{Binding Name}"
+                                IsChecked="{Binding IsChecked}">
+                                <ToggleButton.Style>
+                                    <Style BasedOn="{StaticResource ToggleButtonStyle}" TargetType="ToggleButton">
+                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Margin" Value="6,0" />
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+
+                <TextBlock
+                    Grid.Row="2"
+                    Margin="16,12"
+                    Foreground="{StaticResource TextTertiaryBrush}"
+                    Text="勾选的星期当天任务正常调度，未勾选视为休息日（配合「跳过节假日」开关生效）；全部取消则每天都跳过" />
+            </Grid>
+        </Border>
+
+        <Border
             Height="150"
             Margin="20,0"
             Background="{StaticResource CardBackgroundBrush}"
@@ -139,7 +232,7 @@
                             Text="建议每周同步一次，保证节假日判断准确" />
 
                         <Button
-                            Margin="0,10"
+                            Margin="0,12"
                             Padding="14,0"
                             Command="{Binding SyncHolidayDataCommand}"
                             Content="同步节假日数据"

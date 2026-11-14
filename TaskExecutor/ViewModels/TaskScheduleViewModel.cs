@@ -1,12 +1,13 @@
-﻿using System.Globalization;
+﻿using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Net.Http;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json.Linq;
 using TaskExecutor.Cache;
-using TaskExecutor.Services;
-using TaskExecutor.Utils;
 using TaskExecutor.Enums;
+using TaskExecutor.Services;
+using DayOfWeek = TaskExecutor.Model.DayOfWeek;
 
 namespace TaskExecutor.ViewModels;
 
@@ -16,6 +17,7 @@ public partial class TaskScheduleViewModel : ObservableObject
 
     [ObservableProperty] private bool _isSkipHoliday = true;
     [ObservableProperty] private bool _isResetDailyTask = true;
+    [ObservableProperty] private ObservableCollection<DayOfWeek> _weekdays = [];
     [ObservableProperty] private string _lastSyncTime = string.Empty;
     [ObservableProperty] private string _currentYear = string.Empty;
 
@@ -39,9 +41,22 @@ public partial class TaskScheduleViewModel : ObservableObject
         var config = SettingsStore.Load<TaskScheduleConfig>(ConfigSections.FileName, ConfigSections.TaskSchedule);
         IsSkipHoliday = config.IsSkipHoliday;
         IsResetDailyTask = config.IsResetDailyTask;
+
+        Weekdays =
+        [
+            new DayOfWeek { Name = "星期一", IsChecked = true },
+            new DayOfWeek { Name = "星期二", IsChecked = true },
+            new DayOfWeek { Name = "星期三", IsChecked = true },
+            new DayOfWeek { Name = "星期四", IsChecked = true },
+            new DayOfWeek { Name = "星期五", IsChecked = true },
+            new DayOfWeek { Name = "星期六", IsChecked = false },
+            new DayOfWeek { Name = "星期日", IsChecked = false }
+        ];
+
         CurrentYear = DateTime.Now.Year.ToString();
-        LastSyncTime = SettingsStore.Load<ChinaHolidayConfig>(ConfigSections.FileName, ConfigSections.ChinaHoliday)
-            .LastSyncTime;
+        LastSyncTime = SettingsStore.Load<ChinaHolidayConfig>(
+            ConfigSections.FileName, ConfigSections.ChinaHoliday
+        ).LastSyncTime;
         PropertyChanged += (_, e) =>
         {
             if (e.PropertyName is nameof(IsSkipHoliday) or nameof(IsResetDailyTask))
