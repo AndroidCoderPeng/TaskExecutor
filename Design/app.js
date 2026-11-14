@@ -579,6 +579,8 @@
   });
   const openRest=()=>{renderWeekPicker();$("restOverlay").classList.add("show");};
   const closeRest=()=>$("restOverlay").classList.remove("show");
+  const weekNames=()=>workWeek.map((on,i)=>on?WEEK_NAMES[i]:null).filter(Boolean).join("、")||"无（每天都跳过）";
+  const updateWorkdayHint=()=>{ $("workdayHint").textContent="当前："+weekNames(); };
   $("btnCustomDay").onclick=openRest;
   $("restClose").onclick=closeRest;
   $("restCancel").onclick=closeRest;
@@ -586,10 +588,11 @@
   document.addEventListener("keydown",e=>{if(e.key==="Escape")closeRest();});
   $("restSave").onclick=()=>{
     closeRest();
-    const names=workWeek.map((on,i)=>on?WEEK_NAMES[i]:null).filter(Boolean).join("、")||"无";
+    updateWorkdayHint();
     toast("自定义工作日已保存");
-    addLog("ok","成功",`每周工作日已更新：${names}`);
+    addLog("ok","成功",`每周工作日已更新：${weekNames()}`);
   };
+  updateWorkdayHint();
 
   // ===== 任务记录（待设计） =====
 
