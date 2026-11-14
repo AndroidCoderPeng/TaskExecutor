@@ -141,12 +141,6 @@
   .badge[hidden]{display:none;}
   .head-filters{gap:8px;align-items:center;}
   .stat b.red{color:var(--red);}
-  .day-tags{display:flex;flex-wrap:wrap;gap:8px;padding:6px 0 2px;}
-  .tag-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px 4px 10px;border-radius:var(--radius);background:var(--orange-dim);color:#B26E00;font-size:12px;font-weight:500;}
-  .tag-chip.rest{background:var(--blue-dim);color:var(--primary);}
-  .tag-chip a{cursor:pointer;font-weight:700;line-height:1;opacity:.65;}
-  .tag-chip a:hover{opacity:1;}
-  .day-tags .hint{font-size:12px;color:var(--text-3);}
   .chip.outline{background:transparent;border:1px solid currentColor;}
   .run-badge{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:3px;font-size:10px;background:var(--green-dim);color:var(--green);vertical-align:1px;}
   .btn{

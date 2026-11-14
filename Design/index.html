@@ -472,8 +472,8 @@
                       class="hint-inline">到达重置时间点后任务链重新开始</span></div>
                 </div>
                 <div class="form-row"><label>自定义工作日</label>
-                  <div class="ctl"><span class="link" id="btnCustomDay">配置例外日期</span><span
-                      class="hint-inline">调休上班的周末按工作日执行；请假、年假标记为额外休息日</span></div>
+                  <div class="ctl"><span class="link" id="btnCustomDay">按星期配置</span><span
+                      class="hint-inline">勾选的星期循环执行任务，无需逐个维护调休日期</span></div>
                 </div>
               </div>
             </div>
@@ -734,36 +734,18 @@
           </button>
         </div>
         <div class="dlg-body">
-          <p class="page-note" style="margin:0 0 8px;">修正 chinese-days 数据之外的例外日期：调休上班的周末标记为「额外工作日」，当天任务正常执行；请假、年假标记为「额外休息日」，当天任务自动跳过。自定义日期优先于节假日数据源。</p>
+          <p class="page-note" style="margin:0 0 8px;">按星期循环设定工作日：勾选的星期当天任务正常调度，未勾选的视为休息日（配合「跳过节假日」开关生效）。法定节假日仍按节假日数据跳过，无需再逐个维护调休日期。</p>
           <section class="dlg-section">
             <div class="section-head">
               <span class="section-no">01</span>
-              <h2>额外工作日</h2>
+              <h2>每周工作日</h2>
               <span class="section-line"></span>
             </div>
-            <div class="form-row">
-              <label>添加日期</label>
-              <div class="ctl"><input class="ui" type="date" id="workDateIn" style="max-width:170px;"><button
-                  class="btn btn-primary" id="addWorkDate">添加</button></div>
-            </div>
-            <div class="day-tags" id="workDateList"></div>
-          </section>
-          <section class="dlg-section">
-            <div class="section-head">
-              <span class="section-no">02</span>
-              <h2>额外休息日</h2>
-              <span class="section-line"></span>
-            </div>
-            <div class="form-row">
-              <label>添加日期</label>
-              <div class="ctl"><input class="ui" type="date" id="restDateIn" style="max-width:170px;"><button
-                  class="btn btn-primary" id="addRestDate">添加</button></div>
-            </div>
-            <div class="day-tags" id="restDateList"></div>
+            <div class="tag-toggles" id="weekPicker" role="group" aria-label="每周工作日"></div>
           </section>
         </div>
         <div class="dlg-foot">
-          <span class="hint">示例：周日调休上班 → 加入「额外工作日」；年假 → 加入「额外休息日」</span>
+          <span class="hint">按星期循环生效：如勾选周六，则每周六都会执行任务</span>
           <div class="btns">
             <button class="btn btn-ghost" id="restCancel">取消</button>
             <button class="btn btn-primary" id="restSave">保存配置</button>

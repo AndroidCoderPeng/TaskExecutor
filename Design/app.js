@@ -563,45 +563,32 @@
     addLog("ok","成功","节假日数据已从 chinese-days CDN 同步（覆盖 2026 全年）");
   };
 
-  // ===== 自定义工作日 =====
-  // 与 HolidayHelper 对齐：额外工作日 → IsWorkday 优先判定；额外休息日 → IsHoliday 补充判定
-  let workDays=["2026-09-20","2026-10-10"],restDays=["2026-11-27"];
-  function renderDayTags(){
-    $("workDateList").innerHTML=workDays.map((d,i)=>
-      `<span class="tag-chip">${d}<a data-del="w" data-i="${i}" title="移除">✕</a></span>`).join("")
-      ||`<span class="hint">暂无，调休上班的周末在这里添加</span>`;
-    $("restDateList").innerHTML=restDays.map((d,i)=>
-      `<span class="tag-chip rest">${d}<a data-del="r" data-i="${i}" title="移除">✕</a></span>`).join("")
-      ||`<span class="hint">暂无，请假、年假在这里添加</span>`;
+  // ===== 自定义工作日（按星期循环） =====
+  // 与 HolidayHelper 对齐：勾选的星期视为工作日；法定节假日仍按节假日数据跳过
+  const WEEK_NAMES=["周一","周二","周三","周四","周五","周六","周日"];
+  let workWeek=[true,true,true,true,true,false,false]; // 默认周一至周五
+  function renderWeekPicker(){
+    $("weekPicker").innerHTML=WEEK_NAMES.map((n,i)=>
+      `<button type="button" class="tag-tg${workWeek[i]?" on":""}" data-w="${i}">${n}</button>`).join("");
   }
-  const openRest=()=>{renderDayTags();$("restOverlay").classList.add("show");};
+  $("weekPicker").addEventListener("click",e=>{
+    const b=e.target.closest("[data-w]");
+    if(!b)return;
+    workWeek[+b.dataset.w]=!workWeek[+b.dataset.w];
+    renderWeekPicker();
+  });
+  const openRest=()=>{renderWeekPicker();$("restOverlay").classList.add("show");};
   const closeRest=()=>$("restOverlay").classList.remove("show");
   $("btnCustomDay").onclick=openRest;
   $("restClose").onclick=closeRest;
   $("restCancel").onclick=closeRest;
   $("restOverlay").addEventListener("click",e=>{if(e.target===$("restOverlay"))closeRest();});
   document.addEventListener("keydown",e=>{if(e.key==="Escape")closeRest();});
-  const addDay=(inputId,list,other)=>{
-    const v=$(inputId).value;
-    if(!v){toast("请先选择日期");return;}
-    if(other.includes(v)){toast("该日期已在另一个分区中，请先移除");return;}
-    if(list.includes(v)){toast("该日期已存在");return;}
-    list.push(v);list.sort();renderDayTags();$(inputId).value="";
-  };
-  $("addWorkDate").onclick=()=>addDay("workDateIn",workDays,restDays);
-  $("addRestDate").onclick=()=>addDay("restDateIn",restDays,workDays);
-  $("workDateList").addEventListener("click",e=>{
-    if(e.target.dataset.del!=="w")return;
-    workDays.splice(+e.target.dataset.i,1);renderDayTags();
-  });
-  $("restDateList").addEventListener("click",e=>{
-    if(e.target.dataset.del!=="r")return;
-    restDays.splice(+e.target.dataset.i,1);renderDayTags();
-  });
   $("restSave").onclick=()=>{
     closeRest();
+    const names=workWeek.map((on,i)=>on?WEEK_NAMES[i]:null).filter(Boolean).join("、")||"无";
     toast("自定义工作日已保存");
-    addLog("ok","成功",`自定义工作日已保存（额外工作日 ${workDays.length} 天 · 额外休息日 ${restDays.length} 天）`);
+    addLog("ok","成功",`每周工作日已更新：${names}`);
   };
 
   // ===== 任务记录（待设计） =====
