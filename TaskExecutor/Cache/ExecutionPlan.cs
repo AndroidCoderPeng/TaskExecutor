@@ -119,21 +119,20 @@ public sealed class ExecutionPlan
                                             entry.MinOffset != min || entry.MaxOffset != max);
             if (entry != null && !differs) continue;
 
+            var newScheduledAt = today.Add(time).AddMinutes(randomOn ? _random(min, max) : 0);
+            
             var previousState = entry?.State;
-            var scheduledAt = previousState == PlannedTaskState.Triggered
+            // 已触发且新时间仍在过去：保留实际执行记录，避免"执行时间"显示一个从未跑过的时刻
+            var scheduledAt = previousState == PlannedTaskState.Triggered && newScheduledAt <= now
                 ? entry!.ScheduledAt
-                : today.Add(time).AddMinutes(randomOn ? _random(min, max) : 0);
+                : newScheduledAt;
             PlannedTaskState state;
             switch (previousState)
             {
                 case PlannedTaskState.Triggered:
-                    // 已触发的任务不重排：避免同一天重复执行，新时间从下次重置起生效
-                    state = PlannedTaskState.Triggered;
-                    break;
-
                 case PlannedTaskState.Skipped:
-                    // 已跳过的任务把时间改到未来：视为主动重排，恢复待执行
-                    state = scheduledAt > now ? PlannedTaskState.Pending : PlannedTaskState.Skipped;
+                    // 已触发/已跳过的任务把时间改到未来：视为主动重排，复位为待执行，到点照常执行
+                    state = scheduledAt > now ? PlannedTaskState.Pending : previousState.Value;
                     break;
 
                 default:

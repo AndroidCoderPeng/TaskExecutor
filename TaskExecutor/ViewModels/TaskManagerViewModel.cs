@@ -178,9 +178,11 @@ public partial class TaskManagerViewModel : ObservableObject
         {
             _toastService.Show($"任务「{task.Name}」的新计划时间已过，本周期跳过", ToastType.Warning);
         }
-        else if (wasTriggered)
+        else if (wasTriggered && _schedulerStatus.PlannedTasks.Any(plan => plan.TaskName == task.Name
+                                                                          && plan.State == PlannedTaskState.Triggered))
         {
-            _toastService.Show($"任务「{task.Name}」今日已执行，新计划时间将于重置后生效");
+            // 仅当新时间仍在过去、未恢复待执行时提示；改到未来会直接重排，无需打扰
+            _toastService.Show($"任务「{task.Name}」今日已执行，新计划时间仍已过，将于重置后生效");
         }
     }
 
