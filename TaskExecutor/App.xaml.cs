@@ -44,6 +44,7 @@ public partial class App : Application
         services.AddTransient<TaskScheduleViewModel>();
 
         services.AddTransient<CommandTestViewModel>();
+        services.AddTransient<TaskRecordViewModel>();
         services.AddTransient<FaqViewModel>();
         services.AddTransient<AboutViewModel>();
 

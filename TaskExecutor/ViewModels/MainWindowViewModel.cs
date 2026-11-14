@@ -70,6 +70,7 @@ public partial class MainWindowViewModel : ObservableObject
             new MenuItem { Group = "调度", Icon = "\ue696", Title = "随机时间范围" },
             new MenuItem { Group = "调度", Icon = "\ue6a6", Title = "调度开关" },
             commandTest,
+            new MenuItem { Group = "帮助", Icon = "\ue682", Title = "任务记录" },
             new MenuItem { Group = "帮助", Icon = "\ue6c7", Title = "常见问题" },
             new MenuItem { Group = "帮助", Icon = "\ue685", Title = "关于应用" }
         ];
@@ -183,6 +184,7 @@ public partial class MainWindowViewModel : ObservableObject
             "随机时间范围" => App.Services.GetRequiredService<RandomTimeViewModel>(),
             "调度开关" => App.Services.GetRequiredService<TaskScheduleViewModel>(),
             "指令测试" => App.Services.GetRequiredService<CommandTestViewModel>(),
+            "任务记录" => App.Services.GetRequiredService<TaskRecordViewModel>(),
             "常见问题" => App.Services.GetRequiredService<FaqViewModel>(),
             "关于应用" => App.Services.GetRequiredService<AboutViewModel>(),
             _ => CurrentView

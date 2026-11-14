@@ -12,6 +12,8 @@
     --text-4:#B4B8C0;
     --green:#1FA84F;
     --green-dim:rgba(31,168,79,.12);
+    --orange:#F5A500;
+    --orange-dim:rgba(245,165,0,.14);
     --red:#E5484D;
     --blue-bright:#007AFF;
     --blue-dim:rgba(0,122,255,.10);
@@ -132,6 +134,10 @@
     font-size:12px;font-weight:500;
   }
   .badge.green{background:var(--green-dim);color:var(--green);}
+  .badge.orange{background:var(--orange-dim);color:#B26E00;}
+  .badge.orange .dot{background:var(--orange);}
+  .badge.gray{background:var(--fill-2);color:var(--text-2);}
+  .badge[hidden]{display:none;}
   .btn{
     display:inline-flex;align-items:center;gap:6px;
     border:none;border-radius:var(--radius);cursor:pointer;

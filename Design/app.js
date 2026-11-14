@@ -726,3 +726,22 @@
   $("svcBadge").style.display = "";
   refreshLock();
   hbReset();
+
+  // 演示：休息日提示药丸，点击循环切换三种状态（实际 WPF 中由调度器状态驱动）
+  const restStates = [
+    { cls: "badge orange", html: '<span class="dot sm"></span>休息日 · 任务暂停' },
+    { cls: "badge gray", html: "今日休息日（跳过节假日未开启）" },
+    { cls: "", html: "" } // 工作日：隐藏
+  ];
+  let restIdx = 0;
+  $("restBadge").onclick = () => {
+    restIdx = (restIdx + 1) % restStates.length;
+    const s = restStates[restIdx];
+    const b = $("restBadge");
+    b.className = s.cls;
+    b.innerHTML = s.html;
+    b.hidden = s.cls === "";
+    if (s.cls) b.title = s.cls.includes("orange")
+      ? "今日为休息日，且计划设置已开启「跳过节假日」，到点任务不会触发"
+      : "今日为休息日，任务正常执行";
+  };
