@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Globalization;
+using Newtonsoft.Json.Linq;
 using TaskExecutor.Cache;
 
 namespace TaskExecutor.Utils;
@@ -8,13 +9,32 @@ namespace TaskExecutor.Utils;
 /// </summary>
 public class HolidayHelper
 {
+    private static readonly Dictionary<DayOfWeek, string> WeekdayNames = new()
+    {
+        [DayOfWeek.Monday] = "星期一",
+        [DayOfWeek.Tuesday] = "星期二",
+        [DayOfWeek.Wednesday] = "星期三",
+        [DayOfWeek.Thursday] = "星期四",
+        [DayOfWeek.Friday] = "星期五",
+        [DayOfWeek.Saturday] = "星期六",
+        [DayOfWeek.Sunday] = "星期日"
+    };
+
     /// <summary>
-    /// 是否为休息日（当前策略）：调休上班日 → 否；法定节假日或周末 → 是。
+    /// 是否为休息日（当前策略）：未勾选的自定义星期 → 是；法定节假日 → 是；调休上班日 → 否。
+    /// 仅在「跳过节假日」开启时由调度器调用，自定义工作日随该开关一起生效。
     /// </summary>
     /// <param name="date"></param>
     /// <returns></returns>
     public static bool IsRestDay(DateOnly date)
     {
+        // 自定义工作日优先：按星期循环生效，未勾选的星期视为休息日（全部取消则每天都跳过）
+        var workday = SettingsStore.Load<WorkdayConfig>(ConfigSections.FileName, ConfigSections.Workday);
+        if (!workday.Weekdays.Contains(WeekdayNames[date.DayOfWeek]))
+        {
+            return true;
+        }
+
         var holiday = SettingsStore.Load<ChinaHolidayConfig>(ConfigSections.FileName, ConfigSections.ChinaHoliday);
 
         // 未同步当年数据时不跳过，避免任务永远不执行
@@ -26,10 +46,14 @@ public class HolidayHelper
         try
         {
             var root = JObject.Parse(holiday.Data);
-            var key = date.ToString("yyyy-MM-dd");
+            var key = date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-            if (IsWorkday(root, key)) return false;
-            return IsHoliday(root, key) || IsWeekend(date);
+            if (IsWorkday(root, key))
+            {
+                return false;
+            }
+
+            return IsHoliday(root, key);
         }
         catch
         {
@@ -43,7 +67,7 @@ public class HolidayHelper
     /// <param name="root"></param>
     /// <param name="key"></param>
     /// <returns></returns>
-    public static bool IsHoliday(JObject root, string key) => root["holidays"]?[key] != null;
+    private static bool IsHoliday(JObject root, string key) => root["holidays"]?[key] != null;
 
     /// <summary>
     /// 调休上班日（chinese-days workdays）
@@ -51,12 +75,5 @@ public class HolidayHelper
     /// <param name="root"></param>
     /// <param name="key"></param>
     /// <returns></returns>
-    public static bool IsWorkday(JObject root, string key) => root["workdays"]?[key] != null;
-
-    /// <summary>
-    /// 自然周末
-    /// </summary>
-    /// <param name="date"></param>
-    /// <returns></returns>
-    public static bool IsWeekend(DateOnly date) => date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
+    private static bool IsWorkday(JObject root, string key) => root["workdays"]?[key] != null;
 }

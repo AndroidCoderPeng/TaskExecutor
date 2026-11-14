@@ -24,6 +24,7 @@ public partial class TaskScheduleViewModel : ObservableObject
     #endregion
 
     private readonly IToastService _toastService;
+    private readonly ISchedulerService _schedulerService;
 
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(15) };
 
@@ -34,24 +35,27 @@ public partial class TaskScheduleViewModel : ObservableObject
         "https://registry.npmmirror.com/chinese-days/latest/files/dist/years/%s.json"
     ];
 
+    private static readonly string[] WeekdayNames = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"];
+    private static readonly string[] DefaultWeekdays = ["星期一", "星期二", "星期三", "星期四", "星期五"];
+
+    // 恢复默认时批量改 IsChecked，避免每个 item 各触发一次落盘
+    private bool _suppressWorkdaySave;
+
     public TaskScheduleViewModel(IToastService toastService, ISchedulerService schedulerService)
     {
         _toastService = toastService;
+        _schedulerService = schedulerService;
 
         var config = SettingsStore.Load<TaskScheduleConfig>(ConfigSections.FileName, ConfigSections.TaskSchedule);
         IsSkipHoliday = config.IsSkipHoliday;
         IsResetDailyTask = config.IsResetDailyTask;
 
-        Weekdays =
-        [
-            new DayOfWeek { Name = "星期一", IsChecked = true },
-            new DayOfWeek { Name = "星期二", IsChecked = true },
-            new DayOfWeek { Name = "星期三", IsChecked = true },
-            new DayOfWeek { Name = "星期四", IsChecked = true },
-            new DayOfWeek { Name = "星期五", IsChecked = true },
-            new DayOfWeek { Name = "星期六", IsChecked = false },
-            new DayOfWeek { Name = "星期日", IsChecked = false }
-        ];
+        var workday = SettingsStore.Load<WorkdayConfig>(ConfigSections.FileName, ConfigSections.Workday);
+        InitWeekdays(workday.IsConfigured ? workday.Weekdays : DefaultWeekdays);
+        if (!workday.IsConfigured)
+        {
+            SaveWorkday(); // 首次运行落盘默认值
+        }
 
         CurrentYear = DateTime.Now.Year.ToString();
         LastSyncTime = SettingsStore.Load<ChinaHolidayConfig>(
@@ -67,6 +71,48 @@ public partial class TaskScheduleViewModel : ObservableObject
                 schedulerService.RefreshPlan();
             }
         };
+    }
+
+    private void InitWeekdays(IReadOnlyCollection<string> checkedNames)
+    {
+        Weekdays = new ObservableCollection<DayOfWeek>(WeekdayNames.Select(str => new DayOfWeek
+        {
+            Name = str, IsChecked = checkedNames.Contains(str)
+        }));
+
+        foreach (var day in Weekdays)
+        {
+            day.PropertyChanged += (_, e) =>
+            {
+                if (!_suppressWorkdaySave && e.PropertyName == nameof(DayOfWeek.IsChecked))
+                {
+                    SaveWorkday();
+                }
+            };
+        }
+    }
+
+    private void SaveWorkday()
+    {
+        SettingsStore.Save(ConfigSections.FileName, ConfigSections.Workday, new WorkdayConfig
+        {
+            IsConfigured = true,
+            Weekdays = [.. Weekdays.Where(day => day.IsChecked).Select(day => day.Name)]
+        });
+        _schedulerService.RefreshPlan();
+    }
+
+    [RelayCommand]
+    private void ResetWorkday()
+    {
+        _suppressWorkdaySave = true;
+        foreach (var day in Weekdays)
+        {
+            day.IsChecked = DefaultWeekdays.Contains(day.Name);
+        }
+        _suppressWorkdaySave = false;
+        SaveWorkday();
+        _toastService.Show("已恢复默认工作日", ToastType.Success);
     }
 
     [RelayCommand]

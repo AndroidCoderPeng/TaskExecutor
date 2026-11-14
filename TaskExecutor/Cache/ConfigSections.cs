@@ -17,6 +17,7 @@ public static class ConfigSections
     public const string ResetTime = "ResetTime";
     public const string TimeRange = "TimeRange";
     public const string TaskSchedule = "TaskSchedule";
+    public const string Workday = "Workday";
     public const string ChinaHoliday = "ChinaHoliday";
 }
 
@@ -103,6 +104,12 @@ public class TaskScheduleConfig
 {
     public bool IsSkipHoliday { get; set; } = true;
     public bool IsResetDailyTask { get; set; } = true;
+}
+
+public class WorkdayConfig
+{
+    public bool IsConfigured { get; set; } // 区分「从未保存」与「用户全取消」
+    public List<string> Weekdays { get; set; } = [];
 }
 
 public class ChinaHolidayConfig
