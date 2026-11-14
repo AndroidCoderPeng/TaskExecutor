@@ -53,7 +53,7 @@ public partial class MainWindowViewModel : ObservableObject
         _heartbeatTimer.Start();
 
         var taskManager = new MenuItem { Group = "管理", Icon = "\ue63f", Title = "任务管理" };
-        var commandTest = new MenuItem { Group = "帮助", Icon = "\ue640", Title = "指令测试" };
+        var commandTest = new MenuItem { Group = "调试", Icon = "\ue640", Title = "指令测试" };
 
         _deviceRequiredItems = [taskManager, commandTest];
 
@@ -61,6 +61,7 @@ public partial class MainWindowViewModel : ObservableObject
         [
             new MenuItem { Group = "管理", Icon = "\ue74f", Title = "连接设备" },
             taskManager,
+            new MenuItem { Group = "管理", Icon = "\ue682", Title = "任务记录" },
             new MenuItem { Group = "配置", Icon = "\ue622", Title = "目标APP" },
             new MenuItem { Group = "配置", Icon = "\ue629", Title = "导入导出" },
             new MenuItem { Group = "配置", Icon = "\ue690", Title = "邮箱配置" },
@@ -70,7 +71,6 @@ public partial class MainWindowViewModel : ObservableObject
             new MenuItem { Group = "调度", Icon = "\ue696", Title = "随机时间范围" },
             new MenuItem { Group = "调度", Icon = "\ue6a6", Title = "调度开关" },
             commandTest,
-            new MenuItem { Group = "帮助", Icon = "\ue682", Title = "任务记录" },
             new MenuItem { Group = "帮助", Icon = "\ue6c7", Title = "常见问题" },
             new MenuItem { Group = "帮助", Icon = "\ue685", Title = "关于应用" }
         ];
@@ -175,6 +175,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             "连接设备" => App.Services.GetRequiredService<ConnectDeviceViewModel>(),
             "任务管理" => App.Services.GetRequiredService<TaskManagerViewModel>(),
+            "任务记录" => App.Services.GetRequiredService<TaskRecordViewModel>(),
             "导入导出" => App.Services.GetRequiredService<ImportExportViewModel>(),
             "目标APP" => App.Services.GetRequiredService<TargetAppViewModel>(),
             "邮箱配置" => App.Services.GetRequiredService<EmailConfigViewModel>(),
@@ -184,7 +185,6 @@ public partial class MainWindowViewModel : ObservableObject
             "随机时间范围" => App.Services.GetRequiredService<RandomTimeViewModel>(),
             "调度开关" => App.Services.GetRequiredService<TaskScheduleViewModel>(),
             "指令测试" => App.Services.GetRequiredService<CommandTestViewModel>(),
-            "任务记录" => App.Services.GetRequiredService<TaskRecordViewModel>(),
             "常见问题" => App.Services.GetRequiredService<FaqViewModel>(),
             "关于应用" => App.Services.GetRequiredService<AboutViewModel>(),
             _ => CurrentView

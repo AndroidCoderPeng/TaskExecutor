@@ -33,6 +33,8 @@ public partial class App : Application
 
         services.AddSingleton<IDeviceStateProvider>(sp => sp.GetRequiredService<ConnectDeviceViewModel>());
 
+        services.AddTransient<TaskRecordViewModel>();
+        
         services.AddTransient<ImportExportViewModel>();
         services.AddTransient<TargetAppViewModel>();
         services.AddTransient<EmailConfigViewModel>();
@@ -44,7 +46,6 @@ public partial class App : Application
         services.AddTransient<TaskScheduleViewModel>();
 
         services.AddTransient<CommandTestViewModel>();
-        services.AddTransient<TaskRecordViewModel>();
         services.AddTransient<FaqViewModel>();
         services.AddTransient<AboutViewModel>();
 

@@ -54,6 +54,13 @@
             </svg>
             任务管理
           </div>
+          <div class="nav-item" data-view="records">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2" />
+              <path d="M8.5 8h7M8.5 12h7M8.5 16h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            任务记录
+          </div>
 
           <div class="nav-label">配置</div>
           <div class="nav-item" data-view="sync">
@@ -198,6 +205,8 @@
               <div class="card-head">
                 <div class="left"><b>定时任务</b><span class="count-badge" id="countBadge">4 项</span></div>
                 <div class="head-right">
+                  <span class="badge plain" id="chainPill" hidden><span class="dot sm pulse"></span><span
+                      id="chainPillText">正在执行</span></span>
                   <span class="badge orange" id="restBadge"
                         title="今日为休息日，且计划设置已开启「跳过节假日」，到点任务不会触发（演示：点击切换状态）"><span
                       class="dot sm"></span>休息日 · 任务暂停</span>
@@ -212,13 +221,13 @@
               </div>
               <table>
                 <colgroup>
-                  <col style="width:20%">
-                  <col style="width:11%">
-                  <col style="width:9%">
-                  <col style="width:27%">
-                  <col style="width:10%">
-                  <col style="width:11%">
+                  <col style="width:19%">
                   <col style="width:12%">
+                  <col style="width:8%">
+                  <col style="width:30%">
+                  <col style="width:13%">
+                  <col style="width:10%">
+                  <col style="width:8%">
                 </colgroup>
                 <thead>
                   <tr>
@@ -243,6 +252,9 @@
               <div class="log-list" id="logList"></div>
             </div>
           </section>
+
+          <!-- ============ 视图：任务记录（待设计） ============ -->
+          <section class="view" data-view="records"></section>
 
           <!-- ============ 视图：数据导入导出 ============ -->
           <section class="view" data-view="sync">
@@ -285,18 +297,19 @@
             <div class="card">
               <div class="card-head">
                 <div class="left"><b>包名映射</b><span class="count-badge" id="appCount">3 项</span></div>
-                <span class="link" id="importApps">从 CSV 导入</span>
               </div>
               <table>
                 <colgroup>
-                  <col style="width:28%">
-                  <col style="width:52%">
-                  <col style="width:20%">
+                  <col style="width:18%">
+                  <col style="width:26%">
+                  <col style="width:40%">
+                  <col style="width:16%">
                 </colgroup>
                 <thead>
                   <tr>
                     <th>应用名称</th>
                     <th>包名</th>
+                    <th>启动页</th>
                     <th style="text-align:right;">操作</th>
                   </tr>
                 </thead>
@@ -307,7 +320,10 @@
                   <input class="ui" id="appName" placeholder="应用名称，如：钉钉" style="max-width:180px;">
                   <input class="ui mono" id="appPkg" placeholder="com.example.package" style="flex:1;">
                 </div>
-                <button class="btn btn-primary" id="addApp">添加</button>
+                <div class="btns" style="display:flex;gap:8px;">
+                  <button class="btn btn-ghost" id="cancelApp" hidden>取消</button>
+                  <button class="btn btn-primary" id="addApp">添加目标 APP</button>
+                </div>
               </div>
             </div>
           </section>
@@ -447,23 +463,23 @@
                 <div class="left"><b>调度开关</b></div>
               </div>
               <div class="form">
-                <div class="form-row"><label>随机任务</label>
-                  <div class="ctl"><span class="switch on" data-switch></span><span
-                      class="hint-inline">启用后执行时间按随机范围偏移</span></div>
-                </div>
                 <div class="form-row"><label>跳过节假日</label>
                   <div class="ctl"><span class="switch on" data-switch></span><span
                       class="hint-inline">法定节假日与周末自动跳过执行</span></div>
                 </div>
                 <div class="form-row"><label>重置任务</label>
-                  <div class="ctl"><span class="switch" data-switch></span><span
+                  <div class="ctl"><span class="switch on" data-switch></span><span
                       class="hint-inline">到达重置时间点后任务链重新开始</span></div>
+                </div>
+                <div class="form-row"><label>自定义工作日</label>
+                  <div class="ctl"><span class="link" id="btnCustomDay">配置例外日期</span><span
+                      class="hint-inline">调休上班的周末按工作日执行；请假、年假标记为额外休息日</span></div>
                 </div>
               </div>
             </div>
             <div class="card">
               <div class="card-head">
-                <div class="left"><b>节假日数据</b><small>数据源：chinese-days（HTTPS CDN）</small></div>
+                <div class="left"><b>节假日数据</b><small>数据源：chinese-days</small></div>
               </div>
               <div class="form">
                 <div class="form-row"><label>上次同步</label>
@@ -550,9 +566,8 @@
             </p>
             <div class="card">
               <div class="card-head">
-                <div class="left"><b>当前连接</b><small>adb devices</small></div>
+                <div class="left"><b>当前连接</b></div>
                 <div style="display:flex;gap:8px;">
-                  <button class="btn btn-ghost" id="btnSimDrop" title="演示用：模拟设备掉线，观察心跳判定与自动恢复">模拟掉线</button>
                   <button class="btn btn-ghost" id="btnRestartAdb">重启 ADB 服务</button>
                   <button class="btn btn-ghost danger-ghost" id="btnDisconnect">断开连接</button>
                 </div>
@@ -561,24 +576,24 @@
                 <div class="form-row">
                   <label>设备状态</label>
                   <div class="ctl"><span class="dot pulse" id="wifiDot"></span><span id="wifiState"
-                      style="font-size:13px;color:var(--text-1);">Pixel 6 · 192.168.1.23:5555 · 已连接 · 延迟 8ms</span>
+                      style="font-size:13px;color:var(--text-1);">Pixel 6 · 192.168.1.23:5555 · 已连接</span>
                   </div>
                 </div>
               </div>
             </div>
             <div class="card">
               <div class="card-head">
-                <div class="left"><b>连接新设备</b><small>adb connect &lt;IP&gt;:5555</small></div>
+                <div class="left"><b>连接新设备</b></div>
               </div>
               <div class="form">
                 <div class="form-row">
                   <label>设备 IP</label>
                   <div class="ctl"><input class="ui mono" id="connAddr" value="192.168.1.23" placeholder="192.168.1.23"
-                      style="max-width:240px;"><span class="hint-inline">端口固定 5555，无需填写</span></div>
+                      style="max-width:240px;"><span class="hint-inline">端口固定 5555</span></div>
                 </div>
               </div>
               <div class="form-foot">
-                <span class="hint">首次连接需在设备上确认调试授权，之后直连即可</span>
+                <span class="hint">首次连接需要在设备上确认调试授权，之后直连即可</span>
                 <div class="btns">
                   <button class="btn btn-primary" id="btnConnect">连接设备</button>
                 </div>
@@ -702,6 +717,56 @@
           <div class="btns">
             <button class="btn btn-ghost" id="btnCancel">取消</button>
             <button class="btn btn-primary" id="btnSave">保存任务</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 自定义工作日弹窗 -->
+    <div class="overlay" id="restOverlay">
+      <div class="dialog" role="dialog" aria-modal="true" style="width:600px;">
+        <div class="dlg-head">
+          <div class="dlg-head-text"><b>自定义工作日</b></div>
+          <button class="dlg-close" id="restClose" aria-label="关闭对话框" title="关闭">
+            <svg viewBox="0 0 16 16" fill="none">
+              <path d="M3 3l10 10M13 3L3 13" stroke="#6E737D" stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="dlg-body">
+          <p class="page-note" style="margin:0 0 8px;">修正 chinese-days 数据之外的例外日期：调休上班的周末标记为「额外工作日」，当天任务正常执行；请假、年假标记为「额外休息日」，当天任务自动跳过。自定义日期优先于节假日数据源。</p>
+          <section class="dlg-section">
+            <div class="section-head">
+              <span class="section-no">01</span>
+              <h2>额外工作日</h2>
+              <span class="section-line"></span>
+            </div>
+            <div class="form-row">
+              <label>添加日期</label>
+              <div class="ctl"><input class="ui" type="date" id="workDateIn" style="max-width:170px;"><button
+                  class="btn btn-primary" id="addWorkDate">添加</button></div>
+            </div>
+            <div class="day-tags" id="workDateList"></div>
+          </section>
+          <section class="dlg-section">
+            <div class="section-head">
+              <span class="section-no">02</span>
+              <h2>额外休息日</h2>
+              <span class="section-line"></span>
+            </div>
+            <div class="form-row">
+              <label>添加日期</label>
+              <div class="ctl"><input class="ui" type="date" id="restDateIn" style="max-width:170px;"><button
+                  class="btn btn-primary" id="addRestDate">添加</button></div>
+            </div>
+            <div class="day-tags" id="restDateList"></div>
+          </section>
+        </div>
+        <div class="dlg-foot">
+          <span class="hint">示例：周日调休上班 → 加入「额外工作日」；年假 → 加入「额外休息日」</span>
+          <div class="btns">
+            <button class="btn btn-ghost" id="restCancel">取消</button>
+            <button class="btn btn-primary" id="restSave">保存配置</button>
           </div>
         </div>
       </div>

@@ -23,19 +23,19 @@
   const actColor=id=>(ACT_KIND[id]||{}).color||"#007AFF";
 
   let tasks=[
-    {name:"工作日打卡",sub:"钉钉 · com.alibaba.android.rimet",time:"07:30 ±5min",exec:"07:32",notify:"邮件",on:true,
+    {name:"工作日打卡",app:"钉钉",pkg:"com.alibaba.android.rimet",time:"07:30 ±5min",exec:"07:32",notify:"邮件",on:true,
       acts:["ScreenOn","OpenTarget","ScreenCapture"]},
-    {name:"会议提醒",sub:"飞书 · com.ss.android.lark",time:"08:50 ±3min",exec:"08:51",notify:"企业微信",on:true,
+    {name:"会议提醒",app:"飞书",pkg:"com.ss.android.lark",time:"08:50 ±3min",exec:"08:51",notify:"企业微信",on:true,
       acts:["ScreenOn","OpenTarget"]},
-    {name:"日报截图",sub:"企业微信 · com.tencent.wework",time:"18:00",exec:"18:00",notify:"邮件",on:true,
+    {name:"日报截图",app:"企业微信",pkg:"com.tencent.wework",time:"18:00",exec:"18:00",notify:"邮件",on:true,
       acts:["ScreenOn","OpenTarget","ScreenCapture","KillTarget"]},
-    {name:"周末巡检",sub:"企业微信 · com.tencent.wework",time:"09:00 ±10min",exec:"—",notify:"",on:false,
+    {name:"周末巡检",app:"企业微信",pkg:"com.tencent.wework",time:"09:00 ±10min",exec:"—",notify:"",on:false,
       acts:["ScreenOn","SendMessage","ScreenOff"],payload:"巡检完成，设备状态正常"},
   ];
   let apps=[
-    {name:"钉钉",pkg:"com.alibaba.android.rimet"},
-    {name:"飞书",pkg:"com.ss.android.lark"},
-    {name:"企业微信",pkg:"com.tencent.wework"},
+    {name:"钉钉",pkg:"com.alibaba.android.rimet",act:"com.alibaba.android.rimet.biz.LaunchHomeActivity"},
+    {name:"飞书",pkg:"com.ss.android.lark",act:"com.ss.android.lark.main.app.MainActivity"},
+    {name:"企业微信",pkg:"com.tencent.wework",act:"com.tencent.wework.launch.WwMainActivity"},
   ];
   // 日志格式与 SchedulerService 一致：任务级一条汇总 + 心跳翻转，无动作级日志
   let logs=[
@@ -55,6 +55,7 @@
   const $=id=>document.getElementById(id);
   const VIEW_META={
     tasks:{title:"任务管理",desc:""},
+    records:{title:"任务记录",desc:"历史执行记录 · 本地保留 7 天"},
     wifi:{title:"无线连接",desc:"Wi-Fi ADB · 仅支持无线"},
     sync:{title:"数据导入导出",desc:"配置备份与恢复"},
     apps:{title:"目标 APP",desc:"包名映射管理"},
@@ -63,7 +64,7 @@
     wait:{title:"任务等待时间",desc:"动作链步骤间隔"},
     reset:{title:"任务重置时间",desc:"每日任务链重置点"},
     random:{title:"随机时间范围",desc:"执行时间随机偏移"},
-    switches:{title:"调度开关",desc:"随机任务 / 节假日 / 重置"},
+    switches:{title:"调度开关",desc:"节假日 / 重置"},
     cmds:{title:"指令测试",desc:"ADB 指令调试"},
     faq:{title:"常见问题",desc:"HTML 帮助页"},
     about:{title:"关于",desc:"版本与项目信息"},
@@ -113,15 +114,24 @@
   // ===== 任务表格 =====
   function chipsHtml(k){
     const acts=k.acts||[];
-    if(!acts.length)return '<span class="chip warn">未配置动作</span>';
-    const head=acts.slice(0,3).map(id=>{
+    // XAML ItemsControl 全量展示动作，不做截断；空动作链显示 —
+    if(!acts.length)return '<span class="pkg">—</span>';
+    return `<div class="chips">${acts.map(id=>{
       const a=actMeta(id);
       const tip=id==="SendMessage"&&k.payload?`${a.name}：${k.payload}`:`${a.name} · ${a.desc}`;
       const c=actColor(id);
       return `<span class="chip" style="color:${c};background:${c}1f" title="${tip}">${a.name}</span>`;
-    });
-    if(acts.length>3)head.push(`<span class="chip" title="${acts.slice(3).map(id=>actMeta(id).name).join(" › ")}">+${acts.length-3}</span>`);
-    return `<div class="chips">${head.join("")}</div>`;
+    }).join("")}</div>`;
+  }
+  // 通知方式：描边标签（XAML Border 1px Color + 前景 Color，无背景）
+  const NOTIFY_COLOR={"邮件":"#007AFF","企业微信":"#12A594"};
+  function notifyHtml(k){
+    const n=(k.notify||"").trim();
+    if(!n)return '<span class="pkg">—</span>';
+    return n.split(/[、,，]/).filter(Boolean).map(x=>{
+      const c=NOTIFY_COLOR[x.trim()]||"#007AFF";
+      return `<span class="chip outline" style="color:${c};border-color:${c}">${x.trim()}</span>`;
+    }).join("");
   }
   // 计划时间：两行文本 = 基准时间 + 实际随机执行窗口；k.time 形如 "07:30 ±5min" / "07:30 +0~5min" / "07:30 +2min" / "18:00"
   function planHtml(time){
@@ -135,7 +145,7 @@
     else if((p=/^\+(\d+)min$/.exec(off))){lo=hi=+p[1];}
     const q=/^(\d{1,2}):(\d{2})$/.exec(base),mins=(+q[1])*60+ +q[2];
     if(hi==null||hi<=0)
-      return `<span class="plan-txt" title="不做随机偏移，到点立即执行"><span class="plan-time">${base}</span><span class="plan-sub">准点执行</span></span>`;
+      return `<span class="plan-txt" title="不做随机偏移，到点立即执行"><span class="plan-time">${base}</span></span>`;
     const tip=`实际执行 = ${base} 后 ${off.replace(/^\+/,"")} 内随机 → ${hm(mins+lo)} ~ ${hm(mins+hi)}`;
     return `<span class="plan-txt" title="${tip}"><span class="plan-time">${base}</span><span class="plan-win">${hm(mins+lo)} ~ ${hm(mins+hi)}</span></span>`;
   }
@@ -144,11 +154,12 @@
     $("taskBody").innerHTML=list.length?list.map((k)=>{
       const i=tasks.indexOf(k);
       return `<tr data-i="${i}" class="${k.on?"":"disabled"}">
-        <td><div class="task-name">${k.name}</div><div class="task-sub">${k.sub}</div></td>
+        <td><div class="task-name">任务名称 - ${k.app}${k.running?'<span class="run-badge">执行中</span>':""}</div><div
+            class="task-sub">${k.pkg}</div></td>
         <td>${planHtml(k.time)}</td>
         <td><span class="time-exec">${k.exec||"—"}</span></td>
         <td>${chipsHtml(k)}</td>
-        <td>${k.notify}</td>
+        <td>${notifyHtml(k)}</td>
         <td><button class="status-pill ${k.on?"on":"off"}" data-act="toggle"><span class="dot"></span>${k.on?"已启用":"已停用"}</button></td>
         <td><div class="ops"><a class="mute" data-act="toggle">${k.on?"暂停":"启用"}</a></div></td>
       </tr>`;}).join("")
@@ -201,6 +212,9 @@
     if(k.acts.includes("SendMessage")&&!k.payload){toast("动作链含「发送消息」但未填写内容");return;}
 
     runningTask=true;
+    k.running=true;render();
+    const pill=$("chainPill");
+    pill.hidden=false;$("chainPillText").textContent="任务「"+k.name+"」执行中";
     toast("正在试运行「"+k.name+"」");
     const steps=k.acts.slice();
     let n=0;
@@ -208,8 +222,11 @@
       if(n>=steps.length){
         addLog("ok","成功","任务「"+k.name+"」试运行成功：完成 "+steps.length+" 个动作");
         toast("「"+k.name+"」试运行完成");
+        pill.hidden=true;
+        k.running=false;render();
         runningTask=false;return;
       }
+      $("chainPillText").textContent=`任务「${k.name}」执行中 · ${n}/${steps.length}`;
       n++;setTimeout(next,900);
     };
     next();
@@ -400,7 +417,7 @@
     const t=mode==="edit"?tasks[i].time:"";
     $("fTime").textContent=t.split(" ")[0];
     offsetEnabled=mode==="edit"?parseOffset(t):true;
-    fillAppOptions(mode==="edit"?(tasks[i].sub.split(" · ")[1]||""):"");
+    fillAppOptions(mode==="edit"?(tasks[i].pkg||""):"");
 
     // 新建默认预置「亮屏 → 打开应用」，与旧任务的迁移结果保持一致
     draftActs=mode==="edit"?(tasks[i].acts||[]).slice():["ScreenOn","OpenTarget"];
@@ -436,50 +453,71 @@
     if(draftActs.includes("SendMessage")&&!draftPayload.trim()){toast("请填写「发送消息」积木的内容");return;}
 
     const app=apps.find(a=>a.pkg===pkg);
-    const sub=app?`${app.name} · ${app.pkg}`:"";
+    const appName=app?app.name:"";
     const label=time+offsetSuffix();
     const acts=draftActs.slice();
     const payload=draftActs.includes("SendMessage")?draftPayload.trim():"";
     const notify=document.querySelector(".tag-tg.on")?.dataset.tag||"";
 
     if(editIndex>=0){
-      Object.assign(tasks[editIndex],{name,time:label,sub,on:true,notify,acts,payload});
+      Object.assign(tasks[editIndex],{name,app:appName,pkg,time:label,on:true,notify,acts,payload});
       toast("任务「"+name+"」已保存");
     }else{
-      tasks.unshift({name,sub,time:label,exec:time,notify,on:true,acts,payload});
+      tasks.unshift({name,app:appName,pkg,time:label,exec:time,notify,on:true,acts,payload});
       toast("任务「"+name+"」已创建");
     }
     closeDialog();render();
   };
 
   // ===== 目标 APP 管理 =====
+  let appEdit=-1;
   function renderApps(){
     $("appBody").innerHTML=apps.length?apps.map((a,i)=>`
       <tr data-i="${i}">
         <td><div class="task-name">${a.name}</div></td>
         <td><span class="pkg">${a.pkg}</span></td>
-        <td style="text-align:right;"><div class="ops" style="justify-content:flex-end;"><a class="danger" data-act="delApp">删除</a></div></td>
+        <td><span class="pkg">${a.act||"—"}</span></td>
+        <td style="text-align:right;"><div class="ops" style="justify-content:flex-end;"><a data-act="editApp">编辑</a><a
+              class="danger" data-act="delApp" style="margin-left:10px;">删除</a></div></td>
       </tr>`).join("")
-      :`<tr class="empty-row"><td colspan="3">暂无映射，在下方输入应用名称与包名后点击「添加」</td></tr>`;
+      :`<tr class="empty-row"><td colspan="4">暂无映射，在下方输入应用名称与包名后点击「添加目标 APP」</td></tr>`;
     $("appCount").textContent=apps.length+" 项";
   }
+  function resetAppForm(){
+    appEdit=-1;$("appName").value="";$("appPkg").value="";
+    $("addApp").textContent="添加目标 APP";$("cancelApp").hidden=true;
+  }
   $("appBody").addEventListener("click",e=>{
-    if(e.target.dataset.act!=="delApp")return;
+    const act=e.target.dataset.act;
+    if(act!=="delApp"&&act!=="editApp")return;
     const i=+e.target.closest("tr").dataset.i;
-    const name=apps[i].name;
-    apps.splice(i,1);renderApps();
-    toast("已移除「"+name+"」包名映射");
+    if(act==="delApp"){
+      const name=apps[i].name;
+      if(appEdit===i)resetAppForm();
+      apps.splice(i,1);renderApps();
+      toast("已移除「"+name+"」包名映射");
+    }else{
+      appEdit=i;
+      $("appName").value=apps[i].name;$("appPkg").value=apps[i].pkg;
+      $("addApp").textContent="保存修改";$("cancelApp").hidden=false;
+      $("appName").focus();
+    }
   });
   $("addApp").onclick=()=>{
     const n=$("appName").value.trim(),p=$("appPkg").value.trim();
     if(!n||!p){toast("请填写应用名称与包名");return;}
     if(!/^[a-zA-Z][\w]*(\.[\w]+)+$/.test(p)){toast("包名格式不正确，如 com.example.app");return;}
-    apps.push({name:n,pkg:p});
-    $("appName").value="";$("appPkg").value="";
-    renderApps();toast("已添加「"+n+"」映射");
-    addLog("info","信息","新增包名映射："+n+" · "+p);
+    if(appEdit>=0){
+      apps[appEdit].name=n;apps[appEdit].pkg=p;
+      toast("已保存「"+n+"」映射修改");
+    }else{
+      apps.push({name:n,pkg:p,act:""});
+      toast("已添加「"+n+"」映射");
+      addLog("info","信息","新增包名映射："+n+" · "+p);
+    }
+    resetAppForm();renderApps();
   };
-  $("importApps").onclick=()=>{toast("已从 apps.csv 导入 3 条包名映射（演示）");};
+  $("cancelApp").onclick=resetAppForm;
   renderApps();
 
   // ===== 数据导入导出 =====
@@ -525,6 +563,49 @@
     addLog("ok","成功","节假日数据已从 chinese-days CDN 同步（覆盖 2026 全年）");
   };
 
+  // ===== 自定义工作日 =====
+  // 与 HolidayHelper 对齐：额外工作日 → IsWorkday 优先判定；额外休息日 → IsHoliday 补充判定
+  let workDays=["2026-09-20","2026-10-10"],restDays=["2026-11-27"];
+  function renderDayTags(){
+    $("workDateList").innerHTML=workDays.map((d,i)=>
+      `<span class="tag-chip">${d}<a data-del="w" data-i="${i}" title="移除">✕</a></span>`).join("")
+      ||`<span class="hint">暂无，调休上班的周末在这里添加</span>`;
+    $("restDateList").innerHTML=restDays.map((d,i)=>
+      `<span class="tag-chip rest">${d}<a data-del="r" data-i="${i}" title="移除">✕</a></span>`).join("")
+      ||`<span class="hint">暂无，请假、年假在这里添加</span>`;
+  }
+  const openRest=()=>{renderDayTags();$("restOverlay").classList.add("show");};
+  const closeRest=()=>$("restOverlay").classList.remove("show");
+  $("btnCustomDay").onclick=openRest;
+  $("restClose").onclick=closeRest;
+  $("restCancel").onclick=closeRest;
+  $("restOverlay").addEventListener("click",e=>{if(e.target===$("restOverlay"))closeRest();});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")closeRest();});
+  const addDay=(inputId,list,other)=>{
+    const v=$(inputId).value;
+    if(!v){toast("请先选择日期");return;}
+    if(other.includes(v)){toast("该日期已在另一个分区中，请先移除");return;}
+    if(list.includes(v)){toast("该日期已存在");return;}
+    list.push(v);list.sort();renderDayTags();$(inputId).value="";
+  };
+  $("addWorkDate").onclick=()=>addDay("workDateIn",workDays,restDays);
+  $("addRestDate").onclick=()=>addDay("restDateIn",restDays,workDays);
+  $("workDateList").addEventListener("click",e=>{
+    if(e.target.dataset.del!=="w")return;
+    workDays.splice(+e.target.dataset.i,1);renderDayTags();
+  });
+  $("restDateList").addEventListener("click",e=>{
+    if(e.target.dataset.del!=="r")return;
+    restDays.splice(+e.target.dataset.i,1);renderDayTags();
+  });
+  $("restSave").onclick=()=>{
+    closeRest();
+    toast("自定义工作日已保存");
+    addLog("ok","成功",`自定义工作日已保存（额外工作日 ${workDays.length} 天 · 额外休息日 ${restDays.length} 天）`);
+  };
+
+  // ===== 任务记录（待设计） =====
+
   // ===== 指令测试 =====
   document.querySelectorAll(".cmd-btn").forEach(b=>b.addEventListener("click",()=>{
     const names={wake:"亮屏",off:"息屏",cap:"截屏",open:"打开目标应用",close:"关闭目标应用",msg:"发送消息"};
@@ -558,7 +639,7 @@
     const as=$("adbStatus"),dv=$("adbDev");
     if(on){
       dot.classList.add("pulse");dot.classList.remove("off");
-      st.textContent="Pixel 6 · "+full+" · 已连接 · 延迟 "+Math.floor(4+Math.random()*12)+"ms";
+      st.textContent="Pixel 6 · "+full+" · 已连接";
       st.style.color="var(--text-1)";
       as.textContent="ADB 已连接";as.style.color="var(--green)";
       dv.textContent="Pixel 6 · "+full;
@@ -612,49 +693,33 @@
 
 
   // ===== ADB 心跳 =====
-  // 真实实现：30s 一次 adb devices 探测，连续 2 次失败判定掉线，90s 无成功探测视为停滞；
-  // 心跳本身只在「掉线 / 恢复」时写运行日志，界面靠这里的秒数表达"心还在跳"。
-  // 原型演示加速：4s 一次成功探测，12s 判定停滞。
+  // 真实实现：30s 一次 adb devices 探测，掉线/恢复时写运行日志；界面靠秒数表达"心还在跳"
+  // 原型演示加速：4s 一次成功探测
   const HB_DEMO_TICK = 4;
-  const HB_DEMO_STALE = 12;
-  let hbLast = Date.now(), hbFrozen = false, hbDropLogged = false;
+  let hbLast = Date.now();
 
   const hbElapsed = () => Math.floor((Date.now() - hbLast) / 1000);
 
   function hbReset() {
     hbLast = Date.now();
-    hbFrozen = false;
-    hbDropLogged = false;
-    $("btnSimDrop").textContent = "模拟掉线";
     renderHeartbeat();
   }
 
   function hbStop() {
-    hbFrozen = false;
-    hbDropLogged = false;
-    $("btnSimDrop").textContent = "模拟掉线";
     renderHeartbeat();
   }
 
   function renderHeartbeat() {
     const elapsed = hbElapsed();
-    const stalled = wifiConnected && hbFrozen && elapsed >= HB_DEMO_STALE;
-    const beating = wifiConnected && !stalled;
-    const cls = !wifiConnected ? "" : stalled ? "stalled" : "alive";
 
     const t = $("adbHbText");
-    t.className = "hb-text " + cls;
-    t.textContent = !wifiConnected
-      ? "心跳 -"
-      : stalled
-        ? `停滞 ${elapsed < 60 ? elapsed + "s" : Math.floor(elapsed / 60) + "min"}`
-        : `心跳 ${elapsed}s`;
+    t.className = "hb-text " + (wifiConnected ? "alive" : "");
+    t.textContent = !wifiConnected ? "心跳 -" : `心跳 ${elapsed}s`;
 
     // 单一状态点：颜色表示连接状态，动画表示心跳节奏
     const dot = $("adbDot");
-    dot.classList.toggle("beat", beating);
+    dot.classList.toggle("beat", wifiConnected);
     dot.classList.toggle("off", !wifiConnected);
-    dot.classList.toggle("bad", stalled);
   }
 
   function restoreLinkUi() {
@@ -662,61 +727,15 @@
     $("adbStatus").style.color = "var(--green)";
     $("wifiDot").classList.remove("off");
     $("wifiDot").classList.add("pulse");
-    $("wifiState").textContent = "Pixel 6 · " + CONN_DEFAULT + " · 已连接 · 延迟 9ms";
+    $("wifiState").textContent = "Pixel 6 · " + CONN_DEFAULT + " · 已连接";
     $("wifiState").style.color = "var(--text-1)";
-  }
-
-  // 心跳判定掉线：只归位界面状态 + 写一条翻转日志，不弹 Toast（无人值守场景不打扰）
-  function hbJudgeDrop() {
-    hbDropLogged = true;
-    addLog("err", "失败", "ADB 心跳：设备连接已断开（" + CONN_DEFAULT + "）");
-    $("adbStatus").textContent = "ADB 未连接";
-    $("adbStatus").style.color = "var(--red)";
-    $("wifiDot").classList.remove("pulse");
-    $("wifiDot").classList.add("off");
-    $("wifiState").textContent = "未连接设备 · 心跳判定掉线，正在自动重连…";
-    $("wifiState").style.color = "var(--text-3)";
-    renderHeartbeat();
-
-    // 模拟 adb connect 自动重连（真实实现最多等待一个心跳周期）
-    setTimeout(() => {
-      if (!wifiConnected) return;
-      hbFrozen = false;
-      hbDropLogged = false;
-      hbLast = Date.now();
-      $("btnSimDrop").textContent = "模拟掉线";
-      restoreLinkUi();
-      addLog("ok", "成功", "ADB 心跳：设备已恢复连接（" + CONN_DEFAULT + "）");
-      renderHeartbeat();
-    }, 2000);
   }
 
   // 每秒刷新"心跳 N 秒前"；每 4s 模拟一次成功探测
   setInterval(() => {
-    if (wifiConnected && !hbFrozen && Date.now() - hbLast >= HB_DEMO_TICK * 1000) hbLast = Date.now();
-    if (wifiConnected && hbFrozen && !hbDropLogged && hbElapsed() >= HB_DEMO_STALE) hbJudgeDrop();
+    if (wifiConnected && Date.now() - hbLast >= HB_DEMO_TICK * 1000) hbLast = Date.now();
     renderHeartbeat();
   }, 1000);
-
-  $("btnSimDrop").onclick = () => {
-    if (!wifiConnected) { toast("请先在下方连接设备"); return; }
-    if (!hbFrozen) {
-      hbFrozen = true;
-      hbLast = Date.now();
-      $("btnSimDrop").textContent = "恢复连接";
-      toast("已模拟掉线：心跳时间冻结，12s 后判定停滞");
-      renderHeartbeat();
-    } else {
-      hbFrozen = false;
-      hbDropLogged = false;
-      hbLast = Date.now();
-      $("btnSimDrop").textContent = "模拟掉线";
-      restoreLinkUi();
-      addLog("ok", "成功", "ADB 心跳：设备已恢复连接（" + CONN_DEFAULT + "）");
-      toast("心跳已恢复");
-      renderHeartbeat();
-    }
-  };
 
   // ===== 初始化 =====
   // 演示初始态：默认设备已连接，便于直接观察心跳跳动（不自动跳转页面）
