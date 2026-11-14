@@ -155,8 +155,13 @@ public partial class TaskManagerViewModel : ObservableObject
     {
         var index = Tasks.IndexOf(task);
         if (index < 0) return;
-        var wasSkipped = _schedulerStatus.PlannedTasks.Any(p => p.TaskName == task.Name &&
-                                                                p.State == PlannedTaskState.Skipped);
+
+        var wasSkipped = _schedulerStatus.PlannedTasks.Any(plan =>
+            plan.TaskName == task.Name && plan.State == PlannedTaskState.Skipped
+        );
+        var wasTriggered = _schedulerStatus.PlannedTasks.Any(plan =>
+            plan.TaskName == task.Name && plan.State == PlannedTaskState.Triggered
+        );
 
         // 因为是周期性执行任务，所以可以在主流程中直接修改任务项，等下次就会直接生效
         var systemVersion = _deviceViewModel.IsConnected
@@ -167,10 +172,16 @@ public partial class TaskManagerViewModel : ObservableObject
         if (_dialogService.ShowDialog(typeof(TaskDialog), parameter) != true) return;
 
         ReloadTasks();
-        if (!wasSkipped && _schedulerStatus.PlannedTasks.Any(p => p.TaskName == task.Name
-                                                                  && p.State == PlannedTaskState.Skipped
-                                                                  && p.ScheduledAt.Date >= DateTime.Today))
+        if (!wasSkipped && _schedulerStatus.PlannedTasks.Any(plan => plan.TaskName == task.Name
+                                                                     && plan.State == PlannedTaskState.Skipped
+                                                                     && plan.ScheduledAt.Date >= DateTime.Today))
+        {
             _toastService.Show($"任务「{task.Name}」的新计划时间已过，本周期跳过", ToastType.Warning);
+        }
+        else if (wasTriggered)
+        {
+            _toastService.Show($"任务「{task.Name}」今日已执行，新计划时间将于重置后生效");
+        }
     }
 
     private void ReloadTasks()
