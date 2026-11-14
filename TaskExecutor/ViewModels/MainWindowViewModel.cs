@@ -61,7 +61,7 @@ public partial class MainWindowViewModel : ObservableObject
         [
             new MenuItem { Group = "管理", Icon = "\ue74f", Title = "连接设备" },
             taskManager,
-            new MenuItem { Group = "管理", Icon = "\ue682", Title = "任务记录" },
+            new MenuItem { Group = "管理", Icon = "\ue682", Title = "记录归档" },
             new MenuItem { Group = "配置", Icon = "\ue622", Title = "目标APP" },
             new MenuItem { Group = "配置", Icon = "\ue629", Title = "导入导出" },
             new MenuItem { Group = "配置", Icon = "\ue690", Title = "邮箱配置" },
@@ -175,7 +175,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             "连接设备" => App.Services.GetRequiredService<ConnectDeviceViewModel>(),
             "任务管理" => App.Services.GetRequiredService<TaskManagerViewModel>(),
-            "任务记录" => App.Services.GetRequiredService<TaskRecordViewModel>(),
+            "记录归档" => App.Services.GetRequiredService<RecordArchiveViewModel>(),
             "导入导出" => App.Services.GetRequiredService<ImportExportViewModel>(),
             "目标APP" => App.Services.GetRequiredService<TargetAppViewModel>(),
             "邮箱配置" => App.Services.GetRequiredService<EmailConfigViewModel>(),

@@ -33,7 +33,7 @@ public partial class App : Application
 
         services.AddSingleton<IDeviceStateProvider>(sp => sp.GetRequiredService<ConnectDeviceViewModel>());
 
-        services.AddTransient<TaskRecordViewModel>();
+        services.AddTransient<RecordArchiveViewModel>();
         
         services.AddTransient<ImportExportViewModel>();
         services.AddTransient<TargetAppViewModel>();

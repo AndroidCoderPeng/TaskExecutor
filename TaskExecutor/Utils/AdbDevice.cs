@@ -13,8 +13,9 @@ public sealed record AdbResult(int Code, IReadOnlyList<string> Output)
     /// <summary>
     /// 退出码为 0 且输出无 Error 视为成功（与调度器既有判断口径一致）
     /// </summary>
-    public bool IsSuccess => Code == 0
-                             && !Output.Any(line => line.Contains("Error", StringComparison.OrdinalIgnoreCase));
+    public bool IsSuccess => Code == 0 && !Output.Any(line =>
+        line.Contains("Error", StringComparison.OrdinalIgnoreCase)
+    );
 }
 
 /// <summary>
@@ -35,7 +36,7 @@ public sealed class AdbDevice
     /// <summary>
     /// 执行任意 adb 子命令，返回完整结果
     /// </summary>
-    public async Task<AdbResult> RunAsync(params string[] arguments)
+    private async Task<AdbResult> RunAsync(params string[] arguments)
     {
         var creator = new ArgumentCreator().Append("-s").Append(_serial);
         foreach (var argument in arguments)
@@ -53,7 +54,7 @@ public sealed class AdbDevice
     /// </summary>
     /// <param name="arguments"></param>
     /// <returns></returns>
-    public async Task<bool> TryRunAsync(params string[] arguments) => (await RunAsync(arguments)).IsSuccess;
+    private async Task<bool> TryRunAsync(params string[] arguments) => (await RunAsync(arguments)).IsSuccess;
 
     /// <summary>
     /// 获取应用的启动 Activity（Launcher Activity）

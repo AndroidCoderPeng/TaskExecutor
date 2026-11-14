@@ -19,6 +19,10 @@
                 <views:TaskManagerView/>
             </DataTemplate>
             
+            <DataTemplate DataType="{x:Type vm:RecordArchiveViewModel}">
+                <views:RecordArchiveView/>
+            </DataTemplate>
+            
             <DataTemplate DataType="{x:Type vm:ImportExportViewModel}">
                 <views:ImportExportView/>
             </DataTemplate>
