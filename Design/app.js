@@ -571,28 +571,16 @@
     $("weekPicker").innerHTML=WEEK_NAMES.map((n,i)=>
       `<button type="button" class="tag-tg${workWeek[i]?" on":""}" data-w="${i}">${n}</button>`).join("");
   }
+  const weekNames=()=>workWeek.map((on,i)=>on?WEEK_NAMES[i]:null).filter(Boolean).join("、")||"无（每天都跳过）";
   $("weekPicker").addEventListener("click",e=>{
     const b=e.target.closest("[data-w]");
     if(!b)return;
     workWeek[+b.dataset.w]=!workWeek[+b.dataset.w];
     renderWeekPicker();
-  });
-  const openRest=()=>{renderWeekPicker();$("restOverlay").classList.add("show");};
-  const closeRest=()=>$("restOverlay").classList.remove("show");
-  const weekNames=()=>workWeek.map((on,i)=>on?WEEK_NAMES[i]:null).filter(Boolean).join("、")||"无（每天都跳过）";
-  const updateWorkdayHint=()=>{ $("workdayHint").textContent="当前："+weekNames(); };
-  $("btnCustomDay").onclick=openRest;
-  $("restClose").onclick=closeRest;
-  $("restCancel").onclick=closeRest;
-  $("restOverlay").addEventListener("click",e=>{if(e.target===$("restOverlay"))closeRest();});
-  document.addEventListener("keydown",e=>{if(e.key==="Escape")closeRest();});
-  $("restSave").onclick=()=>{
-    closeRest();
-    updateWorkdayHint();
-    toast("自定义工作日已保存");
+    toast("自定义工作日已更新");
     addLog("ok","成功",`每周工作日已更新：${weekNames()}`);
-  };
-  updateWorkdayHint();
+  });
+  renderWeekPicker();
 
   // ===== 任务记录（待设计） =====
 

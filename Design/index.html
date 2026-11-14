@@ -472,8 +472,10 @@
                       class="hint-inline">到达重置时间点后任务链重新开始</span></div>
                 </div>
                 <div class="form-row"><label>自定义工作日</label>
-                  <div class="ctl"><span class="link" id="btnCustomDay">按星期配置</span><span
-                      class="hint-inline" id="workdayHint">当前：周一、周二、周三、周四、周五</span></div>
+                  <div class="ctl stack">
+                    <div class="tag-toggles week" id="weekPicker" role="group" aria-label="每周工作日"></div>
+                    <span class="hint-inline">勾选的星期当天任务正常调度，未勾选视为休息日（配合「跳过节假日」开关生效）；全部取消则每天都跳过</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -717,38 +719,6 @@
           <div class="btns">
             <button class="btn btn-ghost" id="btnCancel">取消</button>
             <button class="btn btn-primary" id="btnSave">保存任务</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 自定义工作日弹窗 -->
-    <div class="overlay" id="restOverlay">
-      <div class="dialog" role="dialog" aria-modal="true" style="width:600px;">
-        <div class="dlg-head">
-          <div class="dlg-head-text"><b>自定义工作日</b></div>
-          <button class="dlg-close" id="restClose" aria-label="关闭对话框" title="关闭">
-            <svg viewBox="0 0 16 16" fill="none">
-              <path d="M3 3l10 10M13 3L3 13" stroke="#6E737D" stroke-width="1.6" stroke-linecap="round" />
-            </svg>
-          </button>
-        </div>
-        <div class="dlg-body">
-          <p class="page-note" style="margin:0 0 8px;">按星期循环设定工作日：勾选的星期当天任务正常调度，未勾选的视为休息日（配合「跳过节假日」开关生效）。法定节假日仍按节假日数据跳过，无需再逐个维护调休日期。</p>
-          <section class="dlg-section">
-            <div class="section-head">
-              <span class="section-no">01</span>
-              <h2>每周工作日</h2>
-              <span class="section-line"></span>
-            </div>
-            <div class="tag-toggles" id="weekPicker" role="group" aria-label="每周工作日"></div>
-          </section>
-        </div>
-        <div class="dlg-foot">
-          <span class="hint">按星期循环生效：如勾选周六，则每周六都会执行任务</span>
-          <div class="btns">
-            <button class="btn btn-ghost" id="restCancel">取消</button>
-            <button class="btn btn-primary" id="restSave">保存配置</button>
           </div>
         </div>
       </div>
