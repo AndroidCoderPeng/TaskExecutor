@@ -6,4 +6,5 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 *.user
+/Design
 /.workbuddy
