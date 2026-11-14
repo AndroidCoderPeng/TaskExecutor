@@ -581,6 +581,12 @@
     addLog("ok","成功",`每周工作日已更新：${weekNames()}`);
   });
   renderWeekPicker();
+  $("resetWeek").onclick=()=>{
+    workWeek=[true,true,true,true,true,false,false];
+    renderWeekPicker();
+    toast("已恢复默认工作日");
+    addLog("info","信息","每周工作日已恢复默认：周一至周五");
+  };
 
   // ===== 任务记录（待设计） =====
 

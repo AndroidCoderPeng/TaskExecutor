@@ -249,8 +249,6 @@
   .form-row{display:flex;align-items:center;gap:12px;padding:7px 0;}
   .form-row>label{width:96px;flex:none;font-size:13px;color:var(--text-2);text-align:right;}
   .form-row .ctl{flex:1;display:flex;align-items:center;gap:8px;min-width:0;}
-  .form-row .ctl.stack{flex-direction:column;align-items:flex-start;gap:6px;}
-  .form-row .ctl.stack .hint-inline{line-height:1.4;}
   .form-row .hint-inline{font-size:12px;color:var(--text-3);}
   .subhead{font-size:12px;color:var(--text-3);font-weight:500;padding:8px 0 2px;}
   input.ui{
@@ -431,8 +429,11 @@
   }
   /* 通知方式：等宽分段单选 */
   .tag-toggles{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-  /* 每周工作日：7 个等分一行 */
-  .tag-toggles.week{grid-template-columns:repeat(7,1fr);max-width:560px;}
+  /* 每周工作日：独立卡片，7 个等分一行 */
+  .tag-toggles.week{grid-template-columns:repeat(7,1fr);}
+  .week-body{display:flex;flex-direction:column;gap:8px;padding:10px 0 6px;}
+  .week-body .tag-tg{height:40px;font-size:13px;}
+  .week-body .hint-inline{font-size:12px;color:var(--text-3);line-height:1.4;}
   .tag-tg{
     display:inline-flex;align-items:center;justify-content:center;gap:6px;
     height:34px;padding:0 8px;

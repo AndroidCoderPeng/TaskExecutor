@@ -471,11 +471,17 @@
                   <div class="ctl"><span class="switch on" data-switch></span><span
                       class="hint-inline">到达重置时间点后任务链重新开始</span></div>
                 </div>
-                <div class="form-row"><label>自定义工作日</label>
-                  <div class="ctl stack">
-                    <div class="tag-toggles week" id="weekPicker" role="group" aria-label="每周工作日"></div>
-                    <span class="hint-inline">勾选的星期当天任务正常调度，未勾选视为休息日（配合「跳过节假日」开关生效）；全部取消则每天都跳过</span>
-                  </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <div class="left"><b>自定义工作日</b><small>按星期循环生效：如勾选周六，则每周六都会执行任务</small></div>
+                <button class="btn btn-ghost" id="resetWeek">恢复默认</button>
+              </div>
+              <div class="form">
+                <div class="week-body">
+                  <div class="tag-toggles week" id="weekPicker" role="group" aria-label="每周工作日"></div>
+                  <span class="hint-inline">勾选的星期当天任务正常调度，未勾选视为休息日（配合「跳过节假日」开关生效）；全部取消则每天都跳过</span>
                 </div>
               </div>
             </div>
