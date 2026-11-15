@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Newtonsoft.Json;
 using TaskExecutor.Enums;
 using TaskExecutor.Model;
 using TaskExecutor.Services;
@@ -108,6 +109,12 @@ public partial class RecordArchiveViewModel : ObservableObject
 
     private static string FormatSize(long bytes) =>
         bytes >= 1024 * 1024 ? $"{bytes / 1024d / 1024d:F1} MB" : $"{Math.Round(bytes / 1024d)} KB";
+
+    [RelayCommand]
+    private void ImageItemDoubleClicked(ScreenshotItem? shot)
+    {
+        if (shot is null) return;
+    }
 
     [RelayCommand]
     private void DeleteCapture(ScreenshotItem? shot)

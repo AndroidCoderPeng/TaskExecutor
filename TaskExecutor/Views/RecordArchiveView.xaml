@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:data="clr-namespace:System.Windows.Data;assembly=PresentationFramework"
     xmlns:enums="clr-namespace:TaskExecutor.Enums"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:TaskExecutor.Model"
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
@@ -224,21 +225,29 @@
                                                     BorderThickness="1"
                                                     ToolTip="{Binding FileName}">
                                                     <Grid>
+                                                        <Grid.InputBindings>
+                                                            <MouseBinding
+                                                                Command="{Binding DataContext.ImageItemDoubleClickedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding}"
+                                                                Gesture="LeftDoubleClick" />
+                                                        </Grid.InputBindings>
+
                                                         <Image
                                                             Width="110"
-                                                            Height="216"
+                                                            Height="210"
                                                             Source="{Binding FullPath, Converter={StaticResource ScreenshotImageConverterKey}}"
                                                             Stretch="UniformToFill" />
 
                                                         <Border
-                                                            Margin="4"
+                                                            Margin="2"
                                                             HorizontalAlignment="Right"
                                                             VerticalAlignment="Top"
                                                             Background="{StaticResource DropShadowBrush}"
-                                                            CornerRadius="10">
+                                                            CornerRadius="8">
                                                             <TextBlock
                                                                 Margin="6,2"
                                                                 HorizontalAlignment="Right"
+                                                                FontSize="10"
                                                                 Foreground="White"
                                                                 Text="{Binding SizeText}" />
                                                         </Border>
@@ -251,7 +260,7 @@
                                                                     Command="{Binding DataContext.DeleteCaptureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                     CommandParameter="{Binding}"
                                                                     Content="删除"
-                                                                    Foreground="{StaticResource DangerBrush}"
+                                                                    Foreground="White"
                                                                     Style="{StaticResource TextButtonStyle}" />
                                                             </DockPanel>
                                                         </Border>
