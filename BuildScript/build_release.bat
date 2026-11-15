@@ -1,115 +1,100 @@
 @echo off
 setlocal
 
-echo.
-echo Set variables environment.
-echo.
-set QT_DIR=D:\3rdparty\Qt5.15\5.15.2\mingw81_64
-set OPEN_SSL_DIR=C:\Program Files\OpenSSL-Win64
-set QMAKE=%QT_DIR%\bin\qmake.exe
-set WINDEPLOYQT=%QT_DIR%\bin\windeployqt.exe
-set PLUGIN_DIR=%QT_DIR%\plugins
+REM ============================================================
+REM  TaskExecutor (WPF / .NET 8) build and package script
+REM  Usage: run in CMD. Output: TaskExecutor_Setup.exe on desktop
+REM ============================================================
 
-set PROJECT_DIR=D:\Code\QtProjects\TaskDispatcher
-set HTML_DIR=%PROJECT_DIR%\html
-set ADB_DIR=%PROJECT_DIR%\tool
-set BUILD_DIR=%PROJECT_DIR%\build\Desktop_Qt_5_15_2_MinGW_64_bit_Release\release
-set OUTPUT_EXE=TaskDispatcher.exe
+REM ---------------- Configurable parameters ----------------
+REM Build config / target platform
+set CONFIG=Release
+set RID=win-x64
+REM true = self-contained (no .NET 8 runtime needed on target); false = framework-dependent
+set SELF_CONTAINED=true
 
-set DESKTOP_DIR=C:\Users\Administrator\Desktop
-set TEMP_DIR=%DESKTOP_DIR%\temp_build
+REM Inno Setup compiler path
 set INNO_SETUP=D:\Program Files (x86)\Inno Setup 6\ISCC.exe
-set ISS_SCRIPT=%PROJECT_DIR%\script\windows_x86_64\TaskDispatcher.iss
-set ICON_PATH=%PROJECT_DIR%\application.ico
 
+REM Installer output directory (also written into the .iss OutputDir)
+set OUTPUT_DIR=%USERPROFILE%\Desktop
 
-echo.
-echo Change directory to desktop.
-echo.
-cd /d "%DESKTOP_DIR%"
-
-
-echo.
-echo Remove old temp_build directory if it existed.
-echo.
-if exist "%TEMP_DIR%" rd /s /q "%TEMP_DIR%"
-
+REM ---------------- Derived paths, do not edit ----------------
+set SCRIPT_DIR=%~dp0
+set PROJECT_DIR=%SCRIPT_DIR%..
+set CSPROJ=%PROJECT_DIR%\TaskExecutor\TaskExecutor.csproj
+set PUBLISH_DIR=%PROJECT_DIR%\publish
+set ISS_SCRIPT=%SCRIPT_DIR%TaskExecutor.iss
 
 echo.
-echo Create new temporary build directory.
+echo ===== TaskExecutor build script =====
+echo Project   : %CSPROJ%
+echo Publish   : %PUBLISH_DIR%
+echo Installer : %OUTPUT_DIR%\TaskExecutor_Setup.exe
 echo.
-mkdir "%TEMP_DIR%"
 
+REM ---------------- 0. Environment checks ----------------
+where dotnet >nul 2>nul
+if errorlevel 1 goto :err_dotnet
+if not exist "%CSPROJ%" goto :err_csproj
+if not exist "%INNO_SETUP%" goto :err_inno
+if not exist "%ISS_SCRIPT%" goto :err_iss
 
-echo.
-echo Copy application executable to temporary directory.
-echo.
-copy "%BUILD_DIR%\%OUTPUT_EXE%" "%TEMP_DIR%\"
+REM ---------------- 1. Clean old publish directory ----------------
+echo [1/3] Cleaning old publish directory...
+if exist "%PUBLISH_DIR%" rd /s /q "%PUBLISH_DIR%"
 
+REM ---------------- 2. dotnet publish ----------------
+echo.
+echo [2/3] Publishing (%CONFIG% / %RID% / self-contained=%SELF_CONTAINED%)...
+dotnet publish "%CSPROJ%" -c %CONFIG% -r %RID% --self-contained %SELF_CONTAINED% -o "%PUBLISH_DIR%"
+if errorlevel 1 goto :err_publish
+if not exist "%PUBLISH_DIR%\TaskExecutor.exe" goto :err_publish
 
+REM ---------------- 3. Inno Setup packaging ----------------
 echo.
-echo Change working directory to temporary build folder.
-echo.
-cd /d "%TEMP_DIR%"
-
-
-echo.
-echo Copy ADB environment to temporary directory.
-echo.
-xcopy "%ADB_DIR%\*" "%TEMP_DIR%\tool\" /E /I /Y
-
-echo.
-echo Copy HTML directory to temporary directory.
-echo.
-xcopy "%HTML_DIR%\*" "%TEMP_DIR%\html\" /E /I /Y
-
-echo.
-echo Deploy Qt dependencies using windeployqt.
-echo.
-"%WINDEPLOYQT%" "%TEMP_DIR%\%OUTPUT_EXE%"
-
+echo [3/3] Packaging with Inno Setup...
+"%INNO_SETUP%" /DOutputDir="%OUTPUT_DIR%" "%ISS_SCRIPT%"
+if errorlevel 1 goto :err_pack
 
 echo.
-echo Copy MinGW runtime libraries to temporary directory.
+echo ===== Build succeeded! =====
+echo Installer: %OUTPUT_DIR%\TaskExecutor_Setup.exe
 echo.
-copy "%QT_DIR%\bin\libgcc_s_seh-1.dll" "%TEMP_DIR%\"
-copy "%QT_DIR%\bin\libstdc++-6.dll" "%TEMP_DIR%\"
-copy "%QT_DIR%\bin\libwinpthread-1.dll" "%TEMP_DIR%\"
-copy "%QT_DIR%\bin\D3Dcompiler_47.dll" "%TEMP_DIR%\"
-copy "%QT_DIR%\bin\libEGL.dll" "%TEMP_DIR%\"
-copy "%QT_DIR%\bin\libGLESv2.dll" "%TEMP_DIR%\"
-copy "%QT_DIR%\bin\opengl32sw.dll" "%TEMP_DIR%\"
-copy "%OPEN_SSL_DIR%\bin\libcrypto-1_1-x64.dll" "%TEMP_DIR%\"
-copy "%OPEN_SSL_DIR%\bin\libssl-1_1-x64.dll" "%TEMP_DIR%\"
 
+REM Pass "keep" to preserve the publish directory: build_release.bat keep
+if /i "%~1"=="keep" (
+    echo Publish output kept at: %PUBLISH_DIR%
+) else (
+    echo Cleaning publish directory...
+    if exist "%PUBLISH_DIR%" rd /s /q "%PUBLISH_DIR%"
+)
 
-echo.
-echo Packaging with Inno Setup...
+pause
+exit /b 0
+
+:err_dotnet
+echo Error: dotnet SDK not found in PATH.
+goto :fail
+:err_csproj
+echo Error: project file not found: %CSPROJ%
+goto :fail
+:err_inno
+echo Error: Inno Setup compiler not found, expected at:
 echo %INNO_SETUP%
-echo %ISS_SCRIPT%
+goto :fail
+:err_iss
+echo Error: Inno Setup script not found: %ISS_SCRIPT%
+goto :fail
+:err_publish
+echo Error: dotnet publish failed!
+goto :fail
+:err_pack
+echo Error: Inno Setup packaging failed!
+goto :fail
+
+:fail
 echo.
-if not exist "%ISS_SCRIPT%" (
-    echo Error: Inno Setup script not found at %ISS_SCRIPT%
-    pause
-)
-"%INNO_SETUP%" "%ISS_SCRIPT%"
-
-if errorlevel 1 (
-    echo Error: Inno Setup packaging failed!
-    pause
-)
-
-echo.
-echo Packaging completed successfully! Installer generated on the desktop.
-echo.
-
-echo.
-echo Deleting temporary build directory...
-echo.
-
-REM 切换到桌面目录，释放对 TEMP_DIR 的占用
-cd /d "%DESKTOP_DIR%"
-
-if exist "%TEMP_DIR%" rd /s /q "%TEMP_DIR%"
-
-endlocal
+echo ===== Build FAILED =====
+pause
+exit /b 1
