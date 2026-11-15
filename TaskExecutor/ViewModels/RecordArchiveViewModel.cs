@@ -1,10 +1,11 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Newtonsoft.Json;
 using TaskExecutor.Enums;
 using TaskExecutor.Model;
 using TaskExecutor.Services;
@@ -114,6 +115,27 @@ public partial class RecordArchiveViewModel : ObservableObject
     private void ImageItemDoubleClicked(ScreenshotItem? shot)
     {
         if (shot is null) return;
+        var file = shot.FullPath;
+        Task.Run(() =>
+        {
+            if (!File.Exists(file)) return;
+
+            try
+            {
+                Process.Start(new ProcessStartInfo(file)
+                {
+                    UseShellExecute = true
+                });
+            }
+            catch (Win32Exception exception)
+            {
+                MessageBox.Show(
+                    $"无法使用系统默认程序打开该文件。\n\n{exception.Message}",
+                    "无法打开文件",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        });
     }
 
     [RelayCommand]
