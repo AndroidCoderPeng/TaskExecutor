@@ -42,7 +42,7 @@
             Grid.Row="1"
             Margin="20,16"
             Foreground="{StaticResource TextTertiaryBrush}"
-            Text="「截屏」动作的图片归档：文件名即生成时间（ScreenCapture_20261114_153012.png），按天分组展示，点击缩略图放大查看；截图随任务执行持续增长，请定期清理。" />
+            Text="「截屏」动作的图片归档：文件名即生成时间（ScreenCapture_yyyyMMdd_HHmmss.png），按天分组展示，点击缩略图放大查看；截图随任务执行持续增长，请定期清理。" />
 
         <Grid Grid.Row="2" Margin="20,0">
             <Grid.ColumnDefinitions>
@@ -106,7 +106,7 @@
                         <TextBlock
                             Margin="8,0,4,6"
                             VerticalAlignment="Bottom"
-                            Text="KB" />
+                            Text="{Binding TotalSizeUnit}" />
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -146,7 +146,7 @@
                         FontSize="15"
                         FontWeight="SemiBold"
                         Foreground="{StaticResource TextPrimaryBrush}"
-                        Text="当前连接" />
+                        Text="截图记录" />
 
                     <Border
                         Padding="8,3"
@@ -156,37 +156,104 @@
                         <TextBlock
                             FontSize="11"
                             Foreground="{StaticResource TextTertiaryBrush}"
-                            Text="{Binding DayGroups.Count, StringFormat={}{0} 张, FallbackValue=0 张}" />
+                            Text="{Binding DayGroups.Count, StringFormat={}共 {0} 天}" />
                     </Border>
                 </StackPanel>
 
-                <ListBox
+                <ScrollViewer
                     Grid.Row="1"
                     Margin="12,0"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    ItemsSource="{Binding DayGroups}">
-                    <ListBox.GroupStyle>
-                        <GroupStyle>
-                            <GroupStyle.HeaderTemplate>
-                                <DataTemplate>
-                                    <DockPanel Margin="8,8,0,8" LastChildFill="True">
-                                        <TextBlock
-                                            d:DataContext="{d:DesignInstance Type=data:CollectionViewGroup}"
-                                            FontWeight="SemiBold"
-                                            Foreground="{StaticResource TextDisabledBrush}"
-                                            Text="{Binding Name}" />
+                    VerticalScrollBarVisibility="Hidden">
+                    <ItemsControl ItemsSource="{Binding DayGroups}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
 
-                                        <Grid
-                                            Height="0.25"
-                                            Margin="8,0,0,0"
-                                            Background="{StaticResource TextDisabledBrush}" />
-                                    </DockPanel>
-                                </DataTemplate>
-                            </GroupStyle.HeaderTemplate>
-                        </GroupStyle>
-                    </ListBox.GroupStyle>
-                </ListBox>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock
+                                            Grid.Column="0"
+                                            FontSize="14"
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource TextPrimaryBrush}"
+                                            Text="{Binding Header}" />
+
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Margin="12,0"
+                                            VerticalAlignment="Center"
+                                            Foreground="{StaticResource TextSecondaryBrush}">
+                                            <Run Text="{Binding Shots.Count, StringFormat={}{0} 张, Mode=OneWay}" />
+                                            <Run Text=" · " />
+                                            <Run Text="{Binding SizeText}" />
+                                        </TextBlock>
+
+                                        <Separator Grid.Column="2" Background="{StaticResource CardBorderBrush}" />
+                                    </Grid>
+
+                                    <ItemsControl
+                                        Grid.Row="1"
+                                        Cursor="Hand"
+                                        ItemsSource="{Binding Shots}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border
+                                                    Grid.Row="0"
+                                                    Margin="0,8,10,0"
+                                                    BorderBrush="{StaticResource CardBorderBrush}"
+                                                    BorderThickness="1"
+                                                    ToolTip="{Binding FileName}">
+                                                    <Grid>
+                                                        <Image
+                                                            Width="110"
+                                                            Height="216"
+                                                            Source="{Binding FullPath}"
+                                                            Stretch="UniformToFill" />
+
+                                                        <Border
+                                                            Margin="4"
+                                                            HorizontalAlignment="Right"
+                                                            VerticalAlignment="Top"
+                                                            Background="{StaticResource DropShadowBrush}"
+                                                            CornerRadius="10">
+                                                            <TextBlock
+                                                                Margin="6,2"
+                                                                HorizontalAlignment="Right"
+                                                                Foreground="White"
+                                                                Text="{Binding SizeText}" />
+                                                        </Border>
+
+                                                        <Border VerticalAlignment="Bottom" Background="{StaticResource DropShadowBrush}">
+                                                            <TextBlock
+                                                                Margin="6,4"
+                                                                Foreground="White"
+                                                                Text="{Binding TimeText}" />
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
             </Grid>
         </Border>
     </Grid>

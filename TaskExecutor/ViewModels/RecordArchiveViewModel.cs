@@ -16,9 +16,10 @@ public partial class RecordArchiveViewModel : ObservableObject
 
     [ObservableProperty] private int _imageTotalCount;
     [ObservableProperty] private int _newImageCount;
-    [ObservableProperty] private long _totalSize;               // 单位 KB，与 XAML 静态"KB"后缀配套
-    [ObservableProperty] private string _lastCaptureTime = "-"; // HH:mm，卡片 4 的大号时间
-    [ObservableProperty] private string _lastCaptureDay = "";   // 今天/昨天/MM-dd，卡片 4 的前置文字
+    [ObservableProperty] private string _totalSize = "";
+    [ObservableProperty] private string _totalSizeUnit = "KB";
+    [ObservableProperty] private string _lastCaptureTime = "-";
+    [ObservableProperty] private string _lastCaptureDay = ""; // 今天/昨天/MM-dd，卡片 4 的前置文字
     [ObservableProperty] private ObservableCollection<ScreenshotGroup> _dayGroups = [];
 
     #endregion
@@ -32,7 +33,6 @@ public partial class RecordArchiveViewModel : ObservableObject
         Reload();
     }
 
-    /// <summary>扫描 Screenshots 目录：按文件名日期分组（新→旧），统计四项指标。</summary>
     private void Reload()
     {
         var items = (Directory.Exists(_screenshotDir)
@@ -55,7 +55,10 @@ public partial class RecordArchiveViewModel : ObservableObject
 
         ImageTotalCount = items.Count;
         NewImageCount = items.Count(s => s.CaptureTime.Date == DateTime.Today);
-        TotalSize = (long)Math.Round(items.Sum(s => s.SizeBytes) / 1024d);
+
+        var totalBytes = items.Sum(s => s.SizeBytes);
+        (TotalSize, TotalSizeUnit) = FormatSizeParts(totalBytes);
+
         var last = items.FirstOrDefault();
         if (last is null)
         {
@@ -137,8 +140,8 @@ public partial class RecordArchiveViewModel : ObservableObject
 
         ImageTotalCount = DayGroups.Sum(g => g.Shots.Count);
         NewImageCount = DayGroups.Where(g => g.Date == DateTime.Today).Sum(g => g.Shots.Count);
-        TotalSize = (long)Math.Round(DayGroups.Sum(g => g.Shots.Sum(s => s.SizeBytes)) / 1024d);
-        
+        (TotalSize, TotalSizeUnit) = FormatSizeParts(DayGroups.Sum(g => g.Shots.Sum(s => s.SizeBytes)));
+
         var lastShot = DayGroups
             .SelectMany(g => g.Shots)
             .OrderByDescending(s => s.CaptureTime)
@@ -156,4 +159,8 @@ public partial class RecordArchiveViewModel : ObservableObject
 
         _toastService.Show("截图已删除", ToastType.Success);
     }
+
+    private static (string Value, string Unit) FormatSizeParts(long bytes) => bytes >= 1024 * 1024
+        ? ($"{bytes / 1024d / 1024d:F1}", "MB")
+        : ($"{Math.Round(bytes / 1024d)}", "KB");
 }
