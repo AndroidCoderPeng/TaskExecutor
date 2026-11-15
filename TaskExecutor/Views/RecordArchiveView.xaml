@@ -11,6 +11,11 @@
     xmlns:vm="clr-namespace:TaskExecutor.ViewModels"
     d:DataContext="{d:DesignInstance Type=vm:RecordArchiveViewModel}"
     mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <cvt:ScreenshotImageConverter x:Key="ScreenshotImageConverterKey" />
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -222,7 +227,7 @@
                                                         <Image
                                                             Width="110"
                                                             Height="216"
-                                                            Source="{Binding FullPath}"
+                                                            Source="{Binding FullPath, Converter={StaticResource ScreenshotImageConverterKey}}"
                                                             Stretch="UniformToFill" />
 
                                                         <Border
@@ -239,10 +244,16 @@
                                                         </Border>
 
                                                         <Border VerticalAlignment="Bottom" Background="{StaticResource DropShadowBrush}">
-                                                            <TextBlock
-                                                                Margin="6,4"
-                                                                Foreground="White"
-                                                                Text="{Binding TimeText}" />
+                                                            <DockPanel Margin="6,4">
+                                                                <TextBlock Foreground="White" Text="{Binding TimeText}" />
+
+                                                                <Button
+                                                                    Command="{Binding DataContext.DeleteCaptureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                    CommandParameter="{Binding}"
+                                                                    Content="删除"
+                                                                    Foreground="{StaticResource DangerBrush}"
+                                                                    Style="{StaticResource TextButtonStyle}" />
+                                                            </DockPanel>
                                                         </Border>
                                                     </Grid>
                                                 </Border>
